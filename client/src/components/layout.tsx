@@ -16,7 +16,7 @@ export default function Layout({ children, title = "XANDER WALKER", subtitle = "
       <div className="relative z-20 min-h-screen flex flex-col items-center justify-center px-4 md:px-8">
         <header className="text-center mb-12 md:mb-16">
           <Link href="/">
-            <h1 className="font-xanman text-8xl md:text-9xl lg:text-[12rem] font-bold text-black mb-4 floating-animation cursor-pointer hover:scale-105 transition-transform duration-300">
+            <h1 className="font-xanman text-8xl md:text-9xl lg:text-[12rem] font-bold text-black mb-4 cursor-pointer hover:scale-105 transition-transform duration-300">
               {title}
             </h1>
           </Link>
