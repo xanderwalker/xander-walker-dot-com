@@ -116,7 +116,7 @@
   }
   
   .floating-animation {
-    animation: float 300s ease-in-out infinite;
+    animation: float 600s ease-in-out infinite;
   }
   
   .page-transition {
@@ -133,9 +133,11 @@
 @keyframes float {
   0%, 100% { 
     transform: translateY(0px); 
+    opacity: 1;
   }
   50% { 
-    transform: translateY(-3px); 
+    transform: translateY(-1px); 
+    opacity: 0.98;
   }
 }
 
