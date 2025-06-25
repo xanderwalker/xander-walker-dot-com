@@ -99,63 +99,92 @@ export default function About() {
   return (
     <Layout title="BIO">
       <div className="max-w-5xl mx-auto">
-        {/* Artwork Gallery */}
-        <div className="mb-16">
-          <h2 className="font-xanman-wide text-3xl font-bold mb-8 text-center text-black">
-            Selected Works
-          </h2>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-8">
-            <img src="/assets/model3web_1750891603218.png" alt="Tesla Model 3" className="w-full h-auto glassmorphism rounded-lg p-4" />
-            <img src="/assets/edvweb_1750891603225.png" alt="Amazon EDV" className="w-full h-auto glassmorphism rounded-lg p-4" />
-            <img src="/assets/vikingadventureweb_1750891603225.png" alt="Viking Adventure" className="w-full h-auto glassmorphism rounded-lg p-4" />
-            <img src="/assets/r1tweb_1750891603226.png" alt="Rivian R1T" className="w-full h-auto glassmorphism rounded-lg p-4" />
-            <img src="/assets/flyerweb_1750891603226.png" alt="Flyer" className="w-full h-auto glassmorphism rounded-lg p-4" />
-            <img src="/assets/aspenweb_1750891603226.png" alt="Aspen" className="w-full h-auto glassmorphism rounded-lg p-4" />
-            <img src="/assets/modelxweb_1750891603226.png" alt="Tesla Model X" className="w-full h-auto glassmorphism rounded-lg p-4" />
-            <img src="/assets/tulaneforweb2_1750891603227.png" alt="Tulane" className="w-full h-auto glassmorphism rounded-lg p-4" />
-          </div>
-        </div>
-
         {/* Timeline */}
         <div className="mb-12">
-          <h2 className="font-xanman-wide text-3xl font-bold mb-8 text-center text-black">
-            Timeline
+          <h2 className="font-xanman-wide text-3xl font-bold mb-8 text-center text-black uppercase">
+            TIMELINE
           </h2>
           <div className="space-y-6">
-            {timelineEvents.map((event, index) => (
-              <div key={index} className="glassmorphism rounded-2xl p-6 border-l-4 border-black border-opacity-20">
-                <div className="flex flex-col md:flex-row md:items-center gap-4">
-                  <div className={`text-${event.color} font-xanman-wide text-xl font-bold min-w-24`}>
-                    {event.year}
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="font-xanman-wide text-lg font-semibold text-black mb-2">
-                      {event.title}
-                    </h3>
-                    <p className="text-gray-700 leading-relaxed">
-                      {event.description}
-                    </p>
+            {timelineEvents.map((event, index) => {
+              // Define which images belong to each section
+              const getEventImages = (title: string) => {
+                switch(title) {
+                  case "Kitty Hawk":
+                    return ["/assets/flyerweb_1750891603226.png"];
+                  case "Rivian R1T, R1S, Amazon EDV":
+                  case "Rivian Digital Ecosystem":
+                    return ["/assets/r1tweb_1750891603226.png", "/assets/edvweb_1750891603225.png"];
+                  case "The Aspen Institute":
+                    return ["/assets/aspenweb_1750891603226.png"];
+                  case "Tulane University":
+                    return ["/assets/tulaneforweb2_1750891603227.png"];
+                  case "Tesla & California Move":
+                  case "Model 3 Launch & Ramp":
+                  case "Tesla Remarketing & NYC":
+                  case "Model X Launch":
+                  case "Dual Motor & Autopilot":
+                  case "Tesla Model S Deliveries":
+                    return [
+                      "/assets/model3web_1750891603218.png", 
+                      "/assets/modelxweb_1750891603226.png",
+                      "/assets/vikingadventureweb_1750891603225.png"
+                    ];
+                  default:
+                    return [];
+                }
+              };
+
+              const eventImages = getEventImages(event.title);
+
+              return (
+                <div key={index} className="glassmorphism rounded-2xl p-6 border-l-4 border-black border-opacity-20">
+                  <div className="flex flex-col gap-4">
+                    <div className="flex flex-col md:flex-row md:items-center gap-4">
+                      <div className={`text-${event.color} font-xanman-wide text-xl font-bold min-w-24 uppercase`}>
+                        {event.year}
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="font-xanman-wide text-lg font-semibold text-black mb-2 uppercase">
+                          {event.title}
+                        </h3>
+                        <p className="text-gray-700 leading-relaxed uppercase font-xanman-wide" style={{fontSize: '55px', lineHeight: '1.2'}}>
+                          {event.description}
+                        </p>
+                      </div>
+                    </div>
+                    {eventImages.length > 0 && (
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
+                        {eventImages.map((imageSrc, imgIndex) => (
+                          <img 
+                            key={imgIndex}
+                            src={imageSrc} 
+                            alt={`${event.title} image ${imgIndex + 1}`} 
+                            className="w-full h-auto glassmorphism rounded-lg p-4" 
+                          />
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
 
         {/* Call to Action */}
         <div className="glassmorphism rounded-2xl p-8 text-center mb-8">
-          <p className="text-gray-700 mb-6 font-xanman-wide">
-            If you'd like me to add some more color to this story, shoot me an email or a dm on twitter.
+          <p className="text-gray-700 mb-6 font-xanman-wide uppercase" style={{fontSize: '55px', lineHeight: '1.2'}}>
+            IF YOU'D LIKE ME TO ADD SOME MORE COLOR TO THIS STORY, SHOOT ME AN EMAIL OR A DM ON TWITTER.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/contact">
-              <Button className="bg-electric-orange hover:bg-electric-orange hover:opacity-90 text-black font-xanman-wide">
-                Get in Touch
+              <Button className="bg-electric-orange hover:bg-electric-orange hover:opacity-90 text-black font-xanman-wide uppercase">
+                GET IN TOUCH
               </Button>
             </Link>
             <Link href="/">
-              <Button variant="outline" className="bg-black bg-opacity-10 border-black border-opacity-20 hover:bg-opacity-20 font-xanman-wide">
-                ← Back to Home
+              <Button variant="outline" className="bg-black bg-opacity-10 border-black border-opacity-20 hover:bg-opacity-20 font-xanman-wide uppercase">
+                ← BACK TO HOME
               </Button>
             </Link>
           </div>
