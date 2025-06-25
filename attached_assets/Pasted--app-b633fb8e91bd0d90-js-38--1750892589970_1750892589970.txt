@@ -1,0 +1,109 @@
+_app-b633fb8e91bd0d90.js:38 
+      /////////////////////
+   ///////////////////////////
+  ////////@@@@@@@//////////////
+  ////////@@@@@@@//////////////
+  ////////@@@@@@@//////////////        Curious and driven?
+  ///////////////@@@@@@@///////        Work with us!
+  ///////////////@@@@@@@///////
+  ///////////////@@@@@@@///////        https://join.replit.com/hack.with.us
+  ////////@@@@@@@//////////////
+  ////////@@@@@@@//////////////
+  ////////@@@@@@#//////////////
+   ///////////////////////////
+      /////////////////////
+      
+_app-b633fb8e91bd0d90.js:38 [LaunchDarkly] LaunchDarkly client initialized
+/~:1 Banner not shown: beforeinstallpromptevent.preventDefault() called. The page must call beforeinstallpromptevent.prompt() to show the banner.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+framework-d8a8242a13126841.js:1 Unrecognized feature: 'ambient-light-sensor'.
+_ @ framework-d8a8242a13126841.js:1
+framework-d8a8242a13126841.js:1 Unrecognized feature: 'battery'.
+_ @ framework-d8a8242a13126841.js:1
+framework-d8a8242a13126841.js:1 Unrecognized feature: 'execution-while-not-rendered'.
+_ @ framework-d8a8242a13126841.js:1
+framework-d8a8242a13126841.js:1 Unrecognized feature: 'execution-while-out-of-viewport'.
+_ @ framework-d8a8242a13126841.js:1
+framework-d8a8242a13126841.js:1 Unrecognized feature: 'layout-animations'.
+_ @ framework-d8a8242a13126841.js:1
+framework-d8a8242a13126841.js:1 Unrecognized feature: 'legacy-image-formats'.
+_ @ framework-d8a8242a13126841.js:1
+framework-d8a8242a13126841.js:1 Unrecognized feature: 'navigation-override'.
+_ @ framework-d8a8242a13126841.js:1
+framework-d8a8242a13126841.js:1 Unrecognized feature: 'oversized-images'.
+_ @ framework-d8a8242a13126841.js:1
+framework-d8a8242a13126841.js:1 Unrecognized feature: 'publickey-credentials'.
+_ @ framework-d8a8242a13126841.js:1
+framework-d8a8242a13126841.js:1 Unrecognized feature: 'speaker-selection'.
+_ @ framework-d8a8242a13126841.js:1
+framework-d8a8242a13126841.js:1 Unrecognized feature: 'unoptimized-images'.
+_ @ framework-d8a8242a13126841.js:1
+framework-d8a8242a13126841.js:1 Unrecognized feature: 'unsized-media'.
+_ @ framework-d8a8242a13126841.js:1
+framework-d8a8242a13126841.js:1 Unrecognized feature: 'pointer-lock'.
+_ @ framework-d8a8242a13126841.js:1
+framework-d8a8242a13126841.js:1 Allow attribute will take precedence over 'allowfullscreen'.
+_ @ framework-d8a8242a13126841.js:1
+framework-d8a8242a13126841.js:1 Allow attribute will take precedence over 'allowpaymentrequest'.
+_ @ framework-d8a8242a13126841.js:1
+about:srcdoc:1 An iframe which has both allow-scripts and allow-same-origin for its sandbox attribute can escape its sandboxing.
+ cdn.tailwindcss.com should not be used in production. To use Tailwind CSS in production, install it as a PostCSS plugin or use the Tailwind CLI: https://tailwindcss.com/docs/installation
+(anonymous) @ cdn.tailwindcss.com/:64
+about:srcdoc:1 Failed to decode downloaded font: data:font/opentype;charset=utf-8;base64,
+about:srcdoc:1 Failed to decode downloaded font: data:font/opentype;charset=utf-8;base64,
+PersonalPortfolio:1 Uncaught (in promise) Error: A listener indicated an asynchronous response by returning true, but the message channel closed before a response was received
+PersonalPortfolio:1 Uncaught (in promise) Error: A listener indicated an asynchronous response by returning true, but the message channel closed before a response was received
+PersonalPortfolio:1 Uncaught (in promise) Error: A listener indicated an asynchronous response by returning true, but the message channel closed before a response was received
+PersonalPortfolio:1 Uncaught (in promise) Error: A listener indicated an asynchronous response by returning true, but the message channel closed before a response was received
+PersonalPortfolio:1 Uncaught (in promise) Error: A listener indicated an asynchronous response by returning true, but the message channel closed before a response was received
+PersonalPortfolio:1 Uncaught (in promise) Error: Could not establish connection. Receiving end does not exist.
+PersonalPortfolio:1 Uncaught (in promise) Error: Could not establish connection. Receiving end does not exist.
+workspace_iframe.html:32 Unrecognized feature: 'ambient-light-sensor'.
+workspace_iframe.html:32 Unrecognized feature: 'battery'.
+workspace_iframe.html:32 Unrecognized feature: 'execution-while-not-rendered'.
+workspace_iframe.html:32 Unrecognized feature: 'execution-while-out-of-viewport'.
+workspace_iframe.html:32 Unrecognized feature: 'layout-animations'.
+workspace_iframe.html:32 Unrecognized feature: 'legacy-image-formats'.
+workspace_iframe.html:32 Unrecognized feature: 'navigation-override'.
+workspace_iframe.html:32 Unrecognized feature: 'oversized-images'.
+workspace_iframe.html:32 Unrecognized feature: 'publickey-credentials'.
+workspace_iframe.html:32 Unrecognized feature: 'speaker-selection'.
+workspace_iframe.html:32 Unrecognized feature: 'unoptimized-images'.
+workspace_iframe.html:32 Unrecognized feature: 'unsized-media'.
+workspace_iframe.html:32 Allow attribute will take precedence over 'allowfullscreen'.
+workspace_iframe.html:32 Allow attribute will take precedence over 'allowpaymentrequest'.
+86f11fdb-dc25-464d-832a-bc33ec5d2212-00-2twk56cqiq58c.janeway.replit.dev/:1 Uncaught (in promise) Error: Could not establish connection. Receiving end does not exist.
+PersonalPortfolio:1 Uncaught (in promise) Error: Could not establish connection. Receiving end does not exist.
+86f11fdb-dc25-464d-832a-bc33ec5d2212-00-2twk56cqiq58c.janeway.replit.dev/:1 Uncaught (in promise) Error: Could not establish connection. Receiving end does not exist.
+eruda.js:2 [vite] server connection lost. Polling for restart...
+workspace_iframe.html:32 Unrecognized feature: 'ambient-light-sensor'.
+workspace_iframe.html:32 Unrecognized feature: 'battery'.
+workspace_iframe.html:32 Unrecognized feature: 'execution-while-not-rendered'.
+workspace_iframe.html:32 Unrecognized feature: 'execution-while-out-of-viewport'.
+workspace_iframe.html:32 Unrecognized feature: 'layout-animations'.
+workspace_iframe.html:32 Unrecognized feature: 'legacy-image-formats'.
+workspace_iframe.html:32 Unrecognized feature: 'navigation-override'.
+workspace_iframe.html:32 Unrecognized feature: 'oversized-images'.
+workspace_iframe.html:32 Unrecognized feature: 'publickey-credentials'.
+workspace_iframe.html:32 Unrecognized feature: 'speaker-selection'.
+workspace_iframe.html:32 Unrecognized feature: 'unoptimized-images'.
+workspace_iframe.html:32 Unrecognized feature: 'unsized-media'.
+workspace_iframe.html:32 Allow attribute will take precedence over 'allowfullscreen'.
+workspace_iframe.html:32 Allow attribute will take precedence over 'allowpaymentrequest'.
+86f11fdb-dc25-464d-8…neway.replit.dev/:1 Uncaught (in promise) Error: Could not establish connection. Receiving end does not exist.

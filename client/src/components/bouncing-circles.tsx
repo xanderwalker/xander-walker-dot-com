@@ -1,90 +1,156 @@
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import { useLocation } from 'wouter';
-import { useBouncingAnimation } from '@/hooks/use-bouncing-animation';
+
+interface Circle {
+  id: string;
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  size: number;
+  color: string;
+  text: string;
+  action: () => void;
+}
 
 export default function BouncingCircles() {
-  const containerRef = useRef<HTMLDivElement>(null);
   const [, setLocation] = useLocation();
-  useBouncingAnimation(containerRef);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [circles, setCircles] = useState<Circle[]>([]);
+  const animationRef = useRef<number>();
 
-  const handleNavigation = (path: string, isExternal = false) => {
-    console.log('Navigation clicked:', path);
-    if (isExternal) {
-      window.open(path, '_blank', 'noopener noreferrer');
-    } else {
-      setLocation(path);
-    }
+  const navigateToPage = (path: string) => {
+    console.log('Navigating to:', path);
+    setLocation(path);
   };
 
+  const openExternal = (url: string) => {
+    console.log('Opening external:', url);
+    window.open(url, '_blank', 'noopener noreferrer');
+  };
+
+  useEffect(() => {
+    const initialCircles: Circle[] = [
+      {
+        id: 'bio',
+        x: Math.random() * (window.innerWidth - 320),
+        y: Math.random() * (window.innerHeight - 320),
+        vx: (Math.random() - 0.5) * 3,
+        vy: (Math.random() - 0.5) * 3,
+        size: 320,
+        color: 'bg-electric-orange',
+        text: 'BIO',
+        action: () => navigateToPage('/about')
+      },
+      {
+        id: 'linkedin',
+        x: Math.random() * (window.innerWidth - 240),
+        y: Math.random() * (window.innerHeight - 240),
+        vx: (Math.random() - 0.5) * 3,
+        vy: (Math.random() - 0.5) * 3,
+        size: 240,
+        color: 'bg-cyan-blue',
+        text: 'LINKEDIN',
+        action: () => openExternal('https://linkedin.com')
+      },
+      {
+        id: 'store',
+        x: Math.random() * (window.innerWidth - 280),
+        y: Math.random() * (window.innerHeight - 280),
+        vx: (Math.random() - 0.5) * 3,
+        vy: (Math.random() - 0.5) * 3,
+        size: 280,
+        color: 'bg-electric-red',
+        text: 'STORE',
+        action: () => navigateToPage('/portfolio')
+      },
+      {
+        id: 'contact',
+        x: Math.random() * (window.innerWidth - 200),
+        y: Math.random() * (window.innerHeight - 200),
+        vx: (Math.random() - 0.5) * 3,
+        vy: (Math.random() - 0.5) * 3,
+        size: 200,
+        color: 'bg-neon-green',
+        text: 'CONTACT',
+        action: () => navigateToPage('/contact')
+      }
+    ];
+
+    setCircles(initialCircles);
+
+    const animate = () => {
+      setCircles(prevCircles => 
+        prevCircles.map(circle => {
+          let newX = circle.x + circle.vx;
+          let newY = circle.y + circle.vy;
+          let newVx = circle.vx;
+          let newVy = circle.vy;
+
+          // Bounce off edges
+          if (newX <= 0 || newX >= window.innerWidth - circle.size) {
+            newVx = -newVx;
+            newX = Math.max(0, Math.min(window.innerWidth - circle.size, newX));
+          }
+          if (newY <= 0 || newY >= window.innerHeight - circle.size) {
+            newVy = -newVy;
+            newY = Math.max(0, Math.min(window.innerHeight - circle.size, newY));
+          }
+
+          return {
+            ...circle,
+            x: newX,
+            y: newY,
+            vx: newVx,
+            vy: newVy
+          };
+        })
+      );
+
+      animationRef.current = requestAnimationFrame(animate);
+    };
+
+    animationRef.current = requestAnimationFrame(animate);
+
+    return () => {
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+      }
+    };
+  }, []);
+
   return (
-    <div ref={containerRef} className="fixed inset-0 z-10">
-      <div 
-        className="bouncing-circle w-80 h-80 bg-electric-orange rounded-full cursor-pointer flex items-center justify-center text-white font-xanman-wide hover:scale-110 transition-transform uppercase" 
-        style={{fontSize: '125px', pointerEvents: 'auto'}}
-        onClick={(e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          handleNavigation('/about');
-        }}
-        onMouseDown={(e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          handleNavigation('/about');
-        }}
-      >
-        BIO
-      </div>
-      
-      <div 
-        className="bouncing-circle w-60 h-60 bg-cyan-blue rounded-full cursor-pointer flex items-center justify-center text-white font-xanman-wide hover:scale-110 transition-transform uppercase" 
-        style={{fontSize: '125px', pointerEvents: 'auto'}}
-        onClick={(e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          handleNavigation('https://linkedin.com', true);
-        }}
-        onMouseDown={(e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          handleNavigation('https://linkedin.com', true);
-        }}
-      >
-        LINKEDIN
-      </div>
-      
-      <div 
-        className="bouncing-circle bg-electric-red rounded-full cursor-pointer flex items-center justify-center text-white font-xanman-wide hover:scale-110 transition-transform uppercase" 
-        style={{width: '280px', height: '280px', fontSize: '125px', pointerEvents: 'auto'}}
-        onClick={(e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          handleNavigation('/portfolio');
-        }}
-        onMouseDown={(e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          handleNavigation('/portfolio');
-        }}
-      >
-        STORE
-      </div>
-      
-      <div 
-        className="bouncing-circle bg-neon-green rounded-full cursor-pointer flex items-center justify-center text-white font-xanman-wide hover:scale-110 transition-transform uppercase" 
-        style={{width: '200px', height: '200px', fontSize: '125px', pointerEvents: 'auto'}}
-        onClick={(e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          handleNavigation('/contact');
-        }}
-        onMouseDown={(e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          handleNavigation('/contact');
-        }}
-      >
-        CONTACT
-      </div>
+    <div ref={containerRef} className="fixed inset-0 z-10 pointer-events-none">
+      {circles.map(circle => (
+        <div
+          key={circle.id}
+          className={`absolute ${circle.color} rounded-full cursor-pointer flex items-center justify-center text-white font-xanman-wide hover:scale-110 transition-transform duration-200 uppercase pointer-events-auto select-none`}
+          style={{
+            left: circle.x,
+            top: circle.y,
+            width: circle.size,
+            height: circle.size,
+            fontSize: window.innerWidth < 768 ? '50px' : '80px',
+            lineHeight: '1',
+            userSelect: 'none',
+            WebkitUserSelect: 'none',
+            touchAction: 'manipulation'
+          }}
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('Circle clicked:', circle.id);
+            circle.action();
+          }}
+          onTouchStart={(e) => {
+            e.preventDefault();
+            console.log('Circle touched:', circle.id);
+            circle.action();
+          }}
+        >
+          {circle.text}
+        </div>
+      ))}
     </div>
   );
 }
