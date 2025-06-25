@@ -35,10 +35,10 @@ export default function Contact() {
   };
 
   return (
-    <Layout title="GET IN TOUCH" subtitle="Let's create something amazing together">
+    <Layout title="CONTACT" subtitle="Let's create something amazing together">
       <div className="max-w-4xl mx-auto">
         <div className="grid md:grid-cols-2 gap-8">
-          <Card className="glassmorphism border-white border-opacity-10">
+          <Card className="glassmorphism border-black border-opacity-10">
             <CardContent className="p-8">
               <h3 className="font-xanman text-2xl font-bold mb-6 text-electric-orange">
                 Send a Message
@@ -51,7 +51,7 @@ export default function Contact() {
                     value={formData.name}
                     onChange={handleChange}
                     required
-                    className="bg-white bg-opacity-10 border-white border-opacity-20 text-white placeholder:text-gray-400"
+                    className="bg-black bg-opacity-10 border-black border-opacity-20 text-black placeholder:text-gray-600"
                   />
                 </div>
                 <div>
@@ -62,7 +62,7 @@ export default function Contact() {
                     value={formData.email}
                     onChange={handleChange}
                     required
-                    className="bg-white bg-opacity-10 border-white border-opacity-20 text-white placeholder:text-gray-400"
+                    className="bg-black bg-opacity-10 border-black border-opacity-20 text-black placeholder:text-gray-600"
                   />
                 </div>
                 <div>
@@ -73,12 +73,12 @@ export default function Contact() {
                     onChange={handleChange}
                     required
                     rows={5}
-                    className="bg-white bg-opacity-10 border-white border-opacity-20 text-white placeholder:text-gray-400 resize-none"
+                    className="bg-black bg-opacity-10 border-black border-opacity-20 text-black placeholder:text-gray-600 resize-none"
                   />
                 </div>
                 <Button 
                   type="submit"
-                  className="w-full bg-electric-orange hover:bg-electric-orange hover:opacity-90 text-white"
+                  className="w-full bg-electric-orange hover:bg-electric-orange hover:opacity-90 text-black"
                 >
                   Send Message
                 </Button>
@@ -87,27 +87,27 @@ export default function Contact() {
           </Card>
 
           <div className="space-y-6">
-            <Card className="glassmorphism border-white border-opacity-10">
+            <Card className="glassmorphism border-black border-opacity-10">
               <CardContent className="p-6">
                 <div className="text-2xl mb-4 text-cyan-blue">📧</div>
-                <h4 className="font-semibold text-lg mb-2 text-white">Email</h4>
-                <p className="text-gray-300">alex@example.com</p>
+                <h4 className="font-semibold text-lg mb-2 text-black">Email</h4>
+                <p className="text-gray-700">xander@example.com</p>
               </CardContent>
             </Card>
 
-            <Card className="glassmorphism border-white border-opacity-10">
+            <Card className="glassmorphism border-black border-opacity-10">
               <CardContent className="p-6">
                 <div className="text-2xl mb-4 text-neon-green">🌍</div>
-                <h4 className="font-semibold text-lg mb-2 text-white">Location</h4>
-                <p className="text-gray-300">Available for remote work worldwide</p>
+                <h4 className="font-semibold text-lg mb-2 text-black">Location</h4>
+                <p className="text-gray-700">Available for remote work worldwide</p>
               </CardContent>
             </Card>
 
-            <Card className="glassmorphism border-white border-opacity-10">
+            <Card className="glassmorphism border-black border-opacity-10">
               <CardContent className="p-6">
                 <div className="text-2xl mb-4 text-electric-red">⚡</div>
-                <h4 className="font-semibold text-lg mb-2 text-white">Response Time</h4>
-                <p className="text-gray-300">Usually within 24 hours</p>
+                <h4 className="font-semibold text-lg mb-2 text-black">Response Time</h4>
+                <p className="text-gray-700">Usually within 24 hours</p>
               </CardContent>
             </Card>
           </div>
@@ -115,7 +115,7 @@ export default function Contact() {
         
         <div className="text-center mt-12">
           <Link href="/">
-            <Button variant="outline" className="bg-white bg-opacity-10 border-white border-opacity-20 hover:bg-opacity-20">
+            <Button variant="outline" className="bg-black bg-opacity-10 border-black border-opacity-20 hover:bg-opacity-20">
               ← Back to Home
             </Button>
           </Link>

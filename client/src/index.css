@@ -77,8 +77,8 @@
   }
 
   body {
-    @apply font-sans antialiased bg-background text-foreground overflow-x-hidden;
-    background-color: var(--rich-black);
+    @apply antialiased bg-white text-gray-900 overflow-x-hidden;
+    font-family: 'XanmanWide', 'Inter', 'Arial', sans-serif;
   }
 }
 
@@ -94,22 +94,21 @@
   .bouncing-circle {
     position: absolute;
     border-radius: 50%;
-    pointer-events: none;
     z-index: 10;
     transition: none;
   }
   
   .nav-bubble {
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(0, 0, 0, 0.1);
     backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(0, 0, 0, 0.2);
   }
   
   .nav-bubble:hover {
     transform: scale(1.1);
-    background: rgba(255, 255, 255, 0.2);
-    border-color: rgba(255, 255, 255, 0.4);
+    background: rgba(0, 0, 0, 0.2);
+    border-color: rgba(0, 0, 0, 0.4);
   }
   
   .nav-bubble:active {
@@ -125,9 +124,9 @@
   }
   
   .glassmorphism {
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(0, 0, 0, 0.05);
     backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(0, 0, 0, 0.1);
   }
 }
 

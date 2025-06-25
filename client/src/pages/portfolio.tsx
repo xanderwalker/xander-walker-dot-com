@@ -32,11 +32,11 @@ export default function Portfolio() {
   ];
 
   return (
-    <Layout title="MY WORK" subtitle="Projects that showcase creativity and technical expertise">
+    <Layout title="STORE" subtitle="Products and creative works available for purchase">
       <div className="max-w-6xl mx-auto">
         <div className="grid md:grid-cols-2 gap-8 mb-12">
           {projects.map((project, index) => (
-            <Card key={index} className="glassmorphism border-white border-opacity-10 hover:border-opacity-30 transition-all duration-300">
+            <Card key={index} className="glassmorphism border-black border-opacity-10 hover:border-opacity-30 transition-all duration-300">
               <CardContent className="p-6">
                 <div className={`text-2xl mb-4 text-${project.color}`}>
                   {index === 0 && "📊"}
@@ -44,17 +44,17 @@ export default function Portfolio() {
                   {index === 2 && "📱"}
                   {index === 3 && "🤖"}
                 </div>
-                <h3 className="font-xanman text-xl font-bold mb-3 text-white">
+                <h3 className="font-xanman text-xl font-bold mb-3 text-black">
                   {project.title}
                 </h3>
-                <p className="text-gray-300 text-sm leading-relaxed mb-4">
+                <p className="text-gray-700 text-sm leading-relaxed mb-4">
                   {project.description}
                 </p>
                 <div className="flex flex-wrap gap-2">
                   {project.tech.split(', ').map((tech, techIndex) => (
                     <span 
                       key={techIndex}
-                      className="px-2 py-1 bg-white bg-opacity-10 rounded-full text-xs text-gray-300"
+                      className="px-2 py-1 bg-black bg-opacity-10 rounded-full text-xs text-gray-700"
                     >
                       {tech}
                     </span>
@@ -66,22 +66,22 @@ export default function Portfolio() {
         </div>
         
         <div className="text-center glassmorphism rounded-2xl p-8">
-          <h3 className="font-xanman text-2xl font-bold mb-4 text-white">
+          <h3 className="font-xanman text-2xl font-bold mb-4 text-black">
             Want to see more?
           </h3>
-          <p className="text-gray-300 mb-6">
+          <p className="text-gray-700 mb-6">
             Check out my GitHub for more projects and open-source contributions.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button 
               variant="outline" 
-              className="bg-electric-orange bg-opacity-20 border-electric-orange border-opacity-50 hover:bg-opacity-30 text-white"
+              className="bg-electric-orange bg-opacity-20 border-electric-orange border-opacity-50 hover:bg-opacity-30 text-black"
               onClick={() => window.open('https://github.com', '_blank')}
             >
               View GitHub
             </Button>
             <Link href="/">
-              <Button variant="outline" className="bg-white bg-opacity-10 border-white border-opacity-20 hover:bg-opacity-20">
+              <Button variant="outline" className="bg-black bg-opacity-10 border-black border-opacity-20 hover:bg-opacity-20">
                 ← Back to Home
               </Button>
             </Link>

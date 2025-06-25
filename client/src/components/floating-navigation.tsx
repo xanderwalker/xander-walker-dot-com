@@ -58,14 +58,14 @@ export default function FloatingNavigation() {
   return (
     <nav className="relative z-30">
       <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8 max-w-2xl">
-        <NavBubble to="/about" emoji="👨‍💻" label="About" />
-        <NavBubble to="/portfolio" emoji="🎨" label="Work" />
-        <NavBubble to="/contact" emoji="📫" label="Contact" />
+        <NavBubble to="/about" emoji="👨‍💻" label="Bio" />
         <NavBubble 
-          href="https://github.com" 
-          emoji="🔗" 
-          label="GitHub"
+          href="https://linkedin.com" 
+          emoji="💼" 
+          label="LinkedIn"
         />
+        <NavBubble to="/portfolio" emoji="🏪" label="Store" />
+        <NavBubble to="/contact" emoji="📫" label="Contact" />
       </div>
     </nav>
   );
