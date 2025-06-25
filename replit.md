@@ -99,6 +99,7 @@ This is a modern personal portfolio application built with React, featuring a cr
 ```
 Changelog:
 - June 25, 2025. Initial setup
+- June 25, 2025. Fixed bouncing circle navigation - replaced div elements with button elements to resolve click detection issues. Implemented DVD screensaver-style animation with proper collision detection. All navigation links now working (Bio, LinkedIn, Store, Contact).
 ```
 
 ## User Preferences
