@@ -82,36 +82,27 @@ export default function BouncingCircles() {
   }, []);
 
   return (
-    <div ref={containerRef} className="fixed inset-0 z-10 pointer-events-none">
+    <div ref={containerRef} className="fixed inset-0 z-50">
       {circles.map(circle => (
-        <div
+        <button
           key={circle.id}
-          className={`absolute ${circle.color} rounded-full cursor-pointer flex items-center justify-center text-white font-xanman-wide hover:scale-110 transition-transform duration-200 uppercase pointer-events-auto select-none`}
+          className={`absolute ${circle.color} rounded-full cursor-pointer flex items-center justify-center text-white font-xanman-wide hover:scale-110 transition-transform duration-200 uppercase border-0 outline-none`}
           style={{
             left: circle.x,
             top: circle.y,
             width: circle.size,
             height: circle.size,
             fontSize: window.innerWidth < 768 ? '50px' : '80px',
-            lineHeight: '1',
-            userSelect: 'none',
-            WebkitUserSelect: 'none',
-            touchAction: 'manipulation'
+            lineHeight: '1'
           }}
-          onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            console.log('Circle clicked:', circle.id);
+          onClick={() => {
+            console.log('Button clicked:', circle.id);
             circle.action();
           }}
-          onTouchStart={(e) => {
-            e.preventDefault();
-            console.log('Circle touched:', circle.id);
-            circle.action();
-          }}
+          type="button"
         >
           {circle.text}
-        </div>
+        </button>
       ))}
     </div>
   );
