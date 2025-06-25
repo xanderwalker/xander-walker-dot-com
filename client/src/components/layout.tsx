@@ -7,7 +7,7 @@ interface LayoutProps {
   subtitle?: string;
 }
 
-export default function Layout({ children, title = "XANDER WALKER", subtitle = "Creative Developer & Digital Artist" }: LayoutProps) {
+export default function Layout({ children, title = "XANDER WALKER", subtitle = "" }: LayoutProps) {
   return (
     <div className="bg-white text-gray-900 min-h-screen relative">
       <BouncingCircles />
@@ -17,9 +17,11 @@ export default function Layout({ children, title = "XANDER WALKER", subtitle = "
           <h1 className="font-xanman text-5xl md:text-7xl lg:text-8xl font-bold text-black mb-4 floating-animation">
             {title}
           </h1>
-          <p className="text-lg md:text-xl text-gray-700 font-light max-w-2xl mx-auto leading-relaxed">
-            {subtitle}
-          </p>
+          {subtitle && (
+            <p className="text-lg md:text-xl text-gray-700 font-light max-w-2xl mx-auto leading-relaxed">
+              {subtitle}
+            </p>
+          )}
         </header>
         
         {children}
