@@ -98,10 +98,10 @@ export default function About() {
 
   return (
     <Layout title="XANDER WALKER">
-      <div className="max-w-7xl mx-auto relative z-30">
+      <div className="max-w-7xl mx-auto relative z-30 pointer-events-none">
         {/* Timeline */}
         <div className="mb-12">
-          <h2 className="font-xanman-wide mb-8 text-center text-black uppercase" style={{fontSize: '55px', lineHeight: '1.2'}}>
+          <h2 className="font-xanman-wide mb-8 text-center text-black uppercase pointer-events-auto" style={{fontSize: '55px', lineHeight: '1.2'}}>
             BIO
           </h2>
           <div className="space-y-8">
@@ -137,7 +137,7 @@ export default function About() {
               const eventImages = getEventImages(event.title);
 
               return (
-                <div key={index} className="glassmorphism rounded-2xl p-6 relative z-30">
+                <div key={index} className="glassmorphism rounded-2xl p-6 relative z-30 pointer-events-auto">
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                     {/* Text Column */}
                     <div className="space-y-4">
@@ -171,7 +171,7 @@ export default function About() {
         </div>
 
         {/* Call to Action */}
-        <div className="glassmorphism rounded-2xl p-8 text-center mb-8 relative z-30">
+        <div className="glassmorphism rounded-2xl p-8 text-center mb-8 relative z-30 pointer-events-auto">
           <p className="text-gray-700 mb-6 font-xanman-wide uppercase" style={{fontSize: '55px', lineHeight: '1.2'}}>
             IF YOU'D LIKE ME TO ADD SOME MORE COLOR TO THIS STORY, SHOOT ME AN EMAIL OR A DM ON TWITTER.
           </p>
