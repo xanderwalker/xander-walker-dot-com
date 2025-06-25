@@ -116,7 +116,7 @@
   }
   
   .floating-animation {
-    animation: float 15s ease-in-out infinite;
+    animation: float 30s ease-in-out infinite;
   }
   
   .page-transition {
@@ -135,7 +135,7 @@
     transform: translateY(0px); 
   }
   50% { 
-    transform: translateY(-20px); 
+    transform: translateY(-3px); 
   }
 }
 
