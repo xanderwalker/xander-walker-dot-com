@@ -97,14 +97,14 @@ export default function About() {
   ];
 
   return (
-    <Layout title="BIO">
-      <div className="max-w-5xl mx-auto">
+    <Layout title="XANDER WALKER">
+      <div className="max-w-7xl mx-auto relative z-30">
         {/* Timeline */}
         <div className="mb-12">
-          <h2 className="font-xanman-wide font-bold mb-8 text-center text-black uppercase" style={{fontSize: '55px', lineHeight: '1.2'}}>
-            TIMELINE
+          <h2 className="font-xanman-wide mb-8 text-center text-black uppercase" style={{fontSize: '55px', lineHeight: '1.2'}}>
+            BIO
           </h2>
-          <div className="space-y-6">
+          <div className="space-y-8">
             {timelineEvents.map((event, index) => {
               // Define which images belong to each section
               const getEventImages = (title: string) => {
@@ -137,33 +137,32 @@ export default function About() {
               const eventImages = getEventImages(event.title);
 
               return (
-                <div key={index} className="glassmorphism rounded-2xl p-6 border-l-4 border-black border-opacity-20">
-                  <div className="flex flex-col gap-4">
-                    <div className="flex flex-col md:flex-row md:items-center gap-4">
-                      <div className={`text-${event.color} font-xanman-wide font-bold min-w-24 uppercase`} style={{fontSize: '55px', lineHeight: '1.2'}}>
+                <div key={index} className="glassmorphism rounded-2xl p-6 relative z-30">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    {/* Text Column */}
+                    <div className="space-y-4">
+                      <div className={`text-${event.color} font-xanman-wide uppercase`} style={{fontSize: '55px', lineHeight: '1.2'}}>
                         {event.year}
                       </div>
-                      <div className="flex-1">
-                        <h3 className="font-xanman-wide font-semibold text-black mb-2 uppercase" style={{fontSize: '55px', lineHeight: '1.2'}}>
-                          {event.title}
-                        </h3>
-                        <p className="text-gray-700 leading-relaxed uppercase font-xanman-wide" style={{fontSize: '55px', lineHeight: '1.2'}}>
-                          {event.description}
-                        </p>
-                      </div>
+                      <h3 className="font-xanman-wide text-black uppercase" style={{fontSize: '55px', lineHeight: '1.2'}}>
+                        {event.title}
+                      </h3>
+                      <p className="text-gray-700 leading-relaxed uppercase font-xanman-wide" style={{fontSize: '55px', lineHeight: '1.2'}}>
+                        {event.description}
+                      </p>
                     </div>
-                    {eventImages.length > 0 && (
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
-                        {eventImages.map((imageSrc, imgIndex) => (
-                          <img 
-                            key={imgIndex}
-                            src={imageSrc} 
-                            alt={`${event.title} image ${imgIndex + 1}`} 
-                            className="w-full h-auto glassmorphism rounded-lg p-4" 
-                          />
-                        ))}
-                      </div>
-                    )}
+                    
+                    {/* Images Column */}
+                    <div className="flex flex-col gap-4">
+                      {eventImages.map((imageSrc, imgIndex) => (
+                        <img 
+                          key={imgIndex}
+                          src={imageSrc} 
+                          alt={`${event.title} image ${imgIndex + 1}`} 
+                          className="w-full h-auto glassmorphism rounded-lg p-4" 
+                        />
+                      ))}
+                    </div>
                   </div>
                 </div>
               );
@@ -172,7 +171,7 @@ export default function About() {
         </div>
 
         {/* Call to Action */}
-        <div className="glassmorphism rounded-2xl p-8 text-center mb-8">
+        <div className="glassmorphism rounded-2xl p-8 text-center mb-8 relative z-30">
           <p className="text-gray-700 mb-6 font-xanman-wide uppercase" style={{fontSize: '55px', lineHeight: '1.2'}}>
             IF YOU'D LIKE ME TO ADD SOME MORE COLOR TO THIS STORY, SHOOT ME AN EMAIL OR A DM ON TWITTER.
           </p>
