@@ -101,7 +101,7 @@ export default function About() {
       <div className="max-w-5xl mx-auto">
         {/* Timeline */}
         <div className="mb-12">
-          <h2 className="font-xanman-wide text-3xl font-bold mb-8 text-center text-black uppercase">
+          <h2 className="font-xanman-wide font-bold mb-8 text-center text-black uppercase" style={{fontSize: '55px', lineHeight: '1.2'}}>
             TIMELINE
           </h2>
           <div className="space-y-6">
@@ -140,11 +140,11 @@ export default function About() {
                 <div key={index} className="glassmorphism rounded-2xl p-6 border-l-4 border-black border-opacity-20">
                   <div className="flex flex-col gap-4">
                     <div className="flex flex-col md:flex-row md:items-center gap-4">
-                      <div className={`text-${event.color} font-xanman-wide text-xl font-bold min-w-24 uppercase`}>
+                      <div className={`text-${event.color} font-xanman-wide font-bold min-w-24 uppercase`} style={{fontSize: '55px', lineHeight: '1.2'}}>
                         {event.year}
                       </div>
                       <div className="flex-1">
-                        <h3 className="font-xanman-wide text-lg font-semibold text-black mb-2 uppercase">
+                        <h3 className="font-xanman-wide font-semibold text-black mb-2 uppercase" style={{fontSize: '55px', lineHeight: '1.2'}}>
                           {event.title}
                         </h3>
                         <p className="text-gray-700 leading-relaxed uppercase font-xanman-wide" style={{fontSize: '55px', lineHeight: '1.2'}}>
@@ -178,12 +178,12 @@ export default function About() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/contact">
-              <Button className="bg-electric-orange hover:bg-electric-orange hover:opacity-90 text-black font-xanman-wide uppercase">
+              <Button className="bg-electric-orange hover:bg-electric-orange hover:opacity-90 text-black font-xanman-wide uppercase" style={{fontSize: '55px', lineHeight: '1.2', padding: '20px 40px'}}>
                 GET IN TOUCH
               </Button>
             </Link>
             <Link href="/">
-              <Button variant="outline" className="bg-black bg-opacity-10 border-black border-opacity-20 hover:bg-opacity-20 font-xanman-wide uppercase">
+              <Button variant="outline" className="bg-black bg-opacity-10 border-black border-opacity-20 hover:bg-opacity-20 font-xanman-wide uppercase" style={{fontSize: '55px', lineHeight: '1.2', padding: '20px 40px'}}>
                 ← BACK TO HOME
               </Button>
             </Link>
