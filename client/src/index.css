@@ -1,0 +1,195 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom font definitions */
+@font-face {
+  font-family: 'Xanman';
+  src: url('/fonts/Xanman.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'XanmanWide';
+  src: url('/fonts/Xanmanwide.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --background: hsl(0, 0%, 4%);
+  --foreground: hsl(0, 0%, 98%);
+  --muted: hsl(0, 0%, 15%);
+  --muted-foreground: hsl(0, 0%, 65%);
+  --popover: hsl(0, 0%, 4%);
+  --popover-foreground: hsl(0, 0%, 98%);
+  --card: hsl(0, 0%, 4%);
+  --card-foreground: hsl(0, 0%, 98%);
+  --border: hsl(0, 0%, 20%);
+  --input: hsl(0, 0%, 20%);
+  --primary: hsl(207, 90%, 54%);
+  --primary-foreground: hsl(211, 100%, 99%);
+  --secondary: hsl(0, 0%, 15%);
+  --secondary-foreground: hsl(0, 0%, 98%);
+  --accent: hsl(0, 0%, 15%);
+  --accent-foreground: hsl(0, 0%, 98%);
+  --destructive: hsl(0, 84%, 60%);
+  --destructive-foreground: hsl(0, 0%, 98%);
+  --ring: hsl(0, 0%, 83%);
+  --radius: 0.5rem;
+  
+  /* Custom color variables */
+  --rich-black: hsl(0, 0%, 4%);
+  --electric-orange: hsl(15, 100%, 60%);
+  --cyan-blue: hsl(195, 100%, 50%);
+  --electric-red: hsl(347, 100%, 55%);
+  --neon-green: hsl(145, 100%, 45%);
+}
+
+.dark {
+  --background: hsl(0, 0%, 4%);
+  --foreground: hsl(0, 0%, 98%);
+  --muted: hsl(0, 0%, 15%);
+  --muted-foreground: hsl(0, 0%, 65%);
+  --popover: hsl(0, 0%, 4%);
+  --popover-foreground: hsl(0, 0%, 98%);
+  --card: hsl(0, 0%, 4%);
+  --card-foreground: hsl(0, 0%, 98%);
+  --border: hsl(0, 0%, 20%);
+  --input: hsl(0, 0%, 20%);
+  --primary: hsl(207, 90%, 54%);
+  --primary-foreground: hsl(211, 100%, 99%);
+  --secondary: hsl(0, 0%, 15%);
+  --secondary-foreground: hsl(0, 0%, 98%);
+  --accent: hsl(0, 0%, 15%);
+  --accent-foreground: hsl(0, 0%, 98%);
+  --destructive: hsl(0, 84%, 60%);
+  --destructive-foreground: hsl(0, 0%, 98%);
+  --ring: hsl(0, 0%, 83%);
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply font-sans antialiased bg-background text-foreground overflow-x-hidden;
+    background-color: var(--rich-black);
+  }
+}
+
+@layer components {
+  .font-xanman {
+    font-family: 'Xanman', 'Inter', 'Arial', sans-serif;
+  }
+  
+  .font-xanman-wide {
+    font-family: 'XanmanWide', 'Inter', 'Arial', sans-serif;
+  }
+  
+  .bouncing-circle {
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 10;
+    transition: none;
+  }
+  
+  .nav-bubble {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+  
+  .nav-bubble:hover {
+    transform: scale(1.1);
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.4);
+  }
+  
+  .nav-bubble:active {
+    transform: scale(0.95);
+  }
+  
+  .floating-animation {
+    animation: float 6s ease-in-out infinite;
+  }
+  
+  .page-transition {
+    transition: opacity 0.5s ease-in-out;
+  }
+  
+  .glassmorphism {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+}
+
+@keyframes float {
+  0%, 100% { 
+    transform: translateY(0px); 
+  }
+  50% { 
+    transform: translateY(-20px); 
+  }
+}
+
+/* Mobile optimizations */
+@media (max-width: 768px) {
+  .nav-bubble {
+    width: 60px !important;
+    height: 60px !important;
+  }
+  
+  .nav-bubble .text-xs {
+    font-size: 0.75rem !important;
+  }
+  
+  .bouncing-circle {
+    width: 40px !important;
+    height: 40px !important;
+  }
+  
+  .font-xanman {
+    font-size: clamp(2rem, 8vw, 4rem) !important;
+  }
+}
+
+/* Utility classes for custom colors */
+.bg-electric-orange {
+  background-color: var(--electric-orange);
+}
+
+.bg-cyan-blue {
+  background-color: var(--cyan-blue);
+}
+
+.bg-electric-red {
+  background-color: var(--electric-red);
+}
+
+.bg-neon-green {
+  background-color: var(--neon-green);
+}
+
+.text-electric-orange {
+  color: var(--electric-orange);
+}
+
+.text-cyan-blue {
+  color: var(--cyan-blue);
+}
+
+.text-electric-red {
+  color: var(--electric-red);
+}
+
+.text-neon-green {
+  color: var(--neon-green);
+}
