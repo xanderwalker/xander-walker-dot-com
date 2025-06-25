@@ -35,8 +35,8 @@ export default function BouncingCircles() {
         id: 'bio',
         x: Math.random() * (window.innerWidth - 320),
         y: Math.random() * (window.innerHeight - 320),
-        vx: (Math.random() - 0.5) * 3,
-        vy: (Math.random() - 0.5) * 3,
+        vx: (Math.random() - 0.5) * 1.5,
+        vy: (Math.random() - 0.5) * 1.5,
         size: 320,
         color: 'bg-electric-orange',
         text: 'BIO',
@@ -46,8 +46,8 @@ export default function BouncingCircles() {
         id: 'linkedin',
         x: Math.random() * (window.innerWidth - 240),
         y: Math.random() * (window.innerHeight - 240),
-        vx: (Math.random() - 0.5) * 3,
-        vy: (Math.random() - 0.5) * 3,
+        vx: (Math.random() - 0.5) * 1.5,
+        vy: (Math.random() - 0.5) * 1.5,
         size: 240,
         color: 'bg-cyan-blue',
         text: 'LINKEDIN',
@@ -57,8 +57,8 @@ export default function BouncingCircles() {
         id: 'store',
         x: Math.random() * (window.innerWidth - 280),
         y: Math.random() * (window.innerHeight - 280),
-        vx: (Math.random() - 0.5) * 3,
-        vy: (Math.random() - 0.5) * 3,
+        vx: (Math.random() - 0.5) * 1.5,
+        vy: (Math.random() - 0.5) * 1.5,
         size: 280,
         color: 'bg-electric-red',
         text: 'STORE',
@@ -68,8 +68,8 @@ export default function BouncingCircles() {
         id: 'contact',
         x: Math.random() * (window.innerWidth - 200),
         y: Math.random() * (window.innerHeight - 200),
-        vx: (Math.random() - 0.5) * 3,
-        vy: (Math.random() - 0.5) * 3,
+        vx: (Math.random() - 0.5) * 1.5,
+        vy: (Math.random() - 0.5) * 1.5,
         size: 200,
         color: 'bg-neon-green',
         text: 'CONTACT',
@@ -120,7 +120,7 @@ export default function BouncingCircles() {
   }, []);
 
   return (
-    <div ref={containerRef} className="fixed inset-0 z-20">
+    <div ref={containerRef} className="fixed inset-0 z-50">
       {circles.map(circle => (
         <button
           key={circle.id}
