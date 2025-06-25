@@ -14,7 +14,7 @@ export default function Layout({ children, title = "XANDER WALKER", subtitle = "
       
       <div className="relative z-20 min-h-screen flex flex-col items-center justify-center px-4 md:px-8">
         <header className="text-center mb-12 md:mb-16">
-          <h1 className="font-xanman text-5xl md:text-7xl lg:text-8xl font-bold text-black mb-4 floating-animation">
+          <h1 className="font-xanman text-8xl md:text-9xl lg:text-[12rem] font-bold text-black mb-4 floating-animation">
             {title}
           </h1>
           {subtitle && (
