@@ -30,13 +30,14 @@ export default function BouncingCircles() {
   };
 
   useEffect(() => {
+    // Start with static positions to test clicking
     const initialCircles: Circle[] = [
       {
         id: 'bio',
-        x: Math.random() * (window.innerWidth - 320),
-        y: Math.random() * (window.innerHeight - 320),
-        vx: (Math.random() - 0.5) * 3,
-        vy: (Math.random() - 0.5) * 3,
+        x: 100,
+        y: 100,
+        vx: 0,
+        vy: 0,
         size: 320,
         color: 'bg-electric-orange',
         text: 'BIO',
@@ -44,10 +45,10 @@ export default function BouncingCircles() {
       },
       {
         id: 'linkedin',
-        x: Math.random() * (window.innerWidth - 240),
-        y: Math.random() * (window.innerHeight - 240),
-        vx: (Math.random() - 0.5) * 3,
-        vy: (Math.random() - 0.5) * 3,
+        x: 500,
+        y: 200,
+        vx: 0,
+        vy: 0,
         size: 240,
         color: 'bg-cyan-blue',
         text: 'LINKEDIN',
@@ -55,10 +56,10 @@ export default function BouncingCircles() {
       },
       {
         id: 'store',
-        x: Math.random() * (window.innerWidth - 280),
-        y: Math.random() * (window.innerHeight - 280),
-        vx: (Math.random() - 0.5) * 3,
-        vy: (Math.random() - 0.5) * 3,
+        x: 200,
+        y: 400,
+        vx: 0,
+        vy: 0,
         size: 280,
         color: 'bg-electric-red',
         text: 'STORE',
@@ -66,10 +67,10 @@ export default function BouncingCircles() {
       },
       {
         id: 'contact',
-        x: Math.random() * (window.innerWidth - 200),
-        y: Math.random() * (window.innerHeight - 200),
-        vx: (Math.random() - 0.5) * 3,
-        vy: (Math.random() - 0.5) * 3,
+        x: 600,
+        y: 500,
+        vx: 0,
+        vy: 0,
         size: 200,
         color: 'bg-neon-green',
         text: 'CONTACT',
@@ -78,45 +79,6 @@ export default function BouncingCircles() {
     ];
 
     setCircles(initialCircles);
-
-    const animate = () => {
-      setCircles(prevCircles => 
-        prevCircles.map(circle => {
-          let newX = circle.x + circle.vx;
-          let newY = circle.y + circle.vy;
-          let newVx = circle.vx;
-          let newVy = circle.vy;
-
-          // Bounce off edges
-          if (newX <= 0 || newX >= window.innerWidth - circle.size) {
-            newVx = -newVx;
-            newX = Math.max(0, Math.min(window.innerWidth - circle.size, newX));
-          }
-          if (newY <= 0 || newY >= window.innerHeight - circle.size) {
-            newVy = -newVy;
-            newY = Math.max(0, Math.min(window.innerHeight - circle.size, newY));
-          }
-
-          return {
-            ...circle,
-            x: newX,
-            y: newY,
-            vx: newVx,
-            vy: newVy
-          };
-        })
-      );
-
-      animationRef.current = requestAnimationFrame(animate);
-    };
-
-    animationRef.current = requestAnimationFrame(animate);
-
-    return () => {
-      if (animationRef.current) {
-        cancelAnimationFrame(animationRef.current);
-      }
-    };
   }, []);
 
   return (
