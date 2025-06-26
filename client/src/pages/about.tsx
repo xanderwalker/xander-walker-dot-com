@@ -1,6 +1,7 @@
 import { Link } from 'wouter';
 import Layout from '@/components/layout';
 import { Button } from '@/components/ui/button';
+import modelsImage from "@assets/2014-02-21_06.58.54_Original_1750960142835.png";
 
 export default function About() {
   const timelineEvents = [
@@ -42,17 +43,17 @@ export default function About() {
     {
       year: "2019",
       title: "European Model 3 Launch: \"delivery logistics hell\" with massive ships & Swiss import customs.",
-      image: "/assets/model3web_1750891603218.png"
+      image: "/assets/vikingadventureweb_1750891603225.png"
     },
     {
       year: "2018",
       title: "Model 3 launch & ramp: \"delivery logistics hell\" and back.",
-      image: null
+      image: "/assets/model3web_1750891603218.png"
     },
     {
       year: "2016",
       title: "Tesla Remarketing: wholesale auctions, retail sales, residual values, repair & refurbishment, dynamic pricing.",
-      image: "/assets/vikingadventureweb_1750891603225.png"
+      image: null
     },
     {
       year: "2016",
@@ -72,7 +73,7 @@ export default function About() {
     {
       year: "2013–2014",
       title: "Tesla Model S deliveries in DC metro & Atlanta: tip of the spear of Tesla's direct-to-consumer model.",
-      image: null
+      image: modelsImage
     },
     {
       year: "2011–2012",
@@ -108,7 +109,7 @@ export default function About() {
             {timelineEvents.map((event, index) => (
               <div key={index} className="glassmorphism rounded-2xl p-6 relative z-30 pointer-events-auto">
                 {/* Date at top */}
-                <div className="font-serif text-electric-orange mb-4 text-center" style={{fontSize: '32px', lineHeight: '1.2', fontFamily: 'Georgia, serif'}}>
+                <div className="font-serif text-black mb-4 text-center" style={{fontSize: '32px', lineHeight: '1.2', fontFamily: 'Georgia, serif'}}>
                   {event.year}
                 </div>
                 
