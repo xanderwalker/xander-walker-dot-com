@@ -50,7 +50,7 @@ export default function BouncingCircles() {
         action: () => navigateToPage('/about')
       },
       {
-        id: 'linkedin',
+        id: 'projects',
         x: Math.random() * (window.innerWidth - 240),
         y: Math.random() * (window.innerHeight - 240),
         vx: (Math.random() - 0.5) * 1.5,
@@ -58,7 +58,7 @@ export default function BouncingCircles() {
         size: 240,
         color: 'bg-cyan-blue',
         text: 'PROJECTS',
-        action: () => openExternal('https://linkedin.com')
+        action: () => navigateToPage('/projects')
       },
       {
         id: 'store',
