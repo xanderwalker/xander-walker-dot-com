@@ -98,21 +98,36 @@ export default function BouncingCircles() {
             return circle;
           }
 
-          let newX = circle.x + circle.vx;
-          let newY = circle.y + circle.vy;
+          let newX = circle.x;
+          let newY = circle.y;
           let newVx = circle.vx;
           let newVy = circle.vy;
 
-          // Apply accelerometer influence on mobile devices
-          if (permissionGranted && (deviceOrientation.x !== 0 || deviceOrientation.y !== 0)) {
-            const gravityStrength = 0.3; // Increased from 0.1 to 0.3
+          // Check if accelerometer is active
+          const accelerometerActive = permissionGranted && (Math.abs(deviceOrientation.x) > 0.05 || Math.abs(deviceOrientation.y) > 0.05);
+
+          if (accelerometerActive) {
+            // Use accelerometer-based movement only
+            const gravityStrength = 0.4;
             newVx += deviceOrientation.x * gravityStrength;
             newVy += deviceOrientation.y * gravityStrength;
             
-            // Limit maximum velocity to prevent balls from moving too fast
-            const maxVelocity = 8; // Increased from 5 to 8
+            // Apply some friction to prevent infinite acceleration
+            newVx *= 0.98;
+            newVy *= 0.98;
+            
+            // Limit maximum velocity
+            const maxVelocity = 6;
             newVx = Math.max(-maxVelocity, Math.min(maxVelocity, newVx));
             newVy = Math.max(-maxVelocity, Math.min(maxVelocity, newVy));
+            
+            // Update position based on accelerometer-influenced velocity
+            newX = circle.x + newVx;
+            newY = circle.y + newVy;
+          } else {
+            // Use normal bouncing movement when accelerometer is not active
+            newX = circle.x + circle.vx;
+            newY = circle.y + circle.vy;
           }
 
           // Bounce off edges
