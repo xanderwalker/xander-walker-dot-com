@@ -100,7 +100,7 @@ export default function About() {
     <Layout title="XANDER WALKER">
       <div className="max-w-7xl mx-auto relative z-30">
         {/* Timeline */}
-        <div className="mb-12 pointer-events-none">
+        <div className="mb-12">
           <h2 className="font-xanman-wide mb-8 text-center text-black uppercase" style={{fontSize: '55px', lineHeight: '1.2'}}>
             BIO
           </h2>

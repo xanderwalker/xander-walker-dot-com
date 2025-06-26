@@ -120,7 +120,7 @@ export default function BouncingCircles() {
   }, []);
 
   return (
-    <div ref={containerRef} className="fixed inset-0 z-10">
+    <div ref={containerRef} className="fixed inset-0 z-30">
       {circles.map(circle => (
         <button
           key={circle.id}
