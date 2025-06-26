@@ -106,7 +106,7 @@ export default function PhysicsBalls() {
   }, []);
 
   // Get color based on position (for mobile)
-  const getPositionColor = (x: number, y: number) => {
+  const getPositionColor = (x: number, y: number, isLargeBall: boolean = false) => {
     const width = window.innerWidth;
     const height = window.innerHeight;
     
@@ -114,10 +114,19 @@ export default function PhysicsBalls() {
     const leftHalf = x < width / 2;
     const topHalf = y < height / 2;
     
-    if (leftHalf && topHalf) return '#FF6B6B'; // coral - top left
-    if (!leftHalf && topHalf) return '#4ECDC4'; // mint - top right
-    if (leftHalf && !topHalf) return '#45B7D1'; // sky blue - bottom left
-    return '#96CEB4'; // sage green - bottom right
+    if (isLargeBall) {
+      // Opposite/dark colors for large balls
+      if (leftHalf && topHalf) return '#004040'; // dark teal - top left
+      if (!leftHalf && topHalf) return '#B31312'; // dark red - top right
+      if (leftHalf && !topHalf) return '#BA4801'; // dark orange - bottom left
+      return '#2D5A27'; // dark green - bottom right
+    } else {
+      // Regular colors for small balls
+      if (leftHalf && topHalf) return '#FF6B6B'; // coral - top left
+      if (!leftHalf && topHalf) return '#4ECDC4'; // mint - top right
+      if (leftHalf && !topHalf) return '#45B7D1'; // sky blue - bottom left
+      return '#96CEB4'; // sage green - bottom right
+    }
   };
 
   // Animation loop
@@ -216,9 +225,10 @@ export default function PhysicsBalls() {
             newY = Math.max(0, Math.min(window.innerHeight - ball.size, newY));
           }
 
-          // Update color based on position (mobile only) - but not for special large balls
-          if (isMobile && ball.size === 15) { // Only change colors for small balls
-            newColor = getPositionColor(newX + ball.size / 2, newY + ball.size / 2);
+          // Update color based on position (mobile only) - different colors for large vs small balls
+          if (isMobile) {
+            const isLargeBall = ball.size === 45;
+            newColor = getPositionColor(newX + ball.size / 2, newY + ball.size / 2, isLargeBall);
           }
 
           return {
