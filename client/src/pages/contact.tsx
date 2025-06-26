@@ -28,7 +28,7 @@ export default function Contact() {
               rel="noopener noreferrer"
               className="block glassmorphism rounded-2xl p-8 relative z-30 pointer-events-auto hover:bg-electric-orange hover:bg-opacity-20 transition-colors duration-300"
             >
-              <div className="text-black font-xanman-wide uppercase text-center" style={{fontSize: '48px', lineHeight: '1.2'}}>
+              <div className="text-black font-xanman-wide uppercase text-center" style={{fontSize: '72px', lineHeight: '1.2'}}>
                 {social.name}
               </div>
             </a>
