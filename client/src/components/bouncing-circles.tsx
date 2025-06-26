@@ -265,14 +265,22 @@ export default function BouncingCircles() {
       setAccelerometerEnabled(newMode);
       console.log('Accelerometer toggled:', newMode);
       
-      // When switching to accelerometer mode, zero out all velocities
       if (newMode) {
+        // Switching TO accelerometer mode - zero out velocities
         setCircles(prev => prev.map(circle => ({
           ...circle,
           vx: 0,
           vy: 0
         })));
         console.log('Zeroed out all velocities for accelerometer mode');
+      } else {
+        // Switching FROM accelerometer mode - restore random velocities
+        setCircles(prev => prev.map(circle => ({
+          ...circle,
+          vx: (Math.random() - 0.5) * 4,
+          vy: (Math.random() - 0.5) * 4
+        })));
+        console.log('Restored random velocities for auto mode');
       }
     }
   };
