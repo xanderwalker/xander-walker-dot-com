@@ -261,8 +261,19 @@ export default function BouncingCircles() {
     if (!permissionGranted) {
       handlePermissionRequest();
     } else {
-      setAccelerometerEnabled(!accelerometerEnabled);
-      console.log('Accelerometer toggled:', !accelerometerEnabled);
+      const newMode = !accelerometerEnabled;
+      setAccelerometerEnabled(newMode);
+      console.log('Accelerometer toggled:', newMode);
+      
+      // When switching to accelerometer mode, zero out all velocities
+      if (newMode) {
+        setCircles(prev => prev.map(circle => ({
+          ...circle,
+          vx: 0,
+          vy: 0
+        })));
+        console.log('Zeroed out all velocities for accelerometer mode');
+      }
     }
   };
 
