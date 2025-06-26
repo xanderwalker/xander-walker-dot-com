@@ -104,6 +104,7 @@ Changelog:
 - June 26, 2025. Successfully deployed to production - connected GitHub repository (xander-walker-dot-com), deployed to Vercel with custom domain xanderwalker.com. Updated DNS settings in GoDaddy to point to Vercel servers (A record: 216.198.79.193, CNAME: cname.vercel-dns.com). Portfolio now live at xanderwalker.com with SSL certificate.
 - June 26, 2025. Added mobile touch support - implemented onTouchStart, touchmove, and touchend event handlers for bouncing navigation circles. Mobile users can now drag and throw the navigation circles with proper touch detection and velocity calculations.
 - June 26, 2025. Created interactive Projects page with physics simulation - removed bouncing navigation circles, added centered bold "XANDER WALKER" header, implemented 333 small physics balls (15px) with accelerometer responsiveness on mobile, ball-to-ball collision detection, and position-based color changes (coral, mint, sky blue, sage green). Desktop version uses gravity while mobile responds to device tilt.
+- June 26, 2025. Enhanced Projects page with rotating letter elements - replaced large colored balls with floating X and W letters (80px) in circular black-outlined containers. Letters rotate continuously at different speeds, participate in collision physics, and use XanmanWide font. Updated color scheme to be color-blind friendly with navy, purple, orange, and blue palette.
 ```
 
 ## User Preferences
