@@ -98,10 +98,10 @@ export default function About() {
 
   return (
     <Layout title="XANDER WALKER">
-      <div className="max-w-7xl mx-auto relative z-30 pointer-events-none">
+      <div className="max-w-7xl mx-auto relative z-30">
         {/* Timeline */}
-        <div className="mb-12">
-          <h2 className="font-xanman-wide mb-8 text-center text-black uppercase pointer-events-auto" style={{fontSize: '55px', lineHeight: '1.2'}}>
+        <div className="mb-12 pointer-events-none">
+          <h2 className="font-xanman-wide mb-8 text-center text-black uppercase" style={{fontSize: '55px', lineHeight: '1.2'}}>
             BIO
           </h2>
           <div className="space-y-8">
