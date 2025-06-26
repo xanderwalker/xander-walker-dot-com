@@ -75,6 +75,7 @@ export default function PhysicsBalls() {
     const initialBalls: Ball[] = [];
     const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4']; // coral, mint, sky blue, sage green
 
+    // Add 333 regular balls
     for (let i = 0; i < 333; i++) {
       initialBalls.push({
         id: i,
@@ -84,6 +85,19 @@ export default function PhysicsBalls() {
         vy: (Math.random() - 0.5) * 2,
         size: 15, // uniform 15px balls (3x smaller)
         color: colors[Math.floor(Math.random() * colors.length)]
+      });
+    }
+
+    // Add 3 special bright red balls (3x larger)
+    for (let i = 333; i < 336; i++) {
+      initialBalls.push({
+        id: i,
+        x: Math.random() * (window.innerWidth - 45),
+        y: Math.random() * (window.innerHeight - 45),
+        vx: (Math.random() - 0.5) * 1.5, // Slightly slower initial velocity
+        vy: (Math.random() - 0.5) * 1.5,
+        size: 45, // 3x larger (45px vs 15px)
+        color: '#FF0000' // bright red
       });
     }
 
@@ -201,8 +215,8 @@ export default function PhysicsBalls() {
             newY = Math.max(0, Math.min(window.innerHeight - ball.size, newY));
           }
 
-          // Update color based on position (mobile only)
-          if (isMobile) {
+          // Update color based on position (mobile only) - but not for special red balls
+          if (isMobile && ball.color !== '#FF0000') {
             newColor = getPositionColor(newX + ball.size / 2, newY + ball.size / 2);
           }
 
