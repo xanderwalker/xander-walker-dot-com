@@ -73,7 +73,7 @@ export default function PhysicsBalls() {
   // Initialize balls
   useEffect(() => {
     const initialBalls: Ball[] = [];
-    const colors = ['#FF6B35', '#004E89', '#F7931E', '#06D6A0']; // red, blue, yellow, green
+    const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4']; // coral, mint, sky blue, sage green
 
     for (let i = 0; i < 100; i++) {
       initialBalls.push({
@@ -99,10 +99,10 @@ export default function PhysicsBalls() {
     const leftHalf = x < width / 2;
     const topHalf = y < height / 2;
     
-    if (leftHalf && topHalf) return '#FF6B35'; // red - top left
-    if (!leftHalf && topHalf) return '#004E89'; // blue - top right
-    if (leftHalf && !topHalf) return '#F7931E'; // yellow - bottom left
-    return '#06D6A0'; // green - bottom right
+    if (leftHalf && topHalf) return '#FF6B6B'; // coral - top left
+    if (!leftHalf && topHalf) return '#4ECDC4'; // mint - top right
+    if (leftHalf && !topHalf) return '#45B7D1'; // sky blue - bottom left
+    return '#96CEB4'; // sage green - bottom right
   };
 
   // Animation loop
