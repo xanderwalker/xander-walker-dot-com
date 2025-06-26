@@ -101,12 +101,22 @@ export default function BouncingCircles() {
 
           if (accelerometerEnabled && permissionGranted) {
             // ACCELEROMETER MODE: Direct gravity-based movement, preserve original velocities
+            console.log('ACCEL MODE:', { 
+              enabled: accelerometerEnabled, 
+              granted: permissionGranted, 
+              orientation: deviceOrientation,
+              circleId: circle.id,
+              currentPos: { x: circle.x, y: circle.y }
+            });
+            
             const gravity = 1.5;
             const moveX = deviceOrientation.x * gravity;
             const moveY = deviceOrientation.y * gravity;
             
             const newX = Math.max(0, Math.min(window.innerWidth - circle.size, circle.x + moveX));
             const newY = Math.max(0, Math.min(window.innerHeight - circle.size, circle.y + moveY));
+            
+            console.log('ACCEL MOVE:', { moveX, moveY, newX, newY });
             
             return {
               ...circle,
