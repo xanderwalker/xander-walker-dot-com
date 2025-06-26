@@ -99,40 +99,29 @@ export default function BouncingCircles() {
             return circle;
           }
 
-          let newX = circle.x;
-          let newY = circle.y;
-          let newVx = circle.vx;
-          let newVy = circle.vy;
-
           if (accelerometerEnabled && permissionGranted) {
-            // ACCELEROMETER MODE: Only use gravity forces, ignore stored velocities
-            const gravityStrength = 1.2;
-            newVx = deviceOrientation.x * gravityStrength;
-            newVy = deviceOrientation.y * gravityStrength;
+            // ACCELEROMETER MODE: Direct gravity-based movement, preserve original velocities
+            const gravity = 1.5;
+            const moveX = deviceOrientation.x * gravity;
+            const moveY = deviceOrientation.y * gravity;
             
-            // Limit maximum velocity
-            const maxVelocity = 8;
-            newVx = Math.max(-maxVelocity, Math.min(maxVelocity, newVx));
-            newVy = Math.max(-maxVelocity, Math.min(maxVelocity, newVy));
+            const newX = Math.max(0, Math.min(window.innerWidth - circle.size, circle.x + moveX));
+            const newY = Math.max(0, Math.min(window.innerHeight - circle.size, circle.y + moveY));
             
-            newX = circle.x + newVx;
-            newY = circle.y + newVy;
+            return {
+              ...circle,
+              x: newX,
+              y: newY
+              // Keep vx, vy unchanged so they restore when switching back
+            };
           } else {
-            // NORMAL MODE: Use stored velocities for automatic bouncing
-            newVx = circle.vx;
-            newVy = circle.vy;
-            newX = circle.x + newVx;
-            newY = circle.y + newVy;
-          }
+            // AUTO MODE: Standard bouncing physics
+            let newX = circle.x + circle.vx;
+            let newY = circle.y + circle.vy;
+            let newVx = circle.vx;
+            let newVy = circle.vy;
 
-          // Handle edges differently based on mode
-          if (accelerometerEnabled && permissionGranted) {
-            // ACCELEROMETER MODE: Just prevent going off screen, no bouncing
-            newX = Math.max(0, Math.min(window.innerWidth - circle.size, newX));
-            newY = Math.max(0, Math.min(window.innerHeight - circle.size, newY));
-            // Don't save velocities in accelerometer mode - they're calculated fresh each frame
-          } else {
-            // NORMAL MODE: Bounce off edges and update stored velocities
+            // Bounce off edges
             if (newX <= 0 || newX >= window.innerWidth - circle.size) {
               newVx = -newVx * 0.8;
               newX = Math.max(0, Math.min(window.innerWidth - circle.size, newX));
@@ -141,16 +130,15 @@ export default function BouncingCircles() {
               newVy = -newVy * 0.8;
               newY = Math.max(0, Math.min(window.innerHeight - circle.size, newY));
             }
-          }
 
-          return {
-            ...circle,
-            x: newX,
-            y: newY,
-            // Only update stored velocities in normal mode
-            vx: accelerometerEnabled && permissionGranted ? circle.vx : newVx,
-            vy: accelerometerEnabled && permissionGranted ? circle.vy : newVy
-          };
+            return {
+              ...circle,
+              x: newX,
+              y: newY,
+              vx: newVx,
+              vy: newVy
+            };
+          }
         })
       );
 
@@ -260,27 +248,8 @@ export default function BouncingCircles() {
     if (!permissionGranted) {
       handlePermissionRequest();
     } else {
-      const newMode = !accelerometerEnabled;
-      setAccelerometerEnabled(newMode);
-      console.log('Accelerometer toggled:', newMode);
-      
-      if (newMode) {
-        // Switching TO accelerometer mode - zero out velocities
-        setCircles(prev => prev.map(circle => ({
-          ...circle,
-          vx: 0,
-          vy: 0
-        })));
-        console.log('Zeroed out all velocities for accelerometer mode');
-      } else {
-        // Switching FROM accelerometer mode - restore random velocities
-        setCircles(prev => prev.map(circle => ({
-          ...circle,
-          vx: (Math.random() - 0.5) * 4,
-          vy: (Math.random() - 0.5) * 4
-        })));
-        console.log('Restored random velocities for auto mode');
-      }
+      setAccelerometerEnabled(!accelerometerEnabled);
+      console.log('Accelerometer toggled:', !accelerometerEnabled);
     }
   };
 
