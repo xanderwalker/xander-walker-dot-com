@@ -106,6 +106,7 @@ export default function BouncingCircles() {
 
           if (accelerometerEnabled && permissionGranted) {
             // ACCELEROMETER MODE: Start with zero velocity, only use gravity
+            console.log('Accelerometer mode active!', { accelerometerEnabled, permissionGranted, deviceOrientation });
             newVx = 0;
             newVy = 0;
             
