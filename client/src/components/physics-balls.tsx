@@ -108,13 +108,18 @@ export default function PhysicsBalls() {
   // Animation loop
   useEffect(() => {
     const animate = () => {
-      setBalls(prevBalls => 
-        prevBalls.map(ball => {
+      setBalls(prevBalls => {
+        // Create a copy of balls array to work with
+        let updatedBalls = prevBalls.map(ball => ({
+          ...ball,
+          vx: ball.vx,
+          vy: ball.vy
+        }));
+
+        // Apply physics forces first
+        updatedBalls = updatedBalls.map(ball => {
           let newVx = ball.vx;
           let newVy = ball.vy;
-          let newX = ball.x;
-          let newY = ball.y;
-          let newColor = ball.color;
 
           if (isMobile) {
             // Apply accelerometer forces
@@ -125,9 +130,66 @@ export default function PhysicsBalls() {
             newVy += 0.2;
           }
 
-          // Apply velocity
-          newX += newVx;
-          newY += newVy;
+          return {
+            ...ball,
+            vx: newVx,
+            vy: newVy
+          };
+        });
+
+        // Check ball-to-ball collisions
+        for (let i = 0; i < updatedBalls.length; i++) {
+          for (let j = i + 1; j < updatedBalls.length; j++) {
+            const ball1 = updatedBalls[i];
+            const ball2 = updatedBalls[j];
+            
+            const dx = (ball1.x + ball1.size / 2) - (ball2.x + ball2.size / 2);
+            const dy = (ball1.y + ball1.size / 2) - (ball2.y + ball2.size / 2);
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            const minDistance = (ball1.size + ball2.size) / 2;
+
+            if (distance < minDistance) {
+              // Collision detected - calculate collision response
+              const angle = Math.atan2(dy, dx);
+              const sin = Math.sin(angle);
+              const cos = Math.cos(angle);
+
+              // Rotate velocities
+              const vx1 = ball1.vx * cos + ball1.vy * sin;
+              const vy1 = ball1.vy * cos - ball1.vx * sin;
+              const vx2 = ball2.vx * cos + ball2.vy * sin;
+              const vy2 = ball2.vy * cos - ball2.vx * sin;
+
+              // Swap x velocities (elastic collision)
+              const finalVx1 = vx2;
+              const finalVx2 = vx1;
+
+              // Rotate back and apply damping
+              updatedBalls[i].vx = (finalVx1 * cos - vy1 * sin) * 0.9;
+              updatedBalls[i].vy = (vy1 * cos + finalVx1 * sin) * 0.9;
+              updatedBalls[j].vx = (finalVx2 * cos - vy2 * sin) * 0.9;
+              updatedBalls[j].vy = (vy2 * cos + finalVx2 * sin) * 0.9;
+
+              // Separate overlapping balls
+              const overlap = minDistance - distance;
+              const separationX = (dx / distance) * overlap * 0.5;
+              const separationY = (dy / distance) * overlap * 0.5;
+              
+              updatedBalls[i].x += separationX;
+              updatedBalls[i].y += separationY;
+              updatedBalls[j].x -= separationX;
+              updatedBalls[j].y -= separationY;
+            }
+          }
+        }
+
+        // Apply velocity and handle wall collisions
+        return updatedBalls.map(ball => {
+          let newX = ball.x + ball.vx;
+          let newY = ball.y + ball.vy;
+          let newVx = ball.vx;
+          let newVy = ball.vy;
+          let newColor = ball.color;
 
           // Bounce off edges
           if (newX <= 0 || newX >= window.innerWidth - ball.size) {
@@ -152,8 +214,8 @@ export default function PhysicsBalls() {
             vy: newVy,
             color: newColor
           };
-        })
-      );
+        });
+      });
 
       animationRef.current = requestAnimationFrame(animate);
     };
