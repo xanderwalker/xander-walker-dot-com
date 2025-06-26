@@ -102,6 +102,7 @@ Changelog:
 - June 25, 2025. Fixed bouncing circle navigation - replaced div elements with button elements to resolve click detection issues. Implemented DVD screensaver-style animation with proper collision detection. All navigation links now working (Bio, LinkedIn, Store, Contact).
 - June 26, 2025. Enhanced navigation functionality - made bouncing circles semi-transparent (70% opacity), doubled mobile font size to 100px for better readability, removed title animation for static display, and fixed z-index layering to ensure both XANDER WALKER title link and bouncing circle navigation work simultaneously on all pages.
 - June 26, 2025. Successfully deployed to production - connected GitHub repository (xander-walker-dot-com), deployed to Vercel with custom domain xanderwalker.com. Updated DNS settings in GoDaddy to point to Vercel servers (A record: 216.198.79.193, CNAME: cname.vercel-dns.com). Portfolio now live at xanderwalker.com with SSL certificate.
+- June 26, 2025. Added mobile touch support - implemented onTouchStart, touchmove, and touchend event handlers for bouncing navigation circles. Mobile users can now drag and throw the navigation circles with proper touch detection and velocity calculations.
 ```
 
 ## User Preferences
