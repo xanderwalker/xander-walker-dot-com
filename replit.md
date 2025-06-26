@@ -100,6 +100,7 @@ This is a modern personal portfolio application built with React, featuring a cr
 Changelog:
 - June 25, 2025. Initial setup
 - June 25, 2025. Fixed bouncing circle navigation - replaced div elements with button elements to resolve click detection issues. Implemented DVD screensaver-style animation with proper collision detection. All navigation links now working (Bio, LinkedIn, Store, Contact).
+- June 26, 2025. Enhanced navigation functionality - made bouncing circles semi-transparent (70% opacity), doubled mobile font size to 100px for better readability, removed title animation for static display, and fixed z-index layering to ensure both XANDER WALKER title link and bouncing circle navigation work simultaneously on all pages.
 ```
 
 ## User Preferences
