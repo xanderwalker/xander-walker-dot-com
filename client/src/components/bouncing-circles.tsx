@@ -29,6 +29,7 @@ export default function BouncingCircles() {
   const [permissionGranted, setPermissionGranted] = useState(false);
   const [showPermissionButton, setShowPermissionButton] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [accelerometerEnabled, setAccelerometerEnabled] = useState(false);
 
   const navigateToPage = (path: string) => {
     console.log('Navigating to:', path);
@@ -103,29 +104,25 @@ export default function BouncingCircles() {
           let newVx = circle.vx;
           let newVy = circle.vy;
 
-          // Check if accelerometer is active
-          const accelerometerActive = permissionGranted && (Math.abs(deviceOrientation.x) > 0.05 || Math.abs(deviceOrientation.y) > 0.05);
-
-          if (accelerometerActive) {
-            // Use accelerometer-based movement only
-            const gravityStrength = 0.4;
+          if (accelerometerEnabled && permissionGranted) {
+            // ACCELEROMETER MODE: Gravity-based physics only
+            const gravityStrength = 0.5;
             newVx += deviceOrientation.x * gravityStrength;
             newVy += deviceOrientation.y * gravityStrength;
             
-            // Apply some friction to prevent infinite acceleration
-            newVx *= 0.98;
-            newVy *= 0.98;
+            // Apply friction to prevent infinite acceleration
+            newVx *= 0.95;
+            newVy *= 0.95;
             
             // Limit maximum velocity
-            const maxVelocity = 6;
+            const maxVelocity = 8;
             newVx = Math.max(-maxVelocity, Math.min(maxVelocity, newVx));
             newVy = Math.max(-maxVelocity, Math.min(maxVelocity, newVy));
             
-            // Update position based on accelerometer-influenced velocity
             newX = circle.x + newVx;
             newY = circle.y + newVy;
           } else {
-            // Use normal bouncing movement when accelerometer is not active
+            // NORMAL MODE: Automatic bouncing movement
             newX = circle.x + circle.vx;
             newY = circle.y + circle.vy;
           }
@@ -192,6 +189,8 @@ export default function BouncingCircles() {
         // Android and older iOS don't require permission
         setPermissionGranted(true);
         setupOrientationListener();
+        // Show toggle instead of permission button
+        setShowPermissionButton(false);
       } else {
         console.log('DeviceOrientationEvent not supported');
       }
@@ -226,7 +225,7 @@ export default function BouncingCircles() {
     };
   }, []);
 
-  // Function to handle iOS permission request
+  // Function to handle iOS permission request and toggle accelerometer
   const handlePermissionRequest = async () => {
     console.log('Permission button clicked');
     if (typeof DeviceOrientationEvent !== 'undefined' && 'requestPermission' in DeviceOrientationEvent) {
@@ -238,6 +237,7 @@ export default function BouncingCircles() {
           console.log('Permission granted - setting up listener');
           setPermissionGranted(true);
           setShowPermissionButton(false);
+          setAccelerometerEnabled(true);
           setupOrientationListener();
         } else {
           console.log('Permission denied');
@@ -245,6 +245,16 @@ export default function BouncingCircles() {
       } catch (error) {
         console.log('Permission request failed:', error);
       }
+    }
+  };
+
+  // Function to toggle accelerometer on/off
+  const toggleAccelerometer = () => {
+    if (!permissionGranted) {
+      handlePermissionRequest();
+    } else {
+      setAccelerometerEnabled(!accelerometerEnabled);
+      console.log('Accelerometer toggled:', !accelerometerEnabled);
     }
   };
 
@@ -427,10 +437,33 @@ export default function BouncingCircles() {
         </button>
       )}
       
-      {/* Tilt Indicator for Debugging */}
-      {isMobile && permissionGranted && (deviceOrientation.x !== 0 || deviceOrientation.y !== 0) && (
-        <div className="fixed top-4 right-4 bg-black bg-opacity-50 text-white px-4 py-2 rounded-lg text-sm z-50">
-          Tilt: {Math.round(deviceOrientation.x * 100)}, {Math.round(deviceOrientation.y * 100)}
+      {/* Accelerometer Toggle Switch */}
+      {isMobile && permissionGranted && !showPermissionButton && (
+        <div className="fixed bottom-4 right-4 z-50">
+          <div className="bg-black bg-opacity-80 text-white px-4 py-3 rounded-lg backdrop-blur-sm">
+            <div className="flex items-center gap-3">
+              <span className="text-sm font-xanman-wide uppercase">
+                {accelerometerEnabled ? 'Tilt Mode' : 'Auto Mode'}
+              </span>
+              <button
+                onClick={toggleAccelerometer}
+                className={`relative w-12 h-6 rounded-full transition-colors duration-300 ${
+                  accelerometerEnabled ? 'bg-electric-orange' : 'bg-gray-600'
+                }`}
+              >
+                <div
+                  className={`absolute top-0.5 w-5 h-5 bg-white rounded-full transition-transform duration-300 ${
+                    accelerometerEnabled ? 'translate-x-6' : 'translate-x-0.5'
+                  }`}
+                />
+              </button>
+            </div>
+            {accelerometerEnabled && (Math.abs(deviceOrientation.x) > 0.01 || Math.abs(deviceOrientation.y) > 0.01) && (
+              <div className="text-xs mt-2 opacity-70">
+                Tilt: {Math.round(deviceOrientation.x * 100)}, {Math.round(deviceOrientation.y * 100)}
+              </div>
+            )}
+          </div>
         </div>
       )}
     </div>
