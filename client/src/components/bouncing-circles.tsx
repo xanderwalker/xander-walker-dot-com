@@ -124,13 +124,13 @@ export default function BouncingCircles() {
       {circles.map(circle => (
         <button
           key={circle.id}
-          className={`absolute ${circle.color} rounded-full cursor-pointer flex items-center justify-center text-white font-xanman-wide hover:scale-110 transition-transform duration-200 uppercase border-0 outline-none`}
+          className={`absolute ${circle.color} rounded-full cursor-pointer flex items-center justify-center text-white font-xanman-wide hover:scale-110 transition-transform duration-200 uppercase border-0 outline-none opacity-70`}
           style={{
             left: circle.x,
             top: circle.y,
             width: circle.size,
             height: circle.size,
-            fontSize: window.innerWidth < 768 ? '50px' : '80px',
+            fontSize: window.innerWidth < 768 ? '100px' : '80px',
             lineHeight: '1'
           }}
           onClick={() => {
