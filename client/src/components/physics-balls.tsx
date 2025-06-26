@@ -115,11 +115,11 @@ export default function PhysicsBalls() {
     const topHalf = y < height / 2;
     
     if (isLargeBall) {
-      // Opposite/dark colors for large balls
-      if (leftHalf && topHalf) return '#004040'; // dark teal - top left
-      if (!leftHalf && topHalf) return '#B31312'; // dark red - top right
-      if (leftHalf && !topHalf) return '#BA4801'; // dark orange - bottom left
-      return '#2D5A27'; // dark green - bottom right
+      // Color-blind friendly colors for large balls - high contrast, distinct hues
+      if (leftHalf && topHalf) return '#1A1A2E'; // dark navy - top left
+      if (!leftHalf && topHalf) return '#7209B7'; // deep purple - top right
+      if (leftHalf && !topHalf) return '#FF6B35'; // bright orange - bottom left
+      return '#16213E'; // midnight blue - bottom right
     } else {
       // Regular colors for small balls
       if (leftHalf && topHalf) return '#FF6B6B'; // coral - top left
