@@ -98,6 +98,13 @@ export default function BouncingCircles() {
         const currentPermissionGranted = permissionGranted;
         const currentDeviceOrientation = deviceOrientation;
         
+        // Debug logging on every frame
+        console.log('Animation frame state:', {
+          accelerometerEnabled: currentAccelerometerEnabled,
+          permissionGranted: currentPermissionGranted,
+          deviceOrientation: currentDeviceOrientation
+        });
+        
         return prevCircles.map(circle => {
           // Skip physics for dragged circles
           if (circle.isDragging) {
