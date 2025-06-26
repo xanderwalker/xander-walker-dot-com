@@ -75,7 +75,7 @@ export default function PhysicsBalls() {
     const initialBalls: Ball[] = [];
     const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4']; // coral, mint, sky blue, sage green
 
-    for (let i = 0; i < 100; i++) {
+    for (let i = 0; i < 333; i++) {
       initialBalls.push({
         id: i,
         x: Math.random() * (window.innerWidth - 20),
