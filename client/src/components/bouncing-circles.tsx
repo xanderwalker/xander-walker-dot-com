@@ -46,7 +46,7 @@ export default function BouncingCircles() {
         vy: (Math.random() - 0.5) * 1.5,
         size: 320,
         color: 'bg-electric-orange',
-        text: 'BIO',
+        text: 'RESUME',
         action: () => navigateToPage('/about')
       },
       {
@@ -57,7 +57,7 @@ export default function BouncingCircles() {
         vy: (Math.random() - 0.5) * 1.5,
         size: 240,
         color: 'bg-cyan-blue',
-        text: 'LINKEDIN',
+        text: 'PROJECTS',
         action: () => openExternal('https://linkedin.com')
       },
       {
