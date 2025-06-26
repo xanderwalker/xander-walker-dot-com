@@ -1,0 +1,75 @@
+hint: See the 'Note about fast-forwards' in 'git push --help' for details.
+xander@alexanders-MacBook-Pro PersonalPortfolio % git pull origin main
+remote: Enumerating objects: 11, done.
+remote: Counting objects: 100% (11/11), done.
+remote: Compressing objects: 100% (8/8), done.
+remote: Total 8 (delta 4), reused 0 (delta 0), pack-reused 0 (from 0)
+Unpacking objects: 100% (8/8), 2.08 KiB | 212.00 KiB/s, done.
+From https://github.com/xanderwalker/xander-walker-dot-com
+ * branch            main       -> FETCH_HEAD
+   70ffb77..b153aa7  main       -> origin/main
+Updating 70ffb77..b153aa7
+Fast-forward
+ client/index.html | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+xander@alexanders-MacBook-Pro PersonalPortfolio % xander@alexanders-MacBook-Pro PersonalPortfolio % git pull origin main
+remote: Enumerating objects: 11, done.
+remote: Counting objects: 100% (11/11), done.
+remote: Compressing objects: 100% (8/8), done.
+remote: Total 8 (delta 4), reused 0 (delta 0), pack-reused 0 (from 0)
+Unpacking objects: 100% (8/8), 2.08 KiB | 212.00 KiB/s, done.
+From https://github.com/xanderwalker/xander-walker-dot-com
+ * branch            main       -> FETCH_HEAD
+   70ffb77..b153aa7  main       -> origin/main
+Updating 70ffb77..b153aa7
+Fast-forward
+ client/index.html | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+xander@alexanders-MacBook-Pro PersonalPortfolio %
+zsh: command not found: xander@alexanders-MacBook-Pro
+zsh: command not found: remote:
+zsh: bad pattern: (11/11),
+zsh: bad pattern: (8/8),
+zsh: no matches found: (delta 4),
+zsh: bad pattern: (8/8),
+zsh: command not found: 212.00
+zsh: command not found: From
+zsh: command not found: attached_assets
+zsh: no such file or directory: origin/main
+zsh: command not found: Updating
+zsh: command not found: Fast-forward
+zsh: permission denied: client/index.html
+zsh: command not found: 4
+zsh: no matches found: insertions(+),
+zsh: command not found: xander@alexanders-MacBook-Pro
+xander@alexanders-MacBook-Pro PersonalPortfolio % xander@alexanders-MacBook-Pro PersonalPortfolio % git pull origin main
+remote: Enumerating objects: 11, done.
+remote: Counting objects: 100% (11/11), done.
+remote: Compressing objects: 100% (8/8), done.
+remote: Total 8 (delta 4), reused 0 (delta 0), pack-reused 0 (from 0)
+Unpacking objects: 100% (8/8), 2.08 KiB | 212.00 KiB/s, done.
+From https://github.com/xanderwalker/xander-walker-dot-com
+ * branch            main       -> FETCH_HEAD
+   70ffb77..b153aa7  main       -> origin/main
+Updating 70ffb77..b153aa7
+Fast-forward
+ client/index.html | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+xander@alexanders-MacBook-Pro PersonalPortfolio % git status
+zsh: command not found: xander@alexanders-MacBook-Pro
+zsh: command not found: remote:
+zsh: bad pattern: (11/11),
+zsh: bad pattern: (8/8),
+zsh: no matches found: (delta 4),
+zsh: bad pattern: (8/8),
+zsh: command not found: 212.00
+zsh: command not found: From
+zsh: command not found: FETCH_HEAD
+zsh: no such file or directory: origin/main
+zsh: command not found: Updating
+zsh: command not found: Fast-forward
+zsh: permission denied: client/index.html
+zsh: command not found: 4
+zsh: no matches found: insertions(+),
+zsh: command not found: xander@alexanders-MacBook-Pro
+xander@alexanders-MacBook-Pro PersonalPortfolio % 
