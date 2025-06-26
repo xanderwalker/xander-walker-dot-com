@@ -108,4 +108,5 @@ Changelog:
 
 ```
 Preferred communication style: Simple, everyday language.
+Development workflow: Edit files directly in Replit web interface, then push changes to GitHub for automatic deployment to Vercel.
 ```
