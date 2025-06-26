@@ -88,7 +88,8 @@ export default function PhysicsBalls() {
       });
     }
 
-    // Add 3 special bright red balls (3x larger)
+    // Add 3 special large balls with opposite colors (dark/inverted colors)
+    const oppositeColors = ['#004040', '#B31312', '#BA4801']; // dark teal, dark red, dark orange - opposites of mint/sky/coral
     for (let i = 333; i < 336; i++) {
       initialBalls.push({
         id: i,
@@ -97,7 +98,7 @@ export default function PhysicsBalls() {
         vx: (Math.random() - 0.5) * 1.5, // Slightly slower initial velocity
         vy: (Math.random() - 0.5) * 1.5,
         size: 45, // 3x larger (45px vs 15px)
-        color: '#FF0000' // bright red
+        color: oppositeColors[i - 333] // cycle through opposite colors
       });
     }
 
@@ -215,8 +216,8 @@ export default function PhysicsBalls() {
             newY = Math.max(0, Math.min(window.innerHeight - ball.size, newY));
           }
 
-          // Update color based on position (mobile only) - but not for special red balls
-          if (isMobile && ball.color !== '#FF0000') {
+          // Update color based on position (mobile only) - but not for special large balls
+          if (isMobile && ball.size === 15) { // Only change colors for small balls
             newColor = getPositionColor(newX + ball.size / 2, newY + ball.size / 2);
           }
 
