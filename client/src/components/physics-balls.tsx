@@ -82,7 +82,7 @@ export default function PhysicsBalls() {
         y: Math.random() * (window.innerHeight - 20),
         vx: (Math.random() - 0.5) * 2,
         vy: (Math.random() - 0.5) * 2,
-        size: 45, // uniform 45px balls (3x bigger than max previous size)
+        size: 15, // uniform 15px balls (3x smaller)
         color: colors[Math.floor(Math.random() * colors.length)]
       });
     }
