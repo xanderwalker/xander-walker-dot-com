@@ -25,6 +25,10 @@ export default function BouncingCircles() {
   const [draggedCircle, setDraggedCircle] = useState<string | null>(null);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
+  const [deviceOrientation, setDeviceOrientation] = useState({ x: 0, y: 0 });
+  const [permissionGranted, setPermissionGranted] = useState(false);
+  const [showPermissionButton, setShowPermissionButton] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   const navigateToPage = (path: string) => {
     console.log('Navigating to:', path);
@@ -89,18 +93,35 @@ export default function BouncingCircles() {
     const animate = () => {
       setCircles(prevCircles => 
         prevCircles.map(circle => {
+          // Skip physics for dragged circles
+          if (circle.isDragging) {
+            return circle;
+          }
+
           let newX = circle.x + circle.vx;
           let newY = circle.y + circle.vy;
           let newVx = circle.vx;
           let newVy = circle.vy;
 
+          // Apply accelerometer influence on mobile devices
+          if (permissionGranted && (deviceOrientation.x !== 0 || deviceOrientation.y !== 0)) {
+            const gravityStrength = 0.1;
+            newVx += deviceOrientation.x * gravityStrength;
+            newVy += deviceOrientation.y * gravityStrength;
+            
+            // Limit maximum velocity to prevent balls from moving too fast
+            const maxVelocity = 5;
+            newVx = Math.max(-maxVelocity, Math.min(maxVelocity, newVx));
+            newVy = Math.max(-maxVelocity, Math.min(maxVelocity, newVy));
+          }
+
           // Bounce off edges
           if (newX <= 0 || newX >= window.innerWidth - circle.size) {
-            newVx = -newVx;
+            newVx = -newVx * 0.8; // Add some damping
             newX = Math.max(0, Math.min(window.innerWidth - circle.size, newX));
           }
           if (newY <= 0 || newY >= window.innerHeight - circle.size) {
-            newVy = -newVy;
+            newVy = -newVy * 0.8; // Add some damping
             newY = Math.max(0, Math.min(window.innerHeight - circle.size, newY));
           }
 
@@ -125,6 +146,91 @@ export default function BouncingCircles() {
       }
     };
   }, []);
+
+  // Device orientation setup for mobile accelerometer
+  useEffect(() => {
+    // Check if we're on a mobile device
+    const checkMobile = () => {
+      const userAgent = navigator.userAgent || navigator.vendor || (window as any).opera;
+      return /android|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(userAgent.toLowerCase());
+    };
+    
+    setIsMobile(checkMobile());
+    
+    const requestPermission = async () => {
+      // Check if we're on a mobile device with DeviceOrientationEvent
+      if (typeof DeviceOrientationEvent !== 'undefined' && 'requestPermission' in DeviceOrientationEvent) {
+        // iOS 13+ requires user interaction for permission request
+        setShowPermissionButton(true);
+      } else if (typeof DeviceOrientationEvent !== 'undefined') {
+        // Android and older iOS don't require permission
+        setPermissionGranted(true);
+        setupOrientationListener();
+      }
+    };
+
+    const setupOrientationListener = () => {
+      const handleOrientation = (event: DeviceOrientationEvent) => {
+        // Convert orientation to gravity-like forces
+        // gamma: left/right tilt (-90 to 90)
+        // beta: front/back tilt (-180 to 180)
+        const x = event.gamma ? event.gamma / 90 : 0; // Normalize to -1 to 1
+        const y = event.beta ? event.beta / 90 : 0;   // Normalize to -1 to 1
+        
+        setDeviceOrientation({ 
+          x: Math.max(-1, Math.min(1, x)), 
+          y: Math.max(-1, Math.min(1, y)) 
+        });
+      };
+
+      window.addEventListener('deviceorientation', handleOrientation);
+      
+      return () => {
+        window.removeEventListener('deviceorientation', handleOrientation);
+      };
+    };
+
+    // Add a small delay to ensure the component is mounted
+    const timeoutId = setTimeout(requestPermission, 1000);
+    
+    return () => {
+      clearTimeout(timeoutId);
+    };
+  }, []);
+
+  // Function to handle iOS permission request
+  const handlePermissionRequest = async () => {
+    if (typeof DeviceOrientationEvent !== 'undefined' && 'requestPermission' in DeviceOrientationEvent) {
+      try {
+        const permission = await (DeviceOrientationEvent as any).requestPermission();
+        if (permission === 'granted') {
+          setPermissionGranted(true);
+          setShowPermissionButton(false);
+          setupOrientationListener();
+        }
+      } catch (error) {
+        console.log('Permission request failed:', error);
+      }
+    }
+  };
+
+  // Set up orientation listener function
+  const setupOrientationListener = () => {
+    const handleOrientation = (event: DeviceOrientationEvent) => {
+      // Convert orientation to gravity-like forces
+      // gamma: left/right tilt (-90 to 90)
+      // beta: front/back tilt (-180 to 180)
+      const x = event.gamma ? event.gamma / 90 : 0; // Normalize to -1 to 1
+      const y = event.beta ? event.beta / 90 : 0;   // Normalize to -1 to 1
+      
+      setDeviceOrientation({ 
+        x: Math.max(-1, Math.min(1, x)), 
+        y: Math.max(-1, Math.min(1, y)) 
+      });
+    };
+
+    window.addEventListener('deviceorientation', handleOrientation);
+  };
 
   // Global mouse event listeners for dragging
   useEffect(() => {
@@ -260,6 +366,23 @@ export default function BouncingCircles() {
           {circle.text}
         </button>
       ))}
+      
+      {/* iOS Permission Button */}
+      {isMobile && showPermissionButton && (
+        <button
+          onClick={handlePermissionRequest}
+          className="fixed bottom-4 right-4 bg-electric-orange text-white px-6 py-3 rounded-lg font-xanman-wide text-sm uppercase hover:bg-orange-600 transition-colors duration-200 z-50"
+        >
+          Enable Tilt Controls
+        </button>
+      )}
+      
+      {/* Tilt Indicator for Debugging */}
+      {isMobile && permissionGranted && (deviceOrientation.x !== 0 || deviceOrientation.y !== 0) && (
+        <div className="fixed top-4 right-4 bg-black bg-opacity-50 text-white px-4 py-2 rounded-lg text-sm z-50">
+          Tilt: {Math.round(deviceOrientation.x * 100)}, {Math.round(deviceOrientation.y * 100)}
+        </div>
+      )}
     </div>
   );
 }
