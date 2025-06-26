@@ -101,14 +101,14 @@ export default function About() {
       <div className="max-w-7xl mx-auto relative z-30">
         {/* Resume Timeline */}
         <div className="mb-12">
-          <h2 className="font-xanman-wide mb-12 text-center text-black uppercase" style={{fontSize: '55px', lineHeight: '1.2'}}>
+          <h2 className="font-bold mb-12 text-center text-black uppercase" style={{fontSize: '55px', lineHeight: '1.2'}}>
             RESUME
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {timelineEvents.map((event, index) => (
               <div key={index} className="glassmorphism rounded-2xl p-6 relative z-30 pointer-events-auto">
                 {/* Date at top */}
-                <div className="font-xanman-wide text-electric-orange uppercase mb-4 text-center" style={{fontSize: '32px', lineHeight: '1.2'}}>
+                <div className="font-bold text-electric-orange uppercase mb-4 text-center" style={{fontSize: '32px', lineHeight: '1.2'}}>
                   {event.year}
                 </div>
                 
@@ -118,13 +118,13 @@ export default function About() {
                     <img 
                       src={event.image} 
                       alt={`${event.year} artwork`} 
-                      className="w-full max-w-[200px] h-auto glassmorphism rounded-lg p-2" 
+                      className="w-full max-w-[200px] h-auto" 
                     />
                   </div>
                 )}
                 
                 {/* Description below image */}
-                <div className="text-black font-xanman-wide uppercase text-center" style={{fontSize: '18px', lineHeight: '1.3'}}>
+                <div className="text-black font-sans uppercase text-center" style={{fontSize: '18px', lineHeight: '1.3'}}>
                   {event.title}
                 </div>
               </div>
@@ -134,17 +134,17 @@ export default function About() {
 
         {/* Call to Action */}
         <div className="glassmorphism rounded-2xl p-8 text-center mb-8 relative z-30 pointer-events-auto">
-          <p className="text-gray-700 mb-6 font-xanman-wide uppercase" style={{fontSize: '24px', lineHeight: '1.2'}}>
+          <p className="text-gray-700 mb-6 font-sans uppercase" style={{fontSize: '24px', lineHeight: '1.2'}}>
             IF YOU'D LIKE ME TO ADD SOME MORE COLOR TO THIS STORY, SHOOT ME AN EMAIL OR A DM ON TWITTER.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/contact">
-              <Button className="bg-electric-orange hover:bg-electric-orange hover:opacity-90 text-black font-xanman-wide uppercase" style={{fontSize: '20px', lineHeight: '1.2', padding: '12px 24px'}}>
+              <Button className="bg-electric-orange hover:bg-electric-orange hover:opacity-90 text-black font-bold uppercase" style={{fontSize: '20px', lineHeight: '1.2', padding: '12px 24px'}}>
                 GET IN TOUCH
               </Button>
             </Link>
             <Button 
-              className="bg-transparent border-2 border-black hover:bg-black hover:text-white text-black font-xanman-wide uppercase"
+              className="bg-transparent border-2 border-black hover:bg-black hover:text-white text-black font-bold uppercase"
               style={{fontSize: '20px', lineHeight: '1.2', padding: '12px 24px'}}
               onClick={() => window.open('https://twitter.com', '_blank')}
             >
