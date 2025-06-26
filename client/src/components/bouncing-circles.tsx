@@ -105,27 +105,24 @@ export default function BouncingCircles() {
           let newVy = circle.vy;
 
           if (accelerometerEnabled && permissionGranted) {
-            // ACCELEROMETER MODE: Start with zero velocity, only use gravity
-            console.log('Accelerometer mode active!', { accelerometerEnabled, permissionGranted, deviceOrientation });
-            newVx = 0;
-            newVy = 0;
-            
-            // Apply gravity forces from device orientation
-            const gravityStrength = 0.8;
+            // ACCELEROMETER MODE: Only use gravity forces, ignore stored velocities
+            const gravityStrength = 1.2;
             newVx = deviceOrientation.x * gravityStrength;
             newVy = deviceOrientation.y * gravityStrength;
             
             // Limit maximum velocity
-            const maxVelocity = 6;
+            const maxVelocity = 8;
             newVx = Math.max(-maxVelocity, Math.min(maxVelocity, newVx));
             newVy = Math.max(-maxVelocity, Math.min(maxVelocity, newVy));
             
             newX = circle.x + newVx;
             newY = circle.y + newVy;
           } else {
-            // NORMAL MODE: Automatic bouncing movement
-            newX = circle.x + circle.vx;
-            newY = circle.y + circle.vy;
+            // NORMAL MODE: Use stored velocities for automatic bouncing
+            newVx = circle.vx;
+            newVy = circle.vy;
+            newX = circle.x + newVx;
+            newY = circle.y + newVy;
           }
 
           // Handle edges differently based on mode
@@ -133,8 +130,9 @@ export default function BouncingCircles() {
             // ACCELEROMETER MODE: Just prevent going off screen, no bouncing
             newX = Math.max(0, Math.min(window.innerWidth - circle.size, newX));
             newY = Math.max(0, Math.min(window.innerHeight - circle.size, newY));
+            // Don't save velocities in accelerometer mode - they're calculated fresh each frame
           } else {
-            // NORMAL MODE: Bounce off edges
+            // NORMAL MODE: Bounce off edges and update stored velocities
             if (newX <= 0 || newX >= window.innerWidth - circle.size) {
               newVx = -newVx * 0.8;
               newX = Math.max(0, Math.min(window.innerWidth - circle.size, newX));
@@ -149,8 +147,9 @@ export default function BouncingCircles() {
             ...circle,
             x: newX,
             y: newY,
-            vx: newVx,
-            vy: newVy
+            // Only update stored velocities in normal mode
+            vx: accelerometerEnabled && permissionGranted ? circle.vx : newVx,
+            vy: accelerometerEnabled && permissionGranted ? circle.vy : newVy
           };
         })
       );
