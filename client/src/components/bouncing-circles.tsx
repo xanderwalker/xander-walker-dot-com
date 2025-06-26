@@ -105,12 +105,12 @@ export default function BouncingCircles() {
 
           // Apply accelerometer influence on mobile devices
           if (permissionGranted && (deviceOrientation.x !== 0 || deviceOrientation.y !== 0)) {
-            const gravityStrength = 0.1;
+            const gravityStrength = 0.3; // Increased from 0.1 to 0.3
             newVx += deviceOrientation.x * gravityStrength;
             newVy += deviceOrientation.y * gravityStrength;
             
             // Limit maximum velocity to prevent balls from moving too fast
-            const maxVelocity = 5;
+            const maxVelocity = 8; // Increased from 5 to 8
             newVx = Math.max(-maxVelocity, Math.min(maxVelocity, newVx));
             newVy = Math.max(-maxVelocity, Math.min(maxVelocity, newVy));
           }
