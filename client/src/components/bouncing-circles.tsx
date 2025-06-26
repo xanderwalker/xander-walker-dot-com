@@ -126,25 +126,36 @@ export default function BouncingCircles() {
     };
   }, []);
 
-  // Global mouse event listeners for dragging
+  // Global mouse and touch event listeners for dragging
   useEffect(() => {
-    const handleGlobalMouseMove = (e: MouseEvent) => {
+    const handleGlobalMove = (e: MouseEvent | TouchEvent) => {
       if (!draggedCircle) return;
       
       const rect = containerRef.current?.getBoundingClientRect();
       if (!rect) return;
       
-      const mouseX = e.clientX - rect.left;
-      const mouseY = e.clientY - rect.top;
+      let clientX, clientY;
+      if (e.type === 'touchmove') {
+        const touch = (e as TouchEvent).touches[0];
+        if (!touch) return;
+        clientX = touch.clientX;
+        clientY = touch.clientY;
+      } else {
+        clientX = (e as MouseEvent).clientX;
+        clientY = (e as MouseEvent).clientY;
+      }
       
-      setMousePos({ x: mouseX, y: mouseY });
+      const posX = clientX - rect.left;
+      const posY = clientY - rect.top;
+      
+      setMousePos({ x: posX, y: posY });
       
       setCircles(prev => prev.map(c => 
         c.id === draggedCircle 
           ? { 
               ...c, 
-              x: Math.max(0, Math.min(window.innerWidth - c.size, mouseX - dragOffset.x)),
-              y: Math.max(0, Math.min(window.innerHeight - c.size, mouseY - dragOffset.y)),
+              x: Math.max(0, Math.min(window.innerWidth - c.size, posX - dragOffset.x)),
+              y: Math.max(0, Math.min(window.innerHeight - c.size, posY - dragOffset.y)),
               vx: 0,
               vy: 0
             }
@@ -152,7 +163,7 @@ export default function BouncingCircles() {
       ));
     };
 
-    const handleGlobalMouseUp = () => {
+    const handleGlobalEnd = () => {
       if (!draggedCircle) return;
       
       const circle = circles.find(c => c.id === draggedCircle);
@@ -186,17 +197,22 @@ export default function BouncingCircles() {
       setCircles(prev => prev.map(c => ({ ...c, isDragging: false })));
     };
 
-    document.addEventListener('mousemove', handleGlobalMouseMove);
-    document.addEventListener('mouseup', handleGlobalMouseUp);
+    // Add both mouse and touch event listeners
+    document.addEventListener('mousemove', handleGlobalMove);
+    document.addEventListener('mouseup', handleGlobalEnd);
+    document.addEventListener('touchmove', handleGlobalMove, { passive: false });
+    document.addEventListener('touchend', handleGlobalEnd);
 
     return () => {
-      document.removeEventListener('mousemove', handleGlobalMouseMove);
-      document.removeEventListener('mouseup', handleGlobalMouseUp);
+      document.removeEventListener('mousemove', handleGlobalMove);
+      document.removeEventListener('mouseup', handleGlobalEnd);
+      document.removeEventListener('touchmove', handleGlobalMove);
+      document.removeEventListener('touchend', handleGlobalEnd);
     };
   }, [draggedCircle, dragOffset, mousePos, circles]);
 
-  // Drag functionality
-  const handleMouseDown = (e: React.MouseEvent, circleId: string) => {
+  // Drag functionality for both mouse and touch
+  const handleStart = (e: React.MouseEvent | React.TouchEvent, circleId: string) => {
     e.preventDefault();
     const rect = containerRef.current?.getBoundingClientRect();
     if (!rect) return;
@@ -204,20 +220,31 @@ export default function BouncingCircles() {
     const circle = circles.find(c => c.id === circleId);
     if (!circle) return;
     
-    const mouseX = e.clientX - rect.left;
-    const mouseY = e.clientY - rect.top;
+    let clientX, clientY;
+    if (e.type === 'touchstart') {
+      const touch = (e as React.TouchEvent).touches[0];
+      if (!touch) return;
+      clientX = touch.clientX;
+      clientY = touch.clientY;
+    } else {
+      clientX = (e as React.MouseEvent).clientX;
+      clientY = (e as React.MouseEvent).clientY;
+    }
+    
+    const posX = clientX - rect.left;
+    const posY = clientY - rect.top;
     
     setDraggedCircle(circleId);
     setDragOffset({
-      x: mouseX - circle.x,
-      y: mouseY - circle.y
+      x: posX - circle.x,
+      y: posY - circle.y
     });
-    setMousePos({ x: mouseX, y: mouseY });
+    setMousePos({ x: posX, y: posY });
     
     // Mark drag start time and position for click detection
     setCircles(prev => prev.map(c => 
       c.id === circleId 
-        ? { ...c, isDragging: true, dragStartX: mouseX, dragStartY: mouseY, dragStartTime: Date.now() }
+        ? { ...c, isDragging: true, dragStartX: posX, dragStartY: posY, dragStartTime: Date.now() }
         : c
     ));
   };
@@ -253,7 +280,8 @@ export default function BouncingCircles() {
             fontSize: window.innerWidth < 768 ? '100px' : '80px',
             lineHeight: '1'
           }}
-          onMouseDown={(e) => handleMouseDown(e, circle.id)}
+          onMouseDown={(e) => handleStart(e, circle.id)}
+          onTouchStart={(e) => handleStart(e, circle.id)}
           onClick={() => handleClick(circle.id)}
           type="button"
         >
