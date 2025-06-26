@@ -152,20 +152,33 @@ export default function BouncingCircles() {
     // Check if we're on a mobile device
     const checkMobile = () => {
       const userAgent = navigator.userAgent || navigator.vendor || (window as any).opera;
-      return /android|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(userAgent.toLowerCase());
+      const isMobileUA = /android|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(userAgent.toLowerCase());
+      const hasTouchScreen = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+      console.log('Mobile detection:', { userAgent, isMobileUA, hasTouchScreen });
+      return isMobileUA || hasTouchScreen;
     };
     
-    setIsMobile(checkMobile());
+    const mobileDetected = checkMobile();
+    setIsMobile(mobileDetected);
+    console.log('Is mobile device:', mobileDetected);
     
     const requestPermission = async () => {
+      console.log('Requesting device orientation permission...');
+      console.log('DeviceOrientationEvent available:', typeof DeviceOrientationEvent !== 'undefined');
+      console.log('Has requestPermission:', typeof DeviceOrientationEvent !== 'undefined' && 'requestPermission' in DeviceOrientationEvent);
+      
       // Check if we're on a mobile device with DeviceOrientationEvent
       if (typeof DeviceOrientationEvent !== 'undefined' && 'requestPermission' in DeviceOrientationEvent) {
+        console.log('iOS device detected - showing permission button');
         // iOS 13+ requires user interaction for permission request
         setShowPermissionButton(true);
       } else if (typeof DeviceOrientationEvent !== 'undefined') {
+        console.log('Android/older iOS detected - setting up listener directly');
         // Android and older iOS don't require permission
         setPermissionGranted(true);
         setupOrientationListener();
+      } else {
+        console.log('DeviceOrientationEvent not supported');
       }
     };
 
@@ -200,13 +213,19 @@ export default function BouncingCircles() {
 
   // Function to handle iOS permission request
   const handlePermissionRequest = async () => {
+    console.log('Permission button clicked');
     if (typeof DeviceOrientationEvent !== 'undefined' && 'requestPermission' in DeviceOrientationEvent) {
       try {
+        console.log('Requesting DeviceOrientationEvent permission...');
         const permission = await (DeviceOrientationEvent as any).requestPermission();
+        console.log('Permission result:', permission);
         if (permission === 'granted') {
+          console.log('Permission granted - setting up listener');
           setPermissionGranted(true);
           setShowPermissionButton(false);
           setupOrientationListener();
+        } else {
+          console.log('Permission denied');
         }
       } catch (error) {
         console.log('Permission request failed:', error);
@@ -216,6 +235,8 @@ export default function BouncingCircles() {
 
   // Set up orientation listener function
   const setupOrientationListener = () => {
+    console.log('Setting up orientation listener...');
+    
     const handleOrientation = (event: DeviceOrientationEvent) => {
       // Convert orientation to gravity-like forces
       // gamma: left/right tilt (-90 to 90)
@@ -223,13 +244,27 @@ export default function BouncingCircles() {
       const x = event.gamma ? event.gamma / 90 : 0; // Normalize to -1 to 1
       const y = event.beta ? event.beta / 90 : 0;   // Normalize to -1 to 1
       
+      const normalizedX = Math.max(-1, Math.min(1, x));
+      const normalizedY = Math.max(-1, Math.min(1, y));
+      
+      // Only log significant orientation changes to avoid spam
+      if (Math.abs(normalizedX) > 0.1 || Math.abs(normalizedY) > 0.1) {
+        console.log('Orientation event:', { 
+          gamma: event.gamma, 
+          beta: event.beta, 
+          normalizedX, 
+          normalizedY 
+        });
+      }
+      
       setDeviceOrientation({ 
-        x: Math.max(-1, Math.min(1, x)), 
-        y: Math.max(-1, Math.min(1, y)) 
+        x: normalizedX, 
+        y: normalizedY 
       });
     };
 
     window.addEventListener('deviceorientation', handleOrientation);
+    console.log('Orientation listener added');
   };
 
   // Global mouse event listeners for dragging
