@@ -184,14 +184,7 @@ export default function PhysicsBalls() {
         />
       ))}
       
-      {/* Instructions for mobile users */}
-      {isMobile && (
-        <div className="absolute top-20 left-4 right-4 text-center z-20">
-          <div className="bg-black bg-opacity-50 text-white p-4 rounded-lg text-sm">
-            Tilt your device to move the balls! They change color based on screen position.
-          </div>
-        </div>
-      )}
+
     </div>
   );
 }
