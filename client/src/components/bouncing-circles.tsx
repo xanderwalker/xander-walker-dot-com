@@ -105,17 +105,17 @@ export default function BouncingCircles() {
           let newVy = circle.vy;
 
           if (accelerometerEnabled && permissionGranted) {
-            // ACCELEROMETER MODE: Gravity-based physics only
-            const gravityStrength = 0.5;
-            newVx += deviceOrientation.x * gravityStrength;
-            newVy += deviceOrientation.y * gravityStrength;
+            // ACCELEROMETER MODE: Start with zero velocity, only use gravity
+            newVx = 0;
+            newVy = 0;
             
-            // Apply friction to prevent infinite acceleration
-            newVx *= 0.95;
-            newVy *= 0.95;
+            // Apply gravity forces from device orientation
+            const gravityStrength = 0.8;
+            newVx = deviceOrientation.x * gravityStrength;
+            newVy = deviceOrientation.y * gravityStrength;
             
             // Limit maximum velocity
-            const maxVelocity = 8;
+            const maxVelocity = 6;
             newVx = Math.max(-maxVelocity, Math.min(maxVelocity, newVx));
             newVy = Math.max(-maxVelocity, Math.min(maxVelocity, newVy));
             
