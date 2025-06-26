@@ -109,5 +109,5 @@ Changelog:
 
 ```
 Preferred communication style: Simple, everyday language.
-Development workflow: Edit files directly in Replit web interface, then push changes to GitHub for automatic deployment to Vercel.
+Development workflow: Prefers simpler workflows due to complexity of syncing between Replit and local repository. Options include editing directly in Replit with built-in git tools, or using GitHub's web editor for direct browser-based editing.
 ```
