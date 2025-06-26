@@ -8,6 +8,10 @@ interface Ball {
   vy: number;
   size: number;
   color: string;
+  isLetter?: boolean;
+  letter?: string;
+  rotation?: number;
+  rotationSpeed?: number;
 }
 
 export default function PhysicsBalls() {
@@ -88,17 +92,21 @@ export default function PhysicsBalls() {
       });
     }
 
-    // Add 3 special large balls with opposite colors (dark/inverted colors)
-    const oppositeColors = ['#004040', '#B31312', '#BA4801']; // dark teal, dark red, dark orange - opposites of mint/sky/coral
-    for (let i = 333; i < 336; i++) {
+    // Add floating X and W letters
+    const letters = ['X', 'W'];
+    for (let i = 333; i < 335; i++) {
       initialBalls.push({
         id: i,
-        x: Math.random() * (window.innerWidth - 45),
-        y: Math.random() * (window.innerHeight - 45),
-        vx: (Math.random() - 0.5) * 1.5, // Slightly slower initial velocity
-        vy: (Math.random() - 0.5) * 1.5,
-        size: 45, // 3x larger (45px vs 15px)
-        color: oppositeColors[i - 333] // cycle through opposite colors
+        x: Math.random() * (window.innerWidth - 60),
+        y: Math.random() * (window.innerHeight - 60),
+        vx: (Math.random() - 0.5) * 3, // Faster movement for letters
+        vy: (Math.random() - 0.5) * 3,
+        size: 60, // Large size for letters
+        color: '#000000', // Black letters
+        isLetter: true,
+        letter: letters[i - 333],
+        rotation: Math.random() * 360,
+        rotationSpeed: (Math.random() - 0.5) * 8 // Random rotation speed
       });
     }
 
@@ -144,6 +152,7 @@ export default function PhysicsBalls() {
         updatedBalls = updatedBalls.map(ball => {
           let newVx = ball.vx;
           let newVy = ball.vy;
+          let newRotation = ball.rotation || 0;
 
           if (isMobile) {
             // Apply accelerometer forces
@@ -154,10 +163,16 @@ export default function PhysicsBalls() {
             newVy += 0.2;
           }
 
+          // Update rotation for letters
+          if (ball.isLetter) {
+            newRotation += ball.rotationSpeed || 0;
+          }
+
           return {
             ...ball,
             vx: newVx,
-            vy: newVy
+            vy: newVy,
+            rotation: newRotation
           };
         });
 
@@ -225,10 +240,9 @@ export default function PhysicsBalls() {
             newY = Math.max(0, Math.min(window.innerHeight - ball.size, newY));
           }
 
-          // Update color based on position (mobile only) - different colors for large vs small balls
-          if (isMobile) {
-            const isLargeBall = ball.size === 45;
-            newColor = getPositionColor(newX + ball.size / 2, newY + ball.size / 2, isLargeBall);
+          // Update color based on position (mobile only) - only for small balls, not letters
+          if (isMobile && !ball.isLetter) {
+            newColor = getPositionColor(newX + ball.size / 2, newY + ball.size / 2, false);
           }
 
           return {
@@ -257,21 +271,38 @@ export default function PhysicsBalls() {
   return (
     <div ref={containerRef} className="fixed inset-0 z-10">
       {balls.map(ball => (
-        <div
-          key={ball.id}
-          className="absolute rounded-full pointer-events-none"
-          style={{
-            left: ball.x,
-            top: ball.y,
-            width: ball.size,
-            height: ball.size,
-            backgroundColor: ball.color,
-            transition: isMobile ? 'background-color 0.3s ease' : 'none'
-          }}
-        />
+        ball.isLetter ? (
+          <div
+            key={ball.id}
+            className="absolute pointer-events-none font-xanman-wide font-bold flex items-center justify-center"
+            style={{
+              left: ball.x,
+              top: ball.y,
+              width: ball.size,
+              height: ball.size,
+              fontSize: `${ball.size * 0.8}px`,
+              color: ball.color,
+              transform: `rotate(${ball.rotation}deg)`,
+              lineHeight: '1'
+            }}
+          >
+            {ball.letter}
+          </div>
+        ) : (
+          <div
+            key={ball.id}
+            className="absolute rounded-full pointer-events-none"
+            style={{
+              left: ball.x,
+              top: ball.y,
+              width: ball.size,
+              height: ball.size,
+              backgroundColor: ball.color,
+              transition: isMobile ? 'background-color 0.3s ease' : 'none'
+            }}
+          />
+        )
       ))}
-      
-
     </div>
   );
 }
