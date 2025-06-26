@@ -13,8 +13,8 @@ export default function Layout({ children, title = "XANDER WALKER", subtitle = "
     <div className="bg-white text-gray-900 min-h-screen relative">
       <BouncingCircles />
       
-      <div className="relative z-20 min-h-screen flex flex-col items-center justify-center px-4 md:px-8">
-        <header className="text-center mb-12 md:mb-16">
+      <div className="relative z-40 min-h-screen flex flex-col items-center justify-center px-4 md:px-8">
+        <header className="text-center mb-12 md:mb-16 relative z-50">
           <Link href="/">
             <h1 className="font-xanman text-8xl md:text-9xl lg:text-[12rem] font-bold text-black mb-4 cursor-pointer hover:scale-105 transition-transform duration-300">
               {title}
