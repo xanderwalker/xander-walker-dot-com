@@ -126,7 +126,7 @@ export default function BouncingCircles() {
     };
   }, []);
 
-  // Global mouse and touch event listeners for dragging
+  // Global mouse and touch event listeners for dragging (mobile support added)
   useEffect(() => {
     const handleGlobalMove = (e: MouseEvent | TouchEvent) => {
       if (!draggedCircle) return;
