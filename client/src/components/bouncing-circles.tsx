@@ -92,26 +92,31 @@ export default function BouncingCircles() {
     setCircles(initialCircles);
 
     const animate = () => {
-      setCircles(prevCircles => 
-        prevCircles.map(circle => {
+      setCircles(prevCircles => {
+        // Get current state values at render time
+        const currentAccelerometerEnabled = accelerometerEnabled;
+        const currentPermissionGranted = permissionGranted;
+        const currentDeviceOrientation = deviceOrientation;
+        
+        return prevCircles.map(circle => {
           // Skip physics for dragged circles
           if (circle.isDragging) {
             return circle;
           }
 
-          if (accelerometerEnabled && permissionGranted) {
+          if (currentAccelerometerEnabled && currentPermissionGranted) {
             // ACCELEROMETER MODE: Direct gravity-based movement, preserve original velocities
             console.log('ACCEL MODE:', { 
-              enabled: accelerometerEnabled, 
-              granted: permissionGranted, 
-              orientation: deviceOrientation,
+              enabled: currentAccelerometerEnabled, 
+              granted: currentPermissionGranted, 
+              orientation: currentDeviceOrientation,
               circleId: circle.id,
               currentPos: { x: circle.x, y: circle.y }
             });
             
             const gravity = 1.5;
-            const moveX = deviceOrientation.x * gravity;
-            const moveY = deviceOrientation.y * gravity;
+            const moveX = currentDeviceOrientation.x * gravity;
+            const moveY = currentDeviceOrientation.y * gravity;
             
             const newX = Math.max(0, Math.min(window.innerWidth - circle.size, circle.x + moveX));
             const newY = Math.max(0, Math.min(window.innerHeight - circle.size, circle.y + moveY));
@@ -149,8 +154,8 @@ export default function BouncingCircles() {
               vy: newVy
             };
           }
-        })
-      );
+        });
+      });
 
       animationRef.current = requestAnimationFrame(animate);
     };
@@ -162,7 +167,7 @@ export default function BouncingCircles() {
         cancelAnimationFrame(animationRef.current);
       }
     };
-  }, [accelerometerEnabled, permissionGranted, deviceOrientation]);
+  }, []);
 
   // Device orientation setup for mobile accelerometer
   useEffect(() => {
