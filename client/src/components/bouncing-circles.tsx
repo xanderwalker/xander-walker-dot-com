@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import { useLocation } from 'wouter';
 
 interface Circle {
@@ -40,34 +40,34 @@ export default function BouncingCircles() {
     const initialCircles: Circle[] = [
       {
         id: 'bio',
-        x: Math.random() * (window.innerWidth - 200),
-        y: Math.random() * (window.innerHeight - 200),
+        x: Math.random() * (window.innerWidth - 320),
+        y: Math.random() * (window.innerHeight - 320),
         vx: (Math.random() - 0.5) * 1.5,
         vy: (Math.random() - 0.5) * 1.5,
-        size: 200,
+        size: 320,
         color: 'bg-electric-orange',
-        text: 'BIO',
+        text: 'RESUME',
         action: () => navigateToPage('/about')
       },
       {
-        id: 'linkedin',
-        x: Math.random() * (window.innerWidth - 200),
-        y: Math.random() * (window.innerHeight - 200),
+        id: 'projects',
+        x: Math.random() * (window.innerWidth - 240),
+        y: Math.random() * (window.innerHeight - 240),
         vx: (Math.random() - 0.5) * 1.5,
         vy: (Math.random() - 0.5) * 1.5,
-        size: 200,
-        color: 'bg-electric-cyan',
-        text: 'LINKEDIN',
-        action: () => openExternal('https://linkedin.com/in/xander-walker')
+        size: 240,
+        color: 'bg-cyan-blue',
+        text: 'PROJECTS',
+        action: () => navigateToPage('/projects')
       },
       {
         id: 'store',
-        x: Math.random() * (window.innerWidth - 200),
-        y: Math.random() * (window.innerHeight - 200),
+        x: Math.random() * (window.innerWidth - 280),
+        y: Math.random() * (window.innerHeight - 280),
         vx: (Math.random() - 0.5) * 1.5,
         vy: (Math.random() - 0.5) * 1.5,
-        size: 200,
-        color: 'bg-neon-red',
+        size: 280,
+        color: 'bg-electric-red',
         text: 'STORE',
         action: () => navigateToPage('/portfolio')
       },
@@ -89,12 +89,6 @@ export default function BouncingCircles() {
     const animate = () => {
       setCircles(prevCircles => 
         prevCircles.map(circle => {
-          // Skip physics for dragged circles
-          if (circle.isDragging) {
-            return circle;
-          }
-
-          // Standard bouncing physics
           let newX = circle.x + circle.vx;
           let newY = circle.y + circle.vy;
           let newVx = circle.vx;
@@ -102,11 +96,11 @@ export default function BouncingCircles() {
 
           // Bounce off edges
           if (newX <= 0 || newX >= window.innerWidth - circle.size) {
-            newVx = -newVx * 0.8;
+            newVx = -newVx;
             newX = Math.max(0, Math.min(window.innerWidth - circle.size, newX));
           }
           if (newY <= 0 || newY >= window.innerHeight - circle.size) {
-            newVy = -newVy * 0.8;
+            newVy = -newVy;
             newY = Math.max(0, Math.min(window.innerHeight - circle.size, newY));
           }
 
@@ -132,23 +126,30 @@ export default function BouncingCircles() {
     };
   }, []);
 
-  // Global mouse tracking for drag functionality
+  // Global mouse event listeners for dragging
   useEffect(() => {
     const handleGlobalMouseMove = (e: MouseEvent) => {
-      setMousePos({ x: e.clientX, y: e.clientY });
+      if (!draggedCircle) return;
       
-      if (draggedCircle) {
-        setCircles(prev => prev.map(circle => 
-          circle.id === draggedCircle 
-            ? { 
-                ...circle, 
-                x: e.clientX - dragOffset.x,
-                y: e.clientY - dragOffset.y,
-                isDragging: true 
-              }
-            : circle
-        ));
-      }
+      const rect = containerRef.current?.getBoundingClientRect();
+      if (!rect) return;
+      
+      const mouseX = e.clientX - rect.left;
+      const mouseY = e.clientY - rect.top;
+      
+      setMousePos({ x: mouseX, y: mouseY });
+      
+      setCircles(prev => prev.map(c => 
+        c.id === draggedCircle 
+          ? { 
+              ...c, 
+              x: Math.max(0, Math.min(window.innerWidth - c.size, mouseX - dragOffset.x)),
+              y: Math.max(0, Math.min(window.innerHeight - c.size, mouseY - dragOffset.y)),
+              vx: 0,
+              vy: 0
+            }
+          : c
+      ));
     };
 
     const handleGlobalMouseUp = () => {
@@ -203,21 +204,20 @@ export default function BouncingCircles() {
     const circle = circles.find(c => c.id === circleId);
     if (!circle) return;
     
-    const offsetX = e.clientX - circle.x;
-    const offsetY = e.clientY - circle.y;
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
     
-    setDragOffset({ x: offsetX, y: offsetY });
     setDraggedCircle(circleId);
+    setDragOffset({
+      x: mouseX - circle.x,
+      y: mouseY - circle.y
+    });
+    setMousePos({ x: mouseX, y: mouseY });
     
+    // Mark drag start time and position for click detection
     setCircles(prev => prev.map(c => 
       c.id === circleId 
-        ? { 
-            ...c, 
-            isDragging: true,
-            dragStartX: e.clientX,
-            dragStartY: e.clientY,
-            dragStartTime: Date.now()
-          }
+        ? { ...c, isDragging: true, dragStartX: mouseX, dragStartY: mouseY, dragStartTime: Date.now() }
         : c
     ));
   };
