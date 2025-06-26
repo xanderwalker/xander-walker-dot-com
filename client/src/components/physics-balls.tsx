@@ -274,7 +274,7 @@ export default function PhysicsBalls() {
         ball.isLetter ? (
           <div
             key={ball.id}
-            className="absolute pointer-events-none font-xanman-wide font-bold flex items-center justify-center border-2 border-black"
+            className="absolute pointer-events-none font-xanman-wide font-bold flex items-center justify-center border-2 border-black rounded-full"
             style={{
               left: ball.x,
               top: ball.y,
@@ -283,8 +283,7 @@ export default function PhysicsBalls() {
               fontSize: `${ball.size * 0.9}px`,
               color: ball.color,
               transform: `rotate(${ball.rotation}deg)`,
-              lineHeight: '1',
-              borderRadius: '8px'
+              lineHeight: '1'
             }}
           >
             {ball.letter}
