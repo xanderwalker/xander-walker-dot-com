@@ -162,7 +162,7 @@ export default function BouncingCircles() {
         cancelAnimationFrame(animationRef.current);
       }
     };
-  }, []);
+  }, [accelerometerEnabled, permissionGranted, deviceOrientation]);
 
   // Device orientation setup for mobile accelerometer
   useEffect(() => {
