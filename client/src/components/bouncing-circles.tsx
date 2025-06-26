@@ -127,14 +127,21 @@ export default function BouncingCircles() {
             newY = circle.y + circle.vy;
           }
 
-          // Bounce off edges
-          if (newX <= 0 || newX >= window.innerWidth - circle.size) {
-            newVx = -newVx * 0.8; // Add some damping
+          // Handle edges differently based on mode
+          if (accelerometerEnabled && permissionGranted) {
+            // ACCELEROMETER MODE: Just prevent going off screen, no bouncing
             newX = Math.max(0, Math.min(window.innerWidth - circle.size, newX));
-          }
-          if (newY <= 0 || newY >= window.innerHeight - circle.size) {
-            newVy = -newVy * 0.8; // Add some damping
             newY = Math.max(0, Math.min(window.innerHeight - circle.size, newY));
+          } else {
+            // NORMAL MODE: Bounce off edges
+            if (newX <= 0 || newX >= window.innerWidth - circle.size) {
+              newVx = -newVx * 0.8;
+              newX = Math.max(0, Math.min(window.innerWidth - circle.size, newX));
+            }
+            if (newY <= 0 || newY >= window.innerHeight - circle.size) {
+              newVy = -newVy * 0.8;
+              newY = Math.max(0, Math.min(window.innerHeight - circle.size, newY));
+            }
           }
 
           return {
