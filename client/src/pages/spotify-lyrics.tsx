@@ -446,26 +446,51 @@ export default function SpotifyLyrics() {
                   <div className="flex-1 bg-black/20 backdrop-blur-sm rounded-2xl p-8 mb-4">
                     <div className="h-full overflow-y-auto">
                       {(lyrics.syncedLyrics || (currentTrack?.is_playing && lyrics.lyrics)) ? (
-                        // Large synchronized lyrics for distance reading
-                        <div className="font-serif leading-relaxed space-y-6 text-center" style={{fontFamily: 'Georgia, serif'}}>
-                          {(lyrics.syncedLyrics || createBasicSync(lyrics.lyrics, currentTrack?.duration_ms || 0)).map((line, index) => {
-                            const isCurrentLine = getCurrentLyricIndex() === index;
-                            return (
-                              <div
-                                key={index}
-                                className={`transition-all duration-500 ${
-                                  isCurrentLine 
-                                    ? 'text-white font-bold text-4xl md:text-6xl scale-105' 
-                                    : 'text-gray-400 text-2xl md:text-4xl'
-                                }`}
-                                style={{
-                                  transform: isCurrentLine ? 'translateY(-10px)' : 'translateY(0)',
-                                }}
-                              >
-                                {line.words}
-                              </div>
-                            );
-                          })}
+                        // Large synchronized lyrics with sliding window effect
+                        <div className="font-serif leading-relaxed space-y-4 text-center" style={{fontFamily: 'Georgia, serif'}}>
+                          {(() => {
+                            const allLines = lyrics.syncedLyrics || createBasicSync(lyrics.lyrics, currentTrack?.duration_ms || 0);
+                            const currentIndex = getCurrentLyricIndex();
+                            
+                            // Show 10 lines centered around current line
+                            const startIndex = Math.max(0, currentIndex - 4);
+                            const endIndex = Math.min(allLines.length, startIndex + 10);
+                            const visibleLines = allLines.slice(startIndex, endIndex);
+                            
+                            return visibleLines.map((line, relativeIndex) => {
+                              const actualIndex = startIndex + relativeIndex;
+                              const isCurrentLine = actualIndex === currentIndex;
+                              const distanceFromCenter = Math.abs(relativeIndex - 4); // Distance from center (index 4)
+                              
+                              // Size mapping: center=6, +/-1=5, +/-2=4, +/-3=3, +/-4=2
+                              const sizeMap = {
+                                0: 'text-6xl md:text-8xl', // Center line (largest)
+                                1: 'text-5xl md:text-7xl', // Adjacent lines
+                                2: 'text-4xl md:text-6xl', // 2 lines away
+                                3: 'text-3xl md:text-5xl', // 3 lines away
+                                4: 'text-2xl md:text-4xl'  // Edge lines (smallest)
+                              };
+                              
+                              const fontSize = sizeMap[Math.min(distanceFromCenter, 4)] || 'text-xl md:text-3xl';
+                              
+                              return (
+                                <div
+                                  key={actualIndex}
+                                  className={`transition-all duration-500 ${fontSize} ${
+                                    isCurrentLine 
+                                      ? 'text-white font-bold scale-105' 
+                                      : 'text-gray-400'
+                                  }`}
+                                  style={{
+                                    transform: isCurrentLine ? 'translateY(-10px)' : 'translateY(0)',
+                                    opacity: distanceFromCenter === 4 ? 0.6 : 1, // Fade edge lines slightly
+                                  }}
+                                >
+                                  {line.words}
+                                </div>
+                              );
+                            });
+                          })()}
                         </div>
                       ) : (
                         // Large static lyrics
