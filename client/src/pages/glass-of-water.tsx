@@ -112,8 +112,8 @@ export default function GlassOfWater() {
         return prevPoints.map((point, i) => {
           // Calculate target Y based on tilt and base water level with more dramatic curves
           const distanceFromCenter = (point.x - screenSize.width / 2) / (screenSize.width / 2);
-          const tiltOffset = distanceFromCenter * (tilt.x * 0.02); // Much more pronounced horizontal tilt
-          const targetY = point.baseY + tiltOffset + (tilt.y * 8); // Much stronger vertical response
+          const tiltOffset = distanceFromCenter * (-tilt.x * 0.02); // Inverted: water flows toward tilt direction
+          const targetY = point.baseY + tiltOffset + (-tilt.y * 8); // Inverted: water moves with tilt
           
           // Spring physics for water surface with stronger forces
           const force = (targetY - point.y) * 0.03; // Increased spring force
