@@ -610,7 +610,14 @@ const AnalogClock = ({ currentTime }: { currentTime: Date }) => {
       
       <div className="text-white text-center font-serif" style={{fontFamily: 'Georgia, serif'}}>
         <div className="text-lg">Analog Clock</div>
-        <div className="text-sm text-gray-300">{formatTime(currentTime)}</div>
+        <div className="text-sm text-gray-300">
+          {currentTime.toLocaleTimeString('en-US', { 
+            hour12: true,
+            hour: 'numeric',
+            minute: '2-digit',
+            second: '2-digit'
+          })}
+        </div>
       </div>
     </div>
   );
