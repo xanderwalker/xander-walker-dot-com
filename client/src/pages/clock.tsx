@@ -515,61 +515,30 @@ const PixelClockComponent = ({ currentTime }: { currentTime: Date }) => {
       // Calculate total seconds passed in current hour
       const totalSecondsInHour = currentMinutes * 60 + currentSeconds;
       
-      // Create initial balls with natural sand-like distribution
+      // Create initial sand grains filling flat across bottom 
       const initialBalls: PixelBall[] = [];
-      const settledPositions = new Set<string>();
+      const grainsNeeded = Math.floor(totalSecondsInHour / 10); // Reduce density since dropping every 100ms
       
-      for (let i = 0; i < totalSecondsInHour * 10; i++) {
-        let placed = false;
+      // Fill bottom flat layers first
+      let currentLayer = 320; // Start at bottom
+      let currentX = 5; // Start at left edge
+      
+      for (let i = 0; i < grainsNeeded; i++) {
+        initialBalls.push({
+          id: ballIdRef.current++,
+          x: currentX,
+          y: currentLayer,
+          vy: 0,
+          isSettled: true
+        });
         
-        // Simulate natural sand accumulation - balls prefer center and roll to edges
-        const preferredX = 105; // Center of 200-pixel tube (5 + 200/2 = 105)
+        // Move to next position
+        currentX += 2; // 2-pixel wide grains
         
-        // Try positions starting from center and spreading outward
-        for (let spread = 0; spread <= 100 && !placed; spread++) {
-          for (let side = 0; side <= 1 && !placed; side++) {
-            const x = side === 0 ? preferredX - spread : preferredX + spread;
-            
-            if (x >= 5 && x <= 205) {
-              // Find the surface level at this x position
-              for (let y = 320; y >= 0; y--) {
-                if (!settledPositions.has(`${x},${y}`)) {
-                  // Check if this position has proper support (sand behavior)
-                  if (y === 320 || settledPositions.has(`${x},${y + 1}`)) {
-                    initialBalls.push({
-                      id: ballIdRef.current++,
-                      x: x,
-                      y: y,
-                      vy: 0,
-                      isSettled: true
-                    });
-                    settledPositions.add(`${x},${y}`);
-                    placed = true;
-                    break;
-                  }
-                }
-              }
-            }
-          }
-        }
-        
-        // If still not placed (tube getting full), place anywhere available
-        if (!placed) {
-          for (let y = 320; y >= 0 && !placed; y--) {
-            for (let x = 5; x <= 205 && !placed; x++) {
-              if (!settledPositions.has(`${x},${y}`)) {
-                initialBalls.push({
-                  id: ballIdRef.current++,
-                  x: x,
-                  y: y,
-                  vy: 0,
-                  isSettled: true
-                });
-                settledPositions.add(`${x},${y}`);
-                placed = true;
-              }
-            }
-          }
+        // If reached end of tube, go to next layer
+        if (currentX > 205) {
+          currentX = 5;
+          currentLayer--;
         }
       }
       
@@ -578,35 +547,33 @@ const PixelClockComponent = ({ currentTime }: { currentTime: Date }) => {
     }
   }, [currentTime]);
 
-  // Drop 10 balls every second
+  // Drop sand every 100ms
   useEffect(() => {
-    const currentSecond = currentTime.getSeconds();
-    const currentMinute = currentTime.getMinutes();
-    
-    if (lastSecondRef.current !== currentSecond) {
-      lastSecondRef.current = currentSecond;
+    const interval = setInterval(() => {
+      const now = new Date();
+      const currentMinute = now.getMinutes();
+      const currentSecond = now.getSeconds();
       
-      // Clear all balls at the start of each hour (when minutes = 0 and seconds = 0)
+      // Clear all balls at the start of each hour
       if (currentMinute === 0 && currentSecond === 0) {
         setPixelBalls([]);
         return;
       }
       
-      // Drop 10 new pixel balls
-      const newBalls: PixelBall[] = [];
-      for (let i = 0; i < 10; i++) {
-        newBalls.push({
-          id: ballIdRef.current++,
-          x: 5 + Math.random() * 200, // Random position across 200-pixel width
-          y: 0,
-          vy: 0.5 + Math.random() * 0.5,
-          isSettled: false
-        });
-      }
+      // Drop 1 sand grain from center every 100ms
+      const newBall: PixelBall = {
+        id: ballIdRef.current++,
+        x: 105, // Center of 200-pixel tube
+        y: 0,
+        vy: 1.0,
+        isSettled: false
+      };
       
-      setPixelBalls(prev => [...prev, ...newBalls]);
-    }
-  }, [currentTime]);
+      setPixelBalls(prev => [...prev, newBall]);
+    }, 100);
+
+    return () => clearInterval(interval);
+  }, []);
 
   // Physics animation for sand-like stacking
   useEffect(() => {
@@ -615,10 +582,13 @@ const PixelClockComponent = ({ currentTime }: { currentTime: Date }) => {
         const settledPositions = new Set<string>();
         const newBalls = [...prev];
         
-        // First pass: record all settled ball positions
+        // First pass: record all settled sand grain positions (2px wide)
         newBalls.forEach(ball => {
           if (ball.isSettled) {
-            settledPositions.add(`${Math.round(ball.x)},${Math.round(ball.y)}`);
+            const roundedX = Math.round(ball.x);
+            const roundedY = Math.round(ball.y);
+            settledPositions.add(`${roundedX},${roundedY}`);
+            settledPositions.add(`${roundedX + 1},${roundedY}`); // 2px wide
           }
         });
         
@@ -635,35 +605,43 @@ const PixelClockComponent = ({ currentTime }: { currentTime: Date }) => {
           const cylinderLeft = 5;
           const cylinderRight = 205;
           
-          // Add horizontal spreading force when ball is near settling
-          if (ball.vy > 1) {
-            // Add stronger random horizontal movement for better spreading
-            newX += (Math.random() - 0.5) * 2.0;
+          // Hourglass sand spreading - when falling, sand spreads outward from center
+          if (ball.vy > 0.5) {
+            // Calculate distance from center and add outward spreading force
+            const centerX = 105;
+            const distanceFromCenter = newX - centerX;
+            const spreadingForce = distanceFromCenter > 0 ? 0.3 : -0.3;
+            newX += spreadingForce + (Math.random() - 0.5) * 1.0;
           }
           
-          // Add slight settling oscillation for more natural sand behavior
-          if (ball.vy < 0.5 && !ball.isSettled) {
-            newX += (Math.random() - 0.5) * 0.5;
+          // When near settling, add more lateral movement for natural pile formation
+          if (ball.vy < 1.0 && !ball.isSettled) {
+            newX += (Math.random() - 0.5) * 1.5;
           }
           
           // Constrain to cylinder walls
           if (newX < cylinderLeft) newX = cylinderLeft;
           if (newX > cylinderRight) newX = cylinderRight;
           
-          // Check collision with bottom or other balls
+          // Check collision with bottom or other sand grains (2px wide)
           const roundedX = Math.round(newX);
           const roundedY = Math.round(newY);
           
-          // Check if position below is occupied or at bottom
-          if (roundedY >= cylinderBottom || settledPositions.has(`${roundedX},${roundedY + 1}`)) {
+          // Check if position below is occupied or at bottom (check both pixels of 2px width)
+          const collisionBelow = roundedY >= cylinderBottom || 
+                                settledPositions.has(`${roundedX},${roundedY + 1}`) ||
+                                settledPositions.has(`${roundedX + 1},${roundedY + 1}`);
+          
+          if (collisionBelow) {
             // Find natural sand-like settling position
             let finalY = cylinderBottom;
             let finalX = roundedX;
             let found = false;
             
-            // Check if can settle directly below current position
+            // Check if can settle directly below current position (check 2px width)
             const targetY = Math.min(cylinderBottom, roundedY);
-            if (!settledPositions.has(`${roundedX},${targetY}`)) {
+            if (!settledPositions.has(`${roundedX},${targetY}`) && 
+                !settledPositions.has(`${roundedX + 1},${targetY}`)) {
               finalY = targetY;
               finalX = roundedX;
               found = true;
@@ -723,7 +701,9 @@ const PixelClockComponent = ({ currentTime }: { currentTime: Date }) => {
             newX = finalX;
             newVy = 0;
             newIsSettled = true;
+            // Mark both pixels of the 2px wide sand grain as occupied
             settledPositions.add(`${finalX},${finalY}`);
+            settledPositions.add(`${finalX + 1},${finalY}`);
           }
           
           return {
@@ -751,7 +731,7 @@ const PixelClockComponent = ({ currentTime }: { currentTime: Date }) => {
   return (
     <div className="flex justify-center">
       <div className="flex flex-col items-center">
-        <div className="font-serif text-lg mb-2 text-black" style={{fontFamily: 'Georgia, serif'}}>Hour Clock</div>
+        <div className="font-serif text-lg mb-2 text-black" style={{fontFamily: 'Georgia, serif'}}>HOURGLASS</div>
         <div className="relative overflow-hidden" style={{
           width: '220px', // 200 pixels for tube + padding
           height: '340px', // Increased height to accommodate bottom placement
@@ -772,14 +752,16 @@ const PixelClockComponent = ({ currentTime }: { currentTime: Date }) => {
             </div>
           ))}
           
-          {/* Render pixel balls */}
+          {/* Render sand grains (2x1 pixels) */}
           {pixelBalls.map(ball => (
             <div
               key={ball.id}
-              className="absolute w-1 h-1 bg-blue-600"
+              className="absolute bg-yellow-600"
               style={{
                 left: `${ball.x}px`,
-                top: `${ball.y}px`
+                top: `${ball.y}px`,
+                width: '2px',
+                height: '1px'
               }}
             />
           ))}
