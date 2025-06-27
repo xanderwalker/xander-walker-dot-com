@@ -44,6 +44,192 @@ const getDayOfYear = (date: Date) => {
   return Math.floor(diff / (1000 * 60 * 60 * 24));
 };
 
+// Amoeba Clock Component
+const AmoebaClockComponent = ({ currentTime }: { currentTime: Date }) => {
+  const [morphPoints, setMorphPoints] = useState<number[]>([]);
+  const [waterOffset, setWaterOffset] = useState(0);
+  const [pulseScale, setPulseScale] = useState(1);
+  
+  const seconds = currentTime.getSeconds();
+  const minutes = currentTime.getMinutes();
+  
+  // Generate color based on time
+  const getTimeColor = () => {
+    const hue = (seconds * 6) % 360; // Full spectrum over 60 seconds
+    return `hsl(${hue}, 70%, 60%)`;
+  };
+  
+  // Generate amoeba blob path
+  const generateBlobPath = (points: number[]) => {
+    if (points.length === 0) return '';
+    
+    const centerX = 150;
+    const centerY = 150;
+    const baseRadius = 80;
+    
+    let path = `M `;
+    for (let i = 0; i < 12; i++) {
+      const angle = (i / 12) * Math.PI * 2;
+      const radiusVariation = points[i] || 0.8;
+      const radius = baseRadius * (0.6 + radiusVariation * 0.4);
+      const x = centerX + Math.cos(angle) * radius;
+      const y = centerY + Math.sin(angle) * radius;
+      
+      if (i === 0) {
+        path += `${x} ${y}`;
+      } else {
+        // Create smooth curves
+        const prevAngle = ((i - 1) / 12) * Math.PI * 2;
+        const prevRadius = baseRadius * (0.6 + (points[i - 1] || 0.8) * 0.4);
+        const prevX = centerX + Math.cos(prevAngle) * prevRadius;
+        const prevY = centerY + Math.sin(prevAngle) * prevRadius;
+        
+        const cpX = (prevX + x) / 2 + Math.sin(angle) * 20;
+        const cpY = (prevY + y) / 2 + Math.cos(angle) * 20;
+        
+        path += ` Q ${cpX} ${cpY} ${x} ${y}`;
+      }
+    }
+    path += ' Z';
+    return path;
+  };
+  
+  useEffect(() => {
+    // Morph animation
+    const morphInterval = setInterval(() => {
+      setMorphPoints(prev => {
+        const newPoints = prev.map(point => {
+          return Math.max(0.3, Math.min(1.2, point + (Math.random() - 0.5) * 0.1));
+        });
+        
+        // Add or remove points occasionally
+        if (newPoints.length < 12) {
+          while (newPoints.length < 12) {
+            newPoints.push(0.8 + Math.random() * 0.4);
+          }
+        }
+        return newPoints;
+      });
+    }, 150);
+    
+    // Water sloshing animation
+    const waterInterval = setInterval(() => {
+      setWaterOffset(prev => (prev + 1) % 360);
+    }, 50);
+    
+    // Pulse animation on second change
+    const pulseInterval = setInterval(() => {
+      setPulseScale(1.15);
+      setTimeout(() => setPulseScale(1), 100);
+    }, 1000);
+    
+    return () => {
+      clearInterval(morphInterval);
+      clearInterval(waterInterval);
+      clearInterval(pulseInterval);
+    };
+  }, []);
+  
+  // Initialize morph points
+  useEffect(() => {
+    if (morphPoints.length === 0) {
+      setMorphPoints(Array.from({ length: 12 }, () => 0.8 + Math.random() * 0.4));
+    }
+  }, [morphPoints.length]);
+  
+  const blobPath = generateBlobPath(morphPoints);
+  const timeColor = getTimeColor();
+  
+  return (
+    <div className="relative w-80 h-80 mx-auto">
+      <svg width="300" height="300" viewBox="0 0 300 300" className="drop-shadow-2xl">
+        {/* Amoeba shape with gradient */}
+        <defs>
+          <radialGradient id="amoebaGradient" cx="0.3" cy="0.3">
+            <stop offset="0%" stopColor={timeColor} stopOpacity="0.9" />
+            <stop offset="50%" stopColor={timeColor} stopOpacity="0.7" />
+            <stop offset="100%" stopColor={timeColor} stopOpacity="0.5" />
+          </radialGradient>
+          
+          <filter id="gooey">
+            <feGaussianBlur in="SourceGraphic" result="blur" stdDeviation="8" />
+            <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 19 -9" result="goo" />
+            <feComposite in="SourceGraphic" in2="goo" operator="atop" />
+          </filter>
+          
+          <clipPath id="amoebaClip">
+            <path d={blobPath} />
+          </clipPath>
+        </defs>
+        
+        {/* Main amoeba body */}
+        <path
+          d={blobPath}
+          fill="url(#amoebaGradient)"
+          filter="url(#gooey)"
+          style={{
+            transform: `scale(${pulseScale})`,
+            transformOrigin: 'center',
+            transition: 'transform 0.1s ease-out'
+          }}
+        />
+        
+        {/* Water sloshing inside */}
+        <g clipPath="url(#amoebaClip)">
+          <ellipse
+            cx="150"
+            cy="150"
+            rx="60"
+            ry="40"
+            fill="rgba(100, 200, 255, 0.6)"
+            style={{
+              transform: `translate(${Math.sin(waterOffset * 0.02) * 10}px, ${Math.cos(waterOffset * 0.03) * 8}px) rotate(${waterOffset * 0.5}deg)`,
+              transformOrigin: 'center'
+            }}
+          />
+          <ellipse
+            cx="150"
+            cy="150"
+            rx="45"
+            ry="30"
+            fill="rgba(150, 220, 255, 0.4)"
+            style={{
+              transform: `translate(${Math.cos(waterOffset * 0.025) * 8}px, ${Math.sin(waterOffset * 0.035) * 6}px) rotate(${-waterOffset * 0.3}deg)`,
+              transformOrigin: 'center'
+            }}
+          />
+        </g>
+        
+        {/* Glossy highlight */}
+        <ellipse
+          cx="130"
+          cy="120"
+          rx="25"
+          ry="35"
+          fill="rgba(255, 255, 255, 0.3)"
+          style={{
+            transform: `scale(${pulseScale * 0.9})`,
+            transformOrigin: 'center',
+            transition: 'transform 0.1s ease-out'
+          }}
+        />
+      </svg>
+      
+      {/* Time display inside */}
+      <div className="absolute inset-0 flex items-center justify-center">
+        <div className="text-center font-xanman-wide text-white drop-shadow-lg">
+          <div className="text-2xl font-bold">
+            {String(currentTime.getHours()).padStart(2, '0')}:{String(minutes).padStart(2, '0')}
+          </div>
+          <div className="text-lg opacity-80">
+            {String(seconds).padStart(2, '0')}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 // Year Clock Component
 const YearClock = ({ currentDate }: { currentDate: Date }) => {
   const currentYear = currentDate.getFullYear();
@@ -487,6 +673,14 @@ export default function Clock() {
 
       {/* Clocks Display */}
       <div className="flex flex-col items-center justify-center min-h-[calc(100vh-200px)] space-y-12">
+        
+        {/* Amoeba Clock */}
+        <div className="glassmorphism rounded-2xl p-8">
+          <h2 className="font-xanman-wide text-2xl mb-8 text-center text-black">
+            AMOEBA CLOCK
+          </h2>
+          <AmoebaClockComponent currentTime={time} />
+        </div>
         
         {/* Year Clock */}
         <div className="glassmorphism rounded-2xl p-8 w-full max-w-6xl">
