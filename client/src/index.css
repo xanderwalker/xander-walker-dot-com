@@ -196,45 +196,105 @@
   color: var(--neon-green);
 }
 
-/* Morphing Monet water lilies background */
-.sunset-morphing-bg {
-  background: linear-gradient(-45deg, 
-    #2e4c8b, /* deep blue from painting */
-    #4a6bb5, /* medium blue */
-    #6b8dd6, /* lighter blue */
-    #8fa9e5, /* soft blue */
-    #b5c6f2, /* pale blue */
-    #5d4a8a, /* deep purple */
-    #7a6ba0, /* medium purple */
-    #9d8cb6, /* soft purple */
-    #c8b5d4, /* pale purple */
-    #d4c2a8, /* warm beige from lilies */
-    #e8d5c4, /* soft cream */
-    #a8b5a0  /* muted green from water */
-  );
-  background-size: 400% 400%;
-  animation: monet-gradient 30s ease infinite;
+/* Interactive paint swirling background */
+.paint-swirl-bg {
+  background: 
+    radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%), 
+      #2e4c8b 0%, 
+      #4a6bb5 15%, 
+      #6b8dd6 30%, 
+      transparent 50%
+    ),
+    radial-gradient(circle at calc(var(--mouse-x, 50%) + 30%) calc(var(--mouse-y, 50%) - 20%), 
+      #5d4a8a 0%, 
+      #7a6ba0 20%, 
+      #9d8cb6 40%, 
+      transparent 60%
+    ),
+    radial-gradient(circle at calc(var(--mouse-x, 50%) - 25%) calc(var(--mouse-y, 50%) + 35%), 
+      #8fa9e5 0%, 
+      #b5c6f2 25%, 
+      #c8b5d4 50%, 
+      transparent 70%
+    ),
+    radial-gradient(circle at calc(var(--tilt-x, 50%) + 10%) calc(var(--tilt-y, 50%) + 10%), 
+      #d4c2a8 0%, 
+      #e8d5c4 30%, 
+      #a8b5a0 60%, 
+      transparent 80%
+    ),
+    linear-gradient(135deg, 
+      #2e4c8b, #5d4a8a, #8fa9e5, #c8b5d4, #d4c2a8, #a8b5a0
+    );
+  background-size: 
+    150% 150%, 
+    200% 200%, 
+    180% 180%, 
+    120% 120%,
+    300% 300%;
+  animation: paint-base-flow 40s ease-in-out infinite;
+  transition: background 0.3s ease-out;
 }
 
-@keyframes monet-gradient {
-  0% {
-    background-position: 0% 50%;
-    filter: saturate(1.1) brightness(0.95);
+/* Mobile device motion responsiveness */
+@media (max-width: 768px) {
+  .paint-swirl-bg {
+    background: 
+      radial-gradient(circle at var(--tilt-x, 50%) var(--tilt-y, 50%), 
+        #2e4c8b 0%, 
+        #4a6bb5 15%, 
+        #6b8dd6 30%, 
+        transparent 50%
+      ),
+      radial-gradient(circle at calc(var(--tilt-x, 50%) + var(--tilt-z, 0%) / 2) calc(var(--tilt-y, 50%) - var(--tilt-z, 0%) / 3), 
+        #5d4a8a 0%, 
+        #7a6ba0 20%, 
+        #9d8cb6 40%, 
+        transparent 60%
+      ),
+      radial-gradient(circle at calc(var(--tilt-x, 50%) - var(--tilt-z, 0%) / 4) calc(var(--tilt-y, 50%) + var(--tilt-z, 0%) / 2), 
+        #8fa9e5 0%, 
+        #b5c6f2 25%, 
+        #c8b5d4 50%, 
+        transparent 70%
+      ),
+      linear-gradient(calc(var(--tilt-z, 50%) * 3.6deg), 
+        #2e4c8b, #5d4a8a, #8fa9e5, #c8b5d4, #d4c2a8, #a8b5a0
+      );
+    background-size: 
+      120% 120%, 
+      160% 160%, 
+      140% 140%, 
+      250% 250%;
   }
-  25% {
-    background-position: 100% 0%;
-    filter: saturate(1.3) brightness(1.05);
+}
+
+@keyframes paint-base-flow {
+  0%, 100% {
+    background-position: 
+      0% 0%, 
+      100% 100%, 
+      50% 50%, 
+      25% 75%,
+      0% 50%;
+    filter: saturate(1.1) brightness(0.95) blur(0px);
   }
-  50% {
-    background-position: 100% 100%;
-    filter: saturate(0.9) brightness(0.85);
+  33% {
+    background-position: 
+      100% 50%, 
+      0% 50%, 
+      100% 0%, 
+      75% 25%,
+      100% 0%;
+    filter: saturate(1.3) brightness(1.05) blur(0.5px);
   }
-  75% {
-    background-position: 0% 100%;
-    filter: saturate(1.2) brightness(1.1);
-  }
-  100% {
-    background-position: 0% 50%;
-    filter: saturate(1.1) brightness(0.95);
+  66% {
+    background-position: 
+      50% 100%, 
+      50% 0%, 
+      0% 100%, 
+      50% 50%,
+      50% 100%;
+    filter: saturate(0.9) brightness(0.85) blur(0px);
   }
 }
