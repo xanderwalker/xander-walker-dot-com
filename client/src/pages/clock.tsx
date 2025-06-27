@@ -515,25 +515,59 @@ const PixelClockComponent = ({ currentTime }: { currentTime: Date }) => {
       // Calculate total seconds passed in current hour
       const totalSecondsInHour = currentMinutes * 60 + currentSeconds;
       
-      // Create initial balls positioned properly from bottom up
+      // Create initial balls with natural sand-like distribution
       const initialBalls: PixelBall[] = [];
       const settledPositions = new Set<string>();
       
       for (let i = 0; i < totalSecondsInHour * 10; i++) {
         let placed = false;
-        // Fill from bottom layer by layer
-        for (let y = 278; y >= 0 && !placed; y--) {
-          for (let x = 5; x <= 15 && !placed; x++) {
-            if (!settledPositions.has(`${x},${y}`)) {
-              initialBalls.push({
-                id: ballIdRef.current++,
-                x: x,
-                y: y,
-                vy: 0,
-                isSettled: true
-              });
-              settledPositions.add(`${x},${y}`);
-              placed = true;
+        
+        // Simulate natural sand accumulation - balls prefer center and roll to edges
+        const preferredX = 10; // Center of tube
+        
+        // Try positions starting from center and spreading outward
+        for (let spread = 0; spread <= 5 && !placed; spread++) {
+          for (let side = 0; side <= 1 && !placed; side++) {
+            const x = side === 0 ? preferredX - spread : preferredX + spread;
+            
+            if (x >= 5 && x <= 15) {
+              // Find the surface level at this x position
+              for (let y = 278; y >= 0; y--) {
+                if (!settledPositions.has(`${x},${y}`)) {
+                  // Check if this position has proper support (sand behavior)
+                  if (y === 278 || settledPositions.has(`${x},${y + 1}`)) {
+                    initialBalls.push({
+                      id: ballIdRef.current++,
+                      x: x,
+                      y: y,
+                      vy: 0,
+                      isSettled: true
+                    });
+                    settledPositions.add(`${x},${y}`);
+                    placed = true;
+                    break;
+                  }
+                }
+              }
+            }
+          }
+        }
+        
+        // If still not placed (tube getting full), place anywhere available
+        if (!placed) {
+          for (let y = 278; y >= 0 && !placed; y--) {
+            for (let x = 5; x <= 15 && !placed; x++) {
+              if (!settledPositions.has(`${x},${y}`)) {
+                initialBalls.push({
+                  id: ballIdRef.current++,
+                  x: x,
+                  y: y,
+                  vy: 0,
+                  isSettled: true
+                });
+                settledPositions.add(`${x},${y}`);
+                placed = true;
+              }
             }
           }
         }
@@ -604,7 +638,12 @@ const PixelClockComponent = ({ currentTime }: { currentTime: Date }) => {
           // Add horizontal spreading force when ball is near settling
           if (ball.vy > 1) {
             // Add stronger random horizontal movement for better spreading
-            newX += (Math.random() - 0.5) * 1.5;
+            newX += (Math.random() - 0.5) * 2.0;
+          }
+          
+          // Add slight settling oscillation for more natural sand behavior
+          if (ball.vy < 0.5 && !ball.isSettled) {
+            newX += (Math.random() - 0.5) * 0.5;
           }
           
           // Constrain to cylinder walls
@@ -617,40 +656,65 @@ const PixelClockComponent = ({ currentTime }: { currentTime: Date }) => {
           
           // Check if position below is occupied or at bottom
           if (roundedY >= cylinderBottom || settledPositions.has(`${roundedX},${roundedY + 1}`)) {
-            // Find the lowest available position (bottom-up filling)
+            // Find natural sand-like settling position
             let finalY = cylinderBottom;
             let finalX = roundedX;
             let found = false;
             
-            // Start from bottom and work up, checking each row
-            for (let y = cylinderBottom; y >= 0 && !found; y--) {
-              // Check center position first
-              if (!settledPositions.has(`${roundedX},${y}`)) {
-                finalY = y;
-                finalX = roundedX;
-                found = true;
-                break;
-              }
-              
-              // If center occupied, spread outward across the 10-pixel width
-              for (let spread = 1; spread <= 5 && !found; spread++) {
-                const leftX = roundedX - spread;
-                const rightX = roundedX + spread;
-                
-                // Try left side
-                if (leftX >= cylinderLeft && !settledPositions.has(`${leftX},${y}`)) {
+            // Check if can settle directly below current position
+            const targetY = Math.min(cylinderBottom, roundedY);
+            if (!settledPositions.has(`${roundedX},${targetY}`)) {
+              finalY = targetY;
+              finalX = roundedX;
+              found = true;
+            } else {
+              // Find highest stack at this x position
+              for (let y = targetY; y >= 0; y--) {
+                if (!settledPositions.has(`${roundedX},${y}`)) {
                   finalY = y;
-                  finalX = leftX;
+                  finalX = roundedX;
                   found = true;
                   break;
                 }
-                
-                // Try right side
-                if (rightX <= cylinderRight && !settledPositions.has(`${rightX},${y}`)) {
-                  finalY = y;
-                  finalX = rightX;
-                  found = true;
-                  break;
+              }
+              
+              // If column full, try rolling to adjacent positions (sand behavior)
+              if (!found) {
+                // Try immediate neighbors first
+                for (let offset = 1; offset <= 5 && !found; offset++) {
+                  const leftX = roundedX - offset;
+                  const rightX = roundedX + offset;
+                  
+                  // Check left side - find surface level
+                  if (leftX >= cylinderLeft) {
+                    for (let y = cylinderBottom; y >= 0; y--) {
+                      if (!settledPositions.has(`${leftX},${y}`)) {
+                        // Check if this position has proper support (like sand)
+                        if (y === cylinderBottom || settledPositions.has(`${leftX},${y + 1}`)) {
+                          finalY = y;
+                          finalX = leftX;
+                          found = true;
+                          break;
+                        }
+                      }
+                    }
+                  }
+                  
+                  if (!found && rightX <= cylinderRight) {
+                    for (let y = cylinderBottom; y >= 0; y--) {
+                      if (!settledPositions.has(`${rightX},${y}`)) {
+                        // Check if this position has proper support
+                        if (y === cylinderBottom || settledPositions.has(`${rightX},${y + 1}`)) {
+                          finalY = y;
+                          finalX = rightX;
+                          found = true;
+                          break;
+                        }
+                      }
+                    }
+                  }
+                  
+                  if (found) break;
                 }
               }
             }
