@@ -34,7 +34,7 @@ export default function GlassOfWater() {
   useEffect(() => {
     if (screenSize.width === 0 || screenSize.height === 0) return;
 
-    const waterLevel = screenSize.height * 0.4; // Water takes up bottom 60% of screen
+    const waterLevel = screenSize.height * 0.6; // Water surface at 60% down from top (40% from bottom)
     const numPoints = Math.max(20, Math.floor(screenSize.width / 15)); // Adaptive resolution
     
     const points: WaterPoint[] = [];
@@ -112,8 +112,8 @@ export default function GlassOfWater() {
         return prevPoints.map((point, i) => {
           // Calculate target Y based on tilt and base water level with more dramatic curves
           const distanceFromCenter = (point.x - screenSize.width / 2) / (screenSize.width / 2);
-          const tiltOffset = distanceFromCenter * (tilt.x * 0.004); // Doubled for more pronounced tilt
-          const targetY = point.baseY + tiltOffset + (tilt.y * 3); // Increased vertical response
+          const tiltOffset = distanceFromCenter * (tilt.x * 0.02); // Much more pronounced horizontal tilt
+          const targetY = point.baseY + tiltOffset + (tilt.y * 8); // Much stronger vertical response
           
           // Spring physics for water surface with stronger forces
           const force = (targetY - point.y) * 0.03; // Increased spring force
@@ -274,13 +274,48 @@ export default function GlassOfWater() {
         <div className="text-xs">ACCEL: {accelerometerEnabled ? 'ON' : 'OFF'}</div>
       </div>
 
-      {/* Instructions */}
+      {/* Instructions and Test Controls */}
       <div className="absolute bottom-8 right-8 z-10 bg-black bg-opacity-20 rounded-lg p-4 font-xanman-wide text-black text-right">
         <div className="text-sm">
           {accelerometerEnabled ? 'TILT YOUR DEVICE' : 'ENABLE ACCELEROMETER'}
         </div>
-        <div className="text-xs mt-1">
+        <div className="text-xs mt-1 mb-2">
           {accelerometerEnabled ? 'TO SLOSH THE WATER' : 'TO START SLOSHING'}
+        </div>
+        
+        {/* Desktop Test Controls */}
+        <div className="text-xs">
+          <div>DESKTOP TEST:</div>
+          <div className="flex gap-2 mt-1">
+            <button 
+              className="bg-blue-500 text-white px-2 py-1 rounded text-xs"
+              onMouseDown={() => setTilt({x: -10, y: 0})}
+              onMouseUp={() => setTilt({x: 0, y: 0})}
+            >
+              ←
+            </button>
+            <button 
+              className="bg-blue-500 text-white px-2 py-1 rounded text-xs"
+              onMouseDown={() => setTilt({x: 10, y: 0})}
+              onMouseUp={() => setTilt({x: 0, y: 0})}
+            >
+              →
+            </button>
+            <button 
+              className="bg-blue-500 text-white px-2 py-1 rounded text-xs"
+              onMouseDown={() => setTilt({x: 0, y: -10})}
+              onMouseUp={() => setTilt({x: 0, y: 0})}
+            >
+              ↑
+            </button>
+            <button 
+              className="bg-blue-500 text-white px-2 py-1 rounded text-xs"
+              onMouseDown={() => setTilt({x: 0, y: 10})}
+              onMouseUp={() => setTilt({x: 0, y: 0})}
+            >
+              ↓
+            </button>
+          </div>
         </div>
       </div>
     </div>
