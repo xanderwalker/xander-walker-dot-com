@@ -181,9 +181,9 @@ export default function PhysicsBalls() {
           let newRotation = ball.rotation || 0;
 
           if (isMobile) {
-            // Apply accelerometer forces (reversed for sinking effect)
-            newVx += -acceleration.x * 0.1;
-            newVy += acceleration.y * 0.1; // Normal Y for sinking movement
+            // Apply accelerometer forces (both axes reversed for natural sinking effect)
+            newVx += acceleration.x * 0.1;
+            newVy += acceleration.y * 0.1;
           } else {
             // Desktop: apply gravity
             newVy += 0.2;
