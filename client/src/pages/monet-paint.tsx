@@ -15,25 +15,21 @@ export default function MonetPaint() {
     setIsMobile(checkMobile);
     
     if (backgroundRef.current) {
+      // Desktop mouse properties
       backgroundRef.current.style.setProperty('--mouse-x', '50%');
       backgroundRef.current.style.setProperty('--mouse-y', '50%');
+      
+      // Mobile paint flow properties
+      backgroundRef.current.style.setProperty('--flow-x', '50%');
+      backgroundRef.current.style.setProperty('--flow-y', '50%');
+      backgroundRef.current.style.setProperty('--flow-radius', '50%');
+      backgroundRef.current.style.setProperty('--flow-angle', '0deg');
+      backgroundRef.current.style.setProperty('--tilt-intensity', '0.3');
+      
+      // Legacy properties for compatibility
       backgroundRef.current.style.setProperty('--tilt-x', '50%');
       backgroundRef.current.style.setProperty('--tilt-y', '50%');
       backgroundRef.current.style.setProperty('--tilt-z', '50%');
-      
-      // Force background update for mobile
-      if (checkMobile) {
-        setTimeout(() => {
-          if (backgroundRef.current) {
-            backgroundRef.current.style.background = `
-              radial-gradient(circle at 50% 50%, #2e4c8b 0%, #4a6bb5 15%, #6b8dd6 30%, transparent 50%),
-              radial-gradient(circle at 70% 30%, #5d4a8a 0%, #7a6ba0 20%, #9d8cb6 40%, transparent 60%),
-              radial-gradient(circle at 25% 85%, #8fa9e5 0%, #b5c6f2 25%, #c8b5d4 50%, transparent 70%),
-              linear-gradient(135deg, #2e4c8b, #5d4a8a, #8fa9e5, #c8b5d4, #d4c2a8, #a8b5a0)
-            `;
-          }
-        }, 100);
-      }
     }
   }, []);
 
@@ -80,23 +76,50 @@ export default function MonetPaint() {
     }
   };
 
-  // Device motion for paint swirling (mobile)
+  // Device motion for paint washing effect (mobile)
   useEffect(() => {
     if (!sensorEnabled || !isMobile) return;
 
     const handleDeviceMotion = (event: DeviceMotionEvent) => {
       if (event.accelerationIncludingGravity) {
-        const x = Math.max(-50, Math.min(50, (event.accelerationIncludingGravity.x || 0) * 5));
-        const y = Math.max(-50, Math.min(50, (event.accelerationIncludingGravity.y || 0) * 5));
-        const z = Math.max(-50, Math.min(50, (event.accelerationIncludingGravity.z || 0) * 5));
+        // Get gravity-adjusted acceleration for tilt detection
+        const x = (event.accelerationIncludingGravity.x || 0);
+        const y = (event.accelerationIncludingGravity.y || 0);
+        const z = (event.accelerationIncludingGravity.z || 0);
         
-        setDeviceMotion({ x, y, z });
+        // Calculate tilt angles (convert to degrees for easier understanding)
+        // X-axis tilt: positive = tilted right, negative = tilted left
+        // Y-axis tilt: positive = tilted away from user, negative = tilted toward user
+        const tiltX = Math.atan2(x, z) * (180 / Math.PI);
+        const tiltY = Math.atan2(y, z) * (180 / Math.PI);
         
-        // Update CSS custom properties for paint swirling
+        // Map tilt to paint flow positions (0-100%)
+        // Center the flow around 50% and let extreme tilts push toward edges
+        const flowX = Math.max(10, Math.min(90, 50 + (tiltX * 2))); // ±40% range from center
+        const flowY = Math.max(10, Math.min(90, 50 + (tiltY * 2))); // ±40% range from center
+        
+        // Create directional gradient based on tilt intensity
+        const tiltIntensity = Math.sqrt(tiltX * tiltX + tiltY * tiltY);
+        const flowRadius = Math.max(30, Math.min(80, tiltIntensity + 30)); // Radius grows with tilt
+        
+        setDeviceMotion({ x: tiltX, y: tiltY, z: tiltIntensity });
+        
+        // Debug logging for mobile testing
+        if (tiltIntensity > 5) {
+          console.log(`Tilt detected - X: ${tiltX.toFixed(1)}°, Y: ${tiltY.toFixed(1)}°, Intensity: ${tiltIntensity.toFixed(1)}`);
+          console.log(`Paint flow - X: ${flowX.toFixed(1)}%, Y: ${flowY.toFixed(1)}%, Radius: ${flowRadius.toFixed(1)}%`);
+        }
+        
+        // Update CSS custom properties for paint washing effect
         if (backgroundRef.current) {
-          backgroundRef.current.style.setProperty('--tilt-x', `${x + 50}%`);
-          backgroundRef.current.style.setProperty('--tilt-y', `${y + 50}%`);
-          backgroundRef.current.style.setProperty('--tilt-z', `${z + 50}%`);
+          backgroundRef.current.style.setProperty('--flow-x', `${flowX}%`);
+          backgroundRef.current.style.setProperty('--flow-y', `${flowY}%`);
+          backgroundRef.current.style.setProperty('--flow-radius', `${flowRadius}%`);
+          backgroundRef.current.style.setProperty('--tilt-intensity', `${Math.min(1, tiltIntensity / 30)}`);
+          
+          // Create dynamic gradient rotation based on tilt direction
+          const gradientAngle = Math.atan2(tiltY, tiltX) * (180 / Math.PI);
+          backgroundRef.current.style.setProperty('--flow-angle', `${gradientAngle}deg`);
         }
       }
     };
@@ -154,7 +177,14 @@ export default function MonetPaint() {
       {isMobile && sensorEnabled && (
         <div className="fixed top-24 left-1/2 transform -translate-x-1/2 z-30">
           <div className="bg-green-500/20 backdrop-blur-md text-white px-4 py-2 rounded-lg border border-green-400/30 shadow-lg">
-            <span style={{ fontFamily: 'Georgia, serif' }}>Motion Sensors Active</span>
+            <div style={{ fontFamily: 'Georgia, serif' }}>
+              <div>Motion Sensors Active</div>
+              {deviceMotion.z > 5 && (
+                <div className="text-sm mt-1">
+                  Tilt: {deviceMotion.x.toFixed(1)}°, {deviceMotion.y.toFixed(1)}° (Intensity: {deviceMotion.z.toFixed(1)})
+                </div>
+              )}
+            </div>
           </div>
         </div>
       )}
