@@ -38,131 +38,85 @@ export default function PhysicsBalls() {
   useEffect(() => {
     if (!isMobile) return;
 
-    let cleanup: (() => void) | undefined;
-
     const requestPermission = async () => {
-      // Check for iOS 13+ permission system
       if (typeof DeviceOrientationEvent !== 'undefined' && 'requestPermission' in DeviceOrientationEvent) {
         try {
           const permission = await (DeviceOrientationEvent as any).requestPermission();
           if (permission === 'granted') {
-            cleanup = setupAccelerometer();
-          } else {
-            console.log('Permission denied, trying without permission');
-            cleanup = setupAccelerometer();
+            setupAccelerometer();
           }
         } catch (error) {
           console.log('Permission request failed, trying without permission');
-          cleanup = setupAccelerometer();
+          setupAccelerometer();
         }
       } else {
-        // For Android and older iOS devices
-        cleanup = setupAccelerometer();
+        setupAccelerometer();
       }
     };
 
     const setupAccelerometer = () => {
       const handleDeviceMotion = (event: DeviceMotionEvent) => {
-        const accel = event.accelerationIncludingGravity;
-        if (accel && (accel.x !== null || accel.y !== null || accel.z !== null)) {
+        if (event.accelerationIncludingGravity) {
           setAcceleration({
-            x: accel.x || 0,
-            y: accel.y || 0,
-            z: accel.z || 0
+            x: event.accelerationIncludingGravity.x || 0,
+            y: event.accelerationIncludingGravity.y || 0,
+            z: event.accelerationIncludingGravity.z || 0
           });
         }
       };
 
-      // Try to request permission first for iOS devices
-      if (typeof DeviceMotionEvent !== 'undefined' && 'requestPermission' in DeviceMotionEvent) {
-        (DeviceMotionEvent as any).requestPermission()
-          .then((response: string) => {
-            if (response === 'granted') {
-              window.addEventListener('devicemotion', handleDeviceMotion, { passive: true });
-            }
-          })
-          .catch(() => {
-            // Fallback: add listener anyway
-            window.addEventListener('devicemotion', handleDeviceMotion, { passive: true });
-          });
-      } else {
-        // For non-iOS devices
-        window.addEventListener('devicemotion', handleDeviceMotion, { passive: true });
-      }
-
-      return () => {
-        window.removeEventListener('devicemotion', handleDeviceMotion);
-      };
+      window.addEventListener('devicemotion', handleDeviceMotion);
+      return () => window.removeEventListener('devicemotion', handleDeviceMotion);
     };
 
-    // Start immediately for better responsiveness
-    requestPermission();
-
-    return () => {
-      if (cleanup) cleanup();
-    };
+    // Add a small delay to ensure the page is loaded
+    const timeout = setTimeout(requestPermission, 1000);
+    return () => clearTimeout(timeout);
   }, [isMobile]);
 
   // Initialize balls
   useEffect(() => {
-    // Wait for window to be fully available
-    const initializeBalls = () => {
-      // Ensure we have valid window dimensions
-      const width = typeof window !== 'undefined' ? (window.innerWidth || 800) : 800;
-      const height = typeof window !== 'undefined' ? (window.innerHeight || 600) : 600;
-      
-      const initialBalls: Ball[] = [];
-      const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4']; // coral, mint, sky blue, sage green
+    const initialBalls: Ball[] = [];
+    const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4']; // coral, mint, sky blue, sage green
 
-      // Add 333 regular balls
-      for (let i = 0; i < 333; i++) {
-        const x = Math.random() * Math.max(width - 20, 100);
-        const y = Math.random() * Math.max(height - 20, 100);
-        
-        initialBalls.push({
-          id: i,
-          x: isNaN(x) ? 100 : x,
-          y: isNaN(y) ? 100 : y,
-          vx: 0, // Start stationary - only move with accelerometer
-          vy: 0, // Start stationary - only move with accelerometer
-          size: 15, // uniform 15px balls (3x smaller)
-          color: colors[Math.floor(Math.random() * colors.length)]
-        });
-      }
+    // Add 333 regular balls
+    for (let i = 0; i < 333; i++) {
+      initialBalls.push({
+        id: i,
+        x: Math.random() * (window.innerWidth - 20),
+        y: Math.random() * (window.innerHeight - 20),
+        vx: (Math.random() - 0.5) * 2,
+        vy: (Math.random() - 0.5) * 2,
+        size: 15, // uniform 15px balls (3x smaller)
+        color: colors[Math.floor(Math.random() * colors.length)]
+      });
+    }
 
-      // Add floating X and W letters
-      const letters = ['X', 'W'];
-      for (let i = 333; i < 335; i++) {
-        const x = Math.random() * Math.max(width - 80, 100);
-        const y = Math.random() * Math.max(height - 80, 100);
-        
-        initialBalls.push({
-          id: i,
-          x: isNaN(x) ? 100 : x,
-          y: isNaN(y) ? 100 : y,
-          vx: 0, // Start stationary - only move with accelerometer
-          vy: 0, // Start stationary - only move with accelerometer
-          size: 80, // Larger size for letters
-          color: '#000000', // Black letters
-          isLetter: true,
-          letter: letters[i - 333],
-          rotation: Math.random() * 360,
-          rotationSpeed: (Math.random() - 0.5) * 8 // Random rotation speed
-        });
-      }
+    // Add floating X and W letters
+    const letters = ['X', 'W'];
+    for (let i = 333; i < 335; i++) {
+      initialBalls.push({
+        id: i,
+        x: Math.random() * (window.innerWidth - 80),
+        y: Math.random() * (window.innerHeight - 80),
+        vx: (Math.random() - 0.5) * 3, // Faster movement for letters
+        vy: (Math.random() - 0.5) * 3,
+        size: 80, // Larger size for letters
+        color: '#000000', // Black letters
+        isLetter: true,
+        letter: letters[i - 333],
+        rotation: Math.random() * 360,
+        rotationSpeed: (Math.random() - 0.5) * 8 // Random rotation speed
+      });
+    }
 
-      setBalls(initialBalls);
-    };
-
-    // Small delay to ensure window is ready
-    const timer = setTimeout(initializeBalls, 100);
-    return () => clearTimeout(timer);
+    setBalls(initialBalls);
   }, []);
 
   // Get color based on position (for mobile)
   const getPositionColor = (x: number, y: number, isLargeBall: boolean = false) => {
-    const width = window.innerWidth || 800;
-    const height = window.innerHeight || 600;
+    const width = window.innerWidth;
+    const height = window.innerHeight;
     
     // Divide screen into quadrants
     const leftHalf = x < width / 2;
@@ -187,16 +141,11 @@ export default function PhysicsBalls() {
   useEffect(() => {
     const animate = () => {
       setBalls(prevBalls => {
-        // Safety check: ensure we have valid balls
-        if (!prevBalls.length) return prevBalls;
-        
         // Create a copy of balls array to work with
         let updatedBalls = prevBalls.map(ball => ({
           ...ball,
-          vx: ball.vx || 0,
-          vy: ball.vy || 0,
-          x: ball.x || 0,
-          y: ball.y || 0
+          vx: ball.vx,
+          vy: ball.vy
         }));
 
         // Apply physics forces first
@@ -206,11 +155,13 @@ export default function PhysicsBalls() {
           let newRotation = ball.rotation || 0;
 
           if (isMobile) {
-            // Apply accelerometer forces ONLY
+            // Apply accelerometer forces
             newVx += acceleration.x * 0.1;
             newVy += -acceleration.y * 0.1; // Invert Y for natural movement
+          } else {
+            // Desktop: apply gravity
+            newVy += 0.2;
           }
-          // No gravity or automatic movement on desktop
 
           // Update rotation for letters
           if (ball.isLetter) {
@@ -279,18 +230,14 @@ export default function PhysicsBalls() {
           let newVy = ball.vy;
           let newColor = ball.color;
 
-          // Use safe fallback values for window dimensions
-          const width = window.innerWidth || 800;
-          const height = window.innerHeight || 600;
-
           // Bounce off edges
-          if (newX <= 0 || newX >= width - ball.size) {
+          if (newX <= 0 || newX >= window.innerWidth - ball.size) {
             newVx = -newVx * 0.8; // Add some damping
-            newX = Math.max(0, Math.min(width - ball.size, newX));
+            newX = Math.max(0, Math.min(window.innerWidth - ball.size, newX));
           }
-          if (newY <= 0 || newY >= height - ball.size) {
+          if (newY <= 0 || newY >= window.innerHeight - ball.size) {
             newVy = -newVy * 0.8; // Add some damping
-            newY = Math.max(0, Math.min(height - ball.size, newY));
+            newY = Math.max(0, Math.min(window.innerHeight - ball.size, newY));
           }
 
           // Update color based on position (mobile only) - only for small balls, not letters
@@ -323,19 +270,19 @@ export default function PhysicsBalls() {
 
   return (
     <div ref={containerRef} className="fixed inset-0 z-10">
-      {balls.filter(ball => !isNaN(ball.x) && !isNaN(ball.y) && !isNaN(ball.size)).map(ball => (
+      {balls.map(ball => (
         ball.isLetter ? (
           <div
             key={ball.id}
             className="absolute pointer-events-none font-xanman-wide font-bold flex items-center justify-center border-2 border-black rounded-full"
             style={{
-              left: `${ball.x}px`,
-              top: `${ball.y}px`,
-              width: `${ball.size}px`,
-              height: `${ball.size}px`,
+              left: ball.x,
+              top: ball.y,
+              width: ball.size,
+              height: ball.size,
               fontSize: `${ball.size * 0.9}px`,
               color: ball.color,
-              transform: `rotate(${ball.rotation || 0}deg)`,
+              transform: `rotate(${ball.rotation}deg)`,
               lineHeight: '1'
             }}
           >
@@ -346,10 +293,10 @@ export default function PhysicsBalls() {
             key={ball.id}
             className="absolute rounded-full pointer-events-none"
             style={{
-              left: `${ball.x}px`,
-              top: `${ball.y}px`,
-              width: `${ball.size}px`,
-              height: `${ball.size}px`,
+              left: ball.x,
+              top: ball.y,
+              width: ball.size,
+              height: ball.size,
               backgroundColor: ball.color,
               transition: isMobile ? 'background-color 0.3s ease' : 'none'
             }}
