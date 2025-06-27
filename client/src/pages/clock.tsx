@@ -42,8 +42,8 @@ export default function Clock() {
               id: ballIdRef.current++, 
               x: 40, // Center of cylinder (80px width / 2)
               y: -20, // Start above cylinder
-              vx: (Math.random() - 0.5) * 2, // Random horizontal velocity
-              vy: 0, // Start with no vertical velocity
+              vx: (Math.random() - 0.5) * 3, // More horizontal velocity for bounce
+              vy: 0.5, // Small initial downward velocity
               isSettled: false,
               ballSize: 16 // Regular size for minutes
             };
@@ -59,10 +59,10 @@ export default function Clock() {
                 id: ballIdRef.current++, 
                 x: 40, 
                 y: -30, // Start higher for larger balls
-                vx: (Math.random() - 0.5) * 1.5, // Slower for larger balls
+                vx: (Math.random() - 0.5) * 2.5, // More velocity for bigger bounces
                 vy: 0, 
                 isSettled: false,
-                ballSize: 24 // Larger size for hours
+                ballSize: 48 // Much larger size for hours
               };
               const newBalls = [...prev, newBall];
               return newBalls.slice(-currentHour || -12);
@@ -74,8 +74,8 @@ export default function Clock() {
             id: ballIdRef.current++, 
             x: 40, 
             y: -20, 
-            vx: (Math.random() - 0.5) * 2, 
-            vy: 0, 
+            vx: (Math.random() - 0.5) * 3, 
+            vy: 0.5, 
             isSettled: false,
             ballSize: 16 // Regular size for seconds
           };
@@ -162,7 +162,7 @@ export default function Clock() {
     
     setSecondBalls(createSettledBalls(seconds, 16));
     setMinuteBalls(createSettledBalls(minutes, 16));
-    setHourBalls(createSettledBalls(hours, 24));
+    setHourBalls(createSettledBalls(hours, 48));
   }, []);
 
   // Physics animation loop
@@ -176,23 +176,26 @@ export default function Clock() {
             let newX = ball.x + ball.vx;
             let newY = ball.y + ball.vy;
             let newVx = ball.vx;
-            let newVy = ball.vy + 0.4; // Gravity
+            let newVy = ball.vy + 0.6; // Stronger gravity for more bounce
 
-            // Wall collisions (cylinder walls)
-            if (newX <= 8) { // Left wall
-              newX = 8;
-              newVx = -newVx * 0.6; // Bounce with damping
+            // Get ball size and radius for calculations
+            const currentBallSize = ball.ballSize || 16;
+            const currentBallRadius = currentBallSize / 2;
+
+            // Wall collisions (cylinder walls) - adjust for ball size
+            const wallMargin = currentBallRadius;
+            if (newX <= 16 + wallMargin) { // Left wall
+              newX = 16 + wallMargin;
+              newVx = -newVx * 0.8; // More bounce, less damping
             }
-            if (newX >= 72) { // Right wall (80px - 8px for ball width)
-              newX = 72;
-              newVx = -newVx * 0.6;
+            if (newX >= 64 - wallMargin) { // Right wall
+              newX = 64 - wallMargin;
+              newVx = -newVx * 0.8; // More bounce, less damping
             }
 
             // Check collision with other balls and bottom
             const otherBalls = prevBalls.filter(b => b.id !== ball.id);
             let hasCollision = false;
-            const currentBallSize = ball.ballSize || 16;
-            const currentBallRadius = currentBallSize / 2;
             
             // Check collision with other balls (both settled and moving)
             for (const otherBall of otherBalls) {
@@ -214,10 +217,11 @@ export default function Clock() {
                 
                 // Add bounce velocity if ball was moving
                 if (!ball.isSettled) {
-                  newVx += Math.cos(angle) * 1;
-                  newVy += Math.sin(angle) * 1;
-                  newVx *= 0.7; // Damping
-                  newVy *= 0.7;
+                  const bounceForce = 1.5; // Increased bounce force
+                  newVx += Math.cos(angle) * bounceForce;
+                  newVy += Math.sin(angle) * bounceForce;
+                  newVx *= 0.8; // Less damping for more bounce
+                  newVy *= 0.8;
                 }
                 hasCollision = true;
               }
@@ -227,13 +231,14 @@ export default function Clock() {
             const bottomY = 320 - currentBallSize - 8; // Cylinder height minus ball size and margin
             if (newY >= bottomY) {
               newY = bottomY;
-              newVy = -newVy * 0.3; // Bounce with heavy damping
-              newVx *= 0.7; // Friction
+              newVy = -newVy * 0.6; // More bounce, less damping
+              newVx *= 0.85; // Less friction for more natural movement
               hasCollision = true;
             }
             
-            // Check if ball should settle (low energy and touching something)
-            if (hasCollision && Math.abs(newVy) < 0.5 && Math.abs(newVx) < 0.5) {
+            // Check if ball should settle (very low energy and touching something)
+            const settleThreshold = currentBallSize > 24 ? 0.3 : 0.4; // Larger balls settle easier
+            if (hasCollision && Math.abs(newVy) < settleThreshold && Math.abs(newVx) < settleThreshold) {
               return {
                 ...ball,
                 x: newX,
@@ -297,7 +302,7 @@ export default function Clock() {
   }) => {
     // Determine ball size based on cylinder type
     const isHourCylinder = label === "Hours";
-    const ballSize = isHourCylinder ? 24 : 16; // Hours: 24px, others: 16px
+    const ballSize = isHourCylinder ? 48 : 16; // Hours: 48px (3x larger), others: 16px
     return (
       <div className="flex flex-col items-center">
         <div className="font-serif text-lg mb-2" style={{fontFamily: 'Georgia, serif'}}>{label}</div>
