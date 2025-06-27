@@ -4,6 +4,12 @@ import Layout from '../components/layout';
 export default function Projects() {
   const projects = [
     {
+      title: "GLASS OF WATER",
+      description: "Realistic water simulation that responds to device tilting. Water particles slosh around the screen using accelerometer data for authentic physics.",
+      tags: "Physics • Accelerometer • Fluid",
+      link: "/projects/glass-of-water"
+    },
+    {
       title: "333 BALLS",
       description: "Interactive physics simulation with 333 colorful balls that respond to device motion. Features smooth gradient colors, collision detection, and accelerometer controls on mobile.",
       tags: "Physics • Interactive • Mobile",

@@ -7,6 +7,7 @@ import Home from "@/pages/home";
 import About from "@/pages/about";
 import Portfolio from "@/pages/portfolio";
 import Projects from "@/pages/projects";
+import GlassOfWater from "@/pages/glass-of-water";
 import Balls333 from "@/pages/333-balls";
 import Clock from "@/pages/clock";
 import Contact from "@/pages/contact";
@@ -19,6 +20,7 @@ function Router() {
       <Route path="/about" component={About} />
       <Route path="/portfolio" component={Portfolio} />
       <Route path="/projects" component={Projects} />
+      <Route path="/projects/glass-of-water" component={GlassOfWater} />
       <Route path="/projects/333-balls" component={Balls333} />
       <Route path="/projects/clock" component={Clock} />
       <Route path="/contact" component={Contact} />
