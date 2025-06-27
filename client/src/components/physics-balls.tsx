@@ -20,6 +20,8 @@ export default function PhysicsBalls() {
   const animationRef = useRef<number>();
   const [acceleration, setAcceleration] = useState({ x: 0, y: 0, z: 0 });
   const [isMobile, setIsMobile] = useState(false);
+  const [motionEnabled, setMotionEnabled] = useState(false);
+  const [showMotionButton, setShowMotionButton] = useState(false);
 
   // Detect mobile device
   useEffect(() => {
@@ -27,18 +29,21 @@ export default function PhysicsBalls() {
       const userAgent = navigator.userAgent || navigator.vendor;
       const isMobileDevice = /android|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(userAgent.toLowerCase());
       setIsMobile(isMobileDevice);
+      
+      // Show motion button on mobile if motion isn't already enabled
+      if (isMobileDevice && !motionEnabled) {
+        setShowMotionButton(true);
+      }
     };
     
     checkMobile();
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
-  }, []);
+  }, [motionEnabled]);
 
-  // Request accelerometer permission and setup listener for mobile
-  useEffect(() => {
-    if (!isMobile) return;
-
-    let cleanup: (() => void) | undefined;
+  // Enable motion function
+  const enableMotion = async () => {
+    let success = false;
 
     const setupAccelerometer = () => {
       const handleDeviceMotion = (event: DeviceMotionEvent) => {
@@ -46,71 +51,54 @@ export default function PhysicsBalls() {
           const x = event.accelerationIncludingGravity.x || 0;
           const y = event.accelerationIncludingGravity.y || 0;
           const z = event.accelerationIncludingGravity.z || 0;
-          
           setAcceleration({ x, y, z });
+          success = true;
         }
       };
 
       const handleDeviceOrientation = (event: DeviceOrientationEvent) => {
-        // Fallback to orientation if motion isn't available
-        const gamma = event.gamma || 0; // left/right tilt
-        const beta = event.beta || 0;   // front/back tilt
-        
-        setAcceleration({ 
-          x: gamma / 30, // normalize to reasonable range
-          y: beta / 30, 
-          z: 0 
-        });
+        if (event.gamma !== null && event.beta !== null) {
+          const gamma = event.gamma || 0; // left/right tilt
+          const beta = event.beta || 0;   // front/back tilt
+          setAcceleration({ 
+            x: gamma / 30, 
+            y: beta / 30, 
+            z: 0 
+          });
+          success = true;
+        }
       };
 
-      // Try devicemotion first, then orientation as fallback
       window.addEventListener('devicemotion', handleDeviceMotion, { passive: true });
       window.addEventListener('deviceorientation', handleDeviceOrientation, { passive: true });
-      
-      cleanup = () => {
-        window.removeEventListener('devicemotion', handleDeviceMotion);
-        window.removeEventListener('deviceorientation', handleDeviceOrientation);
-      };
     };
 
-    const requestPermission = async () => {
-      // For iOS 13+ devices
+    try {
+      // For iOS 13+ devices - request permission
       if (typeof DeviceMotionEvent !== 'undefined' && 'requestPermission' in DeviceMotionEvent) {
-        try {
-          const motionPermission = await (DeviceMotionEvent as any).requestPermission();
-          const orientationPermission = await (DeviceOrientationEvent as any).requestPermission();
-          
-          if (motionPermission === 'granted' || orientationPermission === 'granted') {
-            setupAccelerometer();
-          }
-        } catch (error) {
-          console.log('Permission request failed, trying without permission');
+        const motionPermission = await (DeviceMotionEvent as any).requestPermission();
+        const orientationPermission = await (DeviceOrientationEvent as any).requestPermission();
+        
+        if (motionPermission === 'granted' || orientationPermission === 'granted') {
           setupAccelerometer();
         }
       } else {
-        // For Android and older iOS
+        // For Android and older iOS - no permission needed
         setupAccelerometer();
       }
-    };
-
-    // Add user interaction requirement for iOS
-    const handleUserInteraction = () => {
-      requestPermission();
-      document.removeEventListener('touchstart', handleUserInteraction);
-      document.removeEventListener('click', handleUserInteraction);
-    };
-
-    // Try immediate setup, then add interaction listeners
-    requestPermission();
-    document.addEventListener('touchstart', handleUserInteraction, { once: true });
-    document.addEventListener('click', handleUserInteraction, { once: true });
-
-    return () => {
-      if (cleanup) cleanup();
-      document.removeEventListener('touchstart', handleUserInteraction);
-      document.removeEventListener('click', handleUserInteraction);
-    };
-  }, [isMobile]);
+      
+      // Wait a moment to see if we get data
+      setTimeout(() => {
+        if (success) {
+          setMotionEnabled(true);
+          setShowMotionButton(false);
+        }
+      }, 500);
+      
+    } catch (error) {
+      console.log('Motion permission denied or not available');
+    }
+  };
 
   // Initialize balls
   useEffect(() => {
@@ -341,6 +329,18 @@ export default function PhysicsBalls() {
           />
         )
       ))}
+      
+      {/* Motion enable button for mobile */}
+      {showMotionButton && (
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50">
+          <button
+            onClick={enableMotion}
+            className="bg-black text-white px-8 py-4 rounded-lg font-xanman-wide text-lg hover:bg-gray-800 transition-colors"
+          >
+            ENABLE MOTION
+          </button>
+        </div>
+      )}
     </div>
   );
 }
