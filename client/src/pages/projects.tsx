@@ -16,6 +16,12 @@ export default function Projects() {
       link: "/projects/spotify-api-test"
     },
     {
+      title: "AUDIO VISUALIZER",
+      description: "Real-time audio visualizer using Spotify's Audio Analysis API. Features beat-synchronized particle effects, frequency bars, and dynamic visuals that respond to tempo, energy, and musical mood.",
+      tags: "Music • Visualizer • Real-time • Audio Analysis",
+      link: "/projects/audio-visualizer"
+    },
+    {
       title: "CAMERA SYSTEM",
       description: "Multi-camera detection and live video streaming system. Automatically detects all available cameras (front/rear) and displays simultaneous video feeds with device identification.",
       tags: "Camera • Video • Hardware",
