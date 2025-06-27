@@ -1,0 +1,16 @@
+COMPLETE CODE TRANSFER GUIDE
+
+This file contains all the key code you need to copy to your new clean Repl.
+
+FILES TO CREATE/UPDATE:
+
+=== 1. client/src/App.tsx ===
+[Content will be added in next message]
+
+=== 2. client/src/index.css ===  
+[Content will be added in next message]
+
+=== 3. client/src/pages/clock.tsx ===
+[Content will be added in next message]
+
+And so on for all updated files...
