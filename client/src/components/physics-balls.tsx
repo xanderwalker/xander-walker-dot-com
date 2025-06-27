@@ -13,6 +13,12 @@ interface Ball {
   rotation?: number;
   rotationSpeed?: number;
   isBeachBall?: boolean;
+  rotationX?: number;
+  rotationY?: number;
+  rotationZ?: number;
+  rotationSpeedX?: number;
+  rotationSpeedY?: number;
+  rotationSpeedZ?: number;
 }
 
 export default function PhysicsBalls() {
@@ -131,7 +137,15 @@ export default function PhysicsBalls() {
         size: 60, // Large beach balls
         color: beachBallColors[i - 333],
         isLetter: false, // No longer letters
-        isBeachBall: true // Mark as beach balls
+        isBeachBall: true, // Mark as beach balls
+        rotation: Math.random() * 360,
+        rotationSpeed: (Math.random() - 0.5) * 4, // Rotation speed for spinning
+        rotationX: Math.random() * 360,
+        rotationY: Math.random() * 360,
+        rotationZ: Math.random() * 360,
+        rotationSpeedX: (Math.random() - 0.5) * 3,
+        rotationSpeedY: (Math.random() - 0.5) * 3,
+        rotationSpeedZ: (Math.random() - 0.5) * 3
       });
     }
 
@@ -193,11 +207,25 @@ export default function PhysicsBalls() {
             newRotation += ball.rotationSpeed || 0;
           }
 
+          // Update 3D rotations for beach balls
+          let newRotationX = ball.rotationX || 0;
+          let newRotationY = ball.rotationY || 0;
+          let newRotationZ = ball.rotationZ || 0;
+          
+          if (ball.isBeachBall) {
+            newRotationX += ball.rotationSpeedX || 0;
+            newRotationY += ball.rotationSpeedY || 0;
+            newRotationZ += ball.rotationSpeedZ || 0;
+          }
+
           return {
             ...ball,
             vx: newVx,
             vy: newVy,
-            rotation: newRotation
+            rotation: newRotation,
+            rotationX: newRotationX,
+            rotationY: newRotationY,
+            rotationZ: newRotationZ
           };
         });
 
@@ -308,7 +336,9 @@ export default function PhysicsBalls() {
               background: ball.id === 333 
                 ? `conic-gradient(from 0deg, #FF6B35 0deg 60deg, #FFFFFF 60deg 120deg, #4ECDC4 120deg 180deg, #FFFFFF 180deg 240deg, #FF6B35 240deg 300deg, #FFFFFF 300deg 360deg)`
                 : `conic-gradient(from 0deg, #E74C3C 0deg 60deg, #FFFFFF 60deg 120deg, #3498DB 120deg 180deg, #FFFFFF 180deg 240deg, #F39C12 240deg 300deg, #FFFFFF 300deg 360deg)`,
-              border: '2px solid #333333'
+              border: '2px solid #333333',
+              transform: `rotateX(${ball.rotationX || 0}deg) rotateY(${ball.rotationY || 0}deg) rotateZ(${ball.rotationZ || 0}deg)`,
+              transformStyle: 'preserve-3d'
             }}
           />
         ) : ball.isLetter ? (
