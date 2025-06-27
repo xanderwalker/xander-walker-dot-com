@@ -28,6 +28,9 @@ export default function SpotifyLyrics() {
 
   // Check for access token in URL after Spotify redirect
   useEffect(() => {
+    console.log('Page loading, checking env vars...');
+    console.log('VITE_SPOTIFY_CLIENT_ID:', import.meta.env.VITE_SPOTIFY_CLIENT_ID);
+    
     const hash = window.location.hash;
     if (hash) {
       const token = hash.substring(1).split('&').find(elem => elem.startsWith('access_token'))?.split('=')[1];
@@ -53,6 +56,9 @@ export default function SpotifyLyrics() {
       ? `${window.location.origin}/projects/spotify-lyrics`
       : `https://xanderwalker.com/projects/spotify-lyrics`;
     const SCOPES = 'user-read-currently-playing user-read-playback-state';
+    
+    console.log('Client ID from env:', CLIENT_ID);
+    console.log('All env vars:', import.meta.env);
     
     if (!CLIENT_ID) {
       setError('Spotify Client ID not configured. Please add VITE_SPOTIFY_CLIENT_ID to environment variables.');
