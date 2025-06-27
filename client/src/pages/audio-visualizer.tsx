@@ -53,11 +53,25 @@ export default function AudioVisualizer() {
     } else {
       const storedToken = localStorage.getItem('spotify_access_token');
       if (storedToken) {
+        console.log('Found stored Spotify token, using it');
         setAccessToken(storedToken);
         setIsConnected(true);
         setShowMinimized(true); // If already connected, show minimized
       }
     }
+
+    // Listen for storage changes to sync tokens between tabs/pages
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'spotify_access_token' && e.newValue) {
+        console.log('Spotify token updated in another tab/page');
+        setAccessToken(e.newValue);
+        setIsConnected(true);
+        setShowMinimized(true);
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
   }, []);
 
   // Spotify auth functions
@@ -92,7 +106,7 @@ export default function AudioVisualizer() {
     setShowMinimized(false);
     
     const clientId = import.meta.env.VITE_SPOTIFY_CLIENT_ID;
-    const redirectUri = `${window.location.origin}/projects/audio-visualizer`;
+    const redirectUri = `${window.location.origin}/projects/spotify-lyrics`;
     const scope = 'user-read-currently-playing user-read-playback-state user-top-read';
     
     const params = new URLSearchParams({
@@ -453,8 +467,11 @@ export default function AudioVisualizer() {
                 <div className="text-white font-xanman-wide font-bold mb-2" style={{fontSize: '100px', lineHeight: '1'}}>
                   CONNECT SPOTIFY
                 </div>
-                <div className="text-white/80 font-xanman-wide" style={{fontSize: '70px', lineHeight: '1'}}>
-                  EXPERIENCE MUSIC VISUALIZATION
+                <div className="text-white/80 font-xanman-wide" style={{fontSize: '50px', lineHeight: '1.2'}}>
+                  WILL REDIRECT TO LYRICS PAGE FOR AUTH
+                </div>
+                <div className="text-white/60 font-xanman-wide mt-4" style={{fontSize: '40px', lineHeight: '1.2'}}>
+                  THEN RETURN HERE FOR VISUALIZATION
                 </div>
               </div>
             </div>
