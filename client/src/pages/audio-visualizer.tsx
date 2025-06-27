@@ -40,6 +40,8 @@ export default function AudioVisualizer() {
   // Animation state for amoebas
   const animationRef = useRef<number>();
   const [time, setTime] = useState(0);
+  const [isConnected, setIsConnected] = useState(false);
+  const [showMinimized, setShowMinimized] = useState(false);
 
   // Initialize auth
   useEffect(() => {
@@ -52,6 +54,8 @@ export default function AudioVisualizer() {
       const storedToken = localStorage.getItem('spotify_access_token');
       if (storedToken) {
         setAccessToken(storedToken);
+        setIsConnected(true);
+        setShowMinimized(true); // If already connected, show minimized
       }
     }
   }, []);
@@ -69,7 +73,11 @@ export default function AudioVisualizer() {
         const data = await response.json();
         setAccessToken(data.access_token);
         localStorage.setItem('spotify_access_token', data.access_token);
+        setIsConnected(true);
         window.history.replaceState({}, document.title, window.location.pathname);
+        
+        // Show minimized button after a brief delay
+        setTimeout(() => setShowMinimized(true), 2000);
       }
     } catch (err) {
       console.error('Failed to authenticate with Spotify');
@@ -212,6 +220,50 @@ export default function AudioVisualizer() {
     }
   }, [accessToken]);
 
+  // Generate amoeba path for button
+  const generateAmoebaButtonPath = (
+    centerX: number, 
+    centerY: number, 
+    baseRadius: number, 
+    intensity: number = 0.5,
+    phaseOffset: number = 0
+  ) => {
+    const points = 8;
+    const variation = intensity * 0.4 + 0.2;
+    const timeOffset = time * 0.8 + phaseOffset;
+    
+    let path = '';
+    
+    for (let i = 0; i <= points; i++) {
+      const angle = (i / points) * Math.PI * 2;
+      const noise = Math.sin(angle * 2 + timeOffset) * variation * 0.3;
+      const radius = baseRadius * (1 + noise);
+      
+      const x = centerX + Math.cos(angle) * radius;
+      const y = centerY + Math.sin(angle) * radius;
+      
+      if (i === 0) {
+        path += `M ${x} ${y}`;
+      } else {
+        const prevAngle = ((i - 1) / points) * Math.PI * 2;
+        const prevNoise = Math.sin(prevAngle * 2 + timeOffset) * variation * 0.3;
+        const prevRadius = baseRadius * (1 + prevNoise);
+        const prevX = centerX + Math.cos(prevAngle) * prevRadius;
+        const prevY = centerY + Math.sin(prevAngle) * prevRadius;
+        
+        // Smooth curves
+        const cp1x = prevX + Math.cos(prevAngle + Math.PI/2) * baseRadius * 0.15;
+        const cp1y = prevY + Math.sin(prevAngle + Math.PI/2) * baseRadius * 0.15;
+        const cp2x = x + Math.cos(angle - Math.PI/2) * baseRadius * 0.15;
+        const cp2y = y + Math.sin(angle - Math.PI/2) * baseRadius * 0.15;
+        
+        path += ` C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${x} ${y}`;
+      }
+    }
+    
+    return path + ' Z';
+  };
+
   // Generate amoeba path based on audio features and time
   const generateAmoebaPath = (
     centerX: number, 
@@ -333,16 +385,75 @@ export default function AudioVisualizer() {
         </Link>
       </div>
 
-      {/* Connection status (minimal) */}
-      {!accessToken && (
-        <div className="absolute top-6 right-6 z-20">
-          <button
-            onClick={loginToSpotify}
-            className="text-white/80 hover:text-white transition-colors text-sm font-serif bg-white/10 backdrop-blur-sm px-3 py-2 rounded-lg border border-white/20"
-            style={{fontFamily: 'Georgia, serif'}}
-          >
-            Connect Spotify
-          </button>
+      {/* Center Connect Button (when not connected) */}
+      {!accessToken && !isConnected && (
+        <div className="absolute inset-0 flex items-center justify-center z-30">
+          <div className="relative">
+            <svg width="300" height="200" viewBox="0 0 300 200" className="cursor-pointer" onClick={loginToSpotify}>
+              <defs>
+                <filter id="buttonBlur" x="-20%" y="-20%" width="140%" height="140%">
+                  <feGaussianBlur in="SourceGraphic" stdDeviation="4" />
+                </filter>
+                <linearGradient id="spotifyGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="rgba(30, 215, 96, 0.8)" />
+                  <stop offset="50%" stopColor="rgba(86, 125, 188, 0.7)" />
+                  <stop offset="100%" stopColor="rgba(30, 215, 96, 0.6)" />
+                </linearGradient>
+              </defs>
+              
+              <path
+                d={generateAmoebaButtonPath(150, 100, 80, 0.7, 0)}
+                fill="url(#spotifyGradient)"
+                filter="url(#buttonBlur)"
+                className="transition-all duration-300 hover:scale-105"
+                style={{
+                  backdropFilter: 'blur(10px)',
+                }}
+              />
+            </svg>
+            
+            {/* Button Text */}
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+              <div className="text-center">
+                <div className="text-white font-serif text-xl font-bold mb-2" style={{fontFamily: 'Georgia, serif'}}>
+                  Connect Spotify
+                </div>
+                <div className="text-white/80 font-serif text-sm" style={{fontFamily: 'Georgia, serif'}}>
+                  Experience music visualization
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Minimized Button (bottom right when connected) */}
+      {isConnected && showMinimized && (
+        <div className="absolute bottom-6 right-6 z-20">
+          <div className="relative">
+            <svg width="60" height="40" viewBox="0 0 60 40" className="cursor-pointer">
+              <defs>
+                <filter id="miniBlur" x="-20%" y="-20%" width="140%" height="140%">
+                  <feGaussianBlur in="SourceGraphic" stdDeviation="2" />
+                </filter>
+              </defs>
+              
+              <path
+                d={generateAmoebaButtonPath(30, 20, 16, 0.3, Math.PI)}
+                fill="rgba(30, 215, 96, 0.6)"
+                filter="url(#miniBlur)"
+                className="transition-all duration-300"
+                style={{
+                  backdropFilter: 'blur(10px)',
+                }}
+              />
+            </svg>
+            
+            {/* Mini button indicator */}
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+              <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+            </div>
+          </div>
         </div>
       )}
 
