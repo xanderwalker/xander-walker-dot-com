@@ -255,6 +255,42 @@ export default function AudioVisualizer() {
     }
   }, [accessToken]);
 
+  // Fallback: Generate simulated audio features when real ones aren't available
+  const getSimulatedAudioFeatures = (trackName: string, artistName: string, progress: number) => {
+    // Create deterministic but varied features based on track info and playback position
+    const trackHash = (trackName + artistName).split('').reduce((a, b) => {
+      a = ((a << 5) - a) + b.charCodeAt(0);
+      return a & a;
+    }, 0);
+    
+    const baseEnergy = Math.abs(trackHash % 100) / 100;
+    const baseDanceability = Math.abs((trackHash * 1.5) % 100) / 100;
+    const baseValence = Math.abs((trackHash * 2.1) % 100) / 100;
+    
+    // Add time-based variation for dynamic movement
+    const timeVariation = Math.sin(progress / 10000) * 0.2;
+    
+    return {
+      energy: Math.max(0.1, Math.min(0.9, baseEnergy + timeVariation)),
+      danceability: Math.max(0.1, Math.min(0.9, baseDanceability + timeVariation * 0.7)),
+      valence: Math.max(0.1, Math.min(0.9, baseValence + timeVariation * 0.5)),
+      tempo: 120 + (Math.abs(trackHash % 60)),
+      loudness: -10,
+      acousticness: Math.abs((trackHash * 0.7) % 100) / 100,
+      speechiness: Math.abs((trackHash * 0.3) % 100) / 100,
+      instrumentalness: Math.abs((trackHash * 0.9) % 100) / 100,
+      liveness: Math.abs((trackHash * 1.1) % 100) / 100
+    };
+  };
+
+  // Use simulated features if real ones aren't available but track is playing
+  const effectiveAudioFeatures = audioFeatures || 
+    (currentTrack?.is_playing ? getSimulatedAudioFeatures(
+      currentTrack.name, 
+      currentTrack.artists[0]?.name || '', 
+      currentTrack.progress_ms || 0
+    ) : null);
+
   // Generate amoeba path for button
   const generateAmoebaButtonPath = (
     centerX: number, 
@@ -508,12 +544,12 @@ export default function AudioVisualizer() {
             </filter>
           </defs>
 
-          {audioFeatures && currentTrack?.is_playing ? (
+          {effectiveAudioFeatures && currentTrack?.is_playing ? (
             <>
               {/* Amoeba 1 - Energy */}
               <path
-                d={generateAmoebaPath(300, 400, 120 + audioFeatures.energy * 80, audioFeatures.energy, 0)}
-                fill={getMonetColor(audioFeatures.energy, 0.1)}
+                d={generateAmoebaPath(300, 400, 120 + effectiveAudioFeatures.energy * 80, effectiveAudioFeatures.energy, 0)}
+                fill={getMonetColor(effectiveAudioFeatures.energy, 0.1)}
                 filter="url(#blur1)"
                 className="transition-all duration-1000"
                 style={{
@@ -523,8 +559,8 @@ export default function AudioVisualizer() {
               
               {/* Amoeba 2 - Danceability */}
               <path
-                d={generateAmoebaPath(700, 350, 100 + audioFeatures.danceability * 90, audioFeatures.danceability, Math.PI * 0.66)}
-                fill={getMonetColor(audioFeatures.danceability, 0.4)}
+                d={generateAmoebaPath(700, 350, 100 + effectiveAudioFeatures.danceability * 90, effectiveAudioFeatures.danceability, Math.PI * 0.66)}
+                fill={getMonetColor(effectiveAudioFeatures.danceability, 0.4)}
                 filter="url(#blur2)"
                 className="transition-all duration-1000"
                 style={{
@@ -534,8 +570,8 @@ export default function AudioVisualizer() {
               
               {/* Amoeba 3 - Valence (Mood) */}
               <path
-                d={generateAmoebaPath(500, 650, 110 + audioFeatures.valence * 70, audioFeatures.valence, Math.PI * 1.33)}
-                fill={getMonetColor(audioFeatures.valence, 0.7)}
+                d={generateAmoebaPath(500, 650, 110 + effectiveAudioFeatures.valence * 70, effectiveAudioFeatures.valence, Math.PI * 1.33)}
+                fill={getMonetColor(effectiveAudioFeatures.valence, 0.7)}
                 filter="url(#blur3)"
                 className="transition-all duration-1000"
                 style={{
@@ -582,8 +618,8 @@ export default function AudioVisualizer() {
             {/* Debug info */}
             <div className="text-white/40 font-xanman-wide text-xs mt-2">
               Playing: {currentTrack.is_playing ? 'YES' : 'NO'} | 
-              Features: {audioFeatures ? 'YES' : 'NO'} |
-              Energy: {audioFeatures?.energy.toFixed(2) || 'N/A'}
+              Features: {effectiveAudioFeatures ? (audioFeatures ? 'REAL' : 'SIMULATED') : 'NO'} |
+              Energy: {effectiveAudioFeatures?.energy.toFixed(2) || 'N/A'}
             </div>
           </div>
         </div>
@@ -595,12 +631,12 @@ export default function AudioVisualizer() {
           <div>Token: {accessToken ? 'YES' : 'NO'}</div>
           <div>Connected: {isConnected ? 'YES' : 'NO'}</div>
           <div>Track: {currentTrack ? currentTrack.name : 'NONE'}</div>
-          <div>Audio Features: {audioFeatures ? 'LOADED' : 'NONE'}</div>
-          {audioFeatures && (
+          <div>Audio Features: {effectiveAudioFeatures ? (audioFeatures ? 'REAL' : 'SIMULATED') : 'NONE'}</div>
+          {effectiveAudioFeatures && (
             <div className="mt-1">
-              <div>Energy: {audioFeatures.energy.toFixed(2)}</div>
-              <div>Dance: {audioFeatures.danceability.toFixed(2)}</div>
-              <div>Mood: {audioFeatures.valence.toFixed(2)}</div>
+              <div>Energy: {effectiveAudioFeatures.energy.toFixed(2)}</div>
+              <div>Dance: {effectiveAudioFeatures.danceability.toFixed(2)}</div>
+              <div>Mood: {effectiveAudioFeatures.valence.toFixed(2)}</div>
             </div>
           )}
           {accessToken && (
