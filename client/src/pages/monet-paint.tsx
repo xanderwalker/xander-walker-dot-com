@@ -2,9 +2,38 @@ import { Link } from 'wouter';
 import { useState, useEffect, useRef } from 'react';
 
 export default function MonetPaint() {
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [mousePosition, setMousePosition] = useState({ x: 50, y: 50 });
   const [deviceMotion, setDeviceMotion] = useState({ x: 0, y: 0, z: 0 });
+  const [isMobile, setIsMobile] = useState(false);
   const backgroundRef = useRef<HTMLDivElement>(null);
+
+  // Detect mobile and initialize background on component mount
+  useEffect(() => {
+    const checkMobile = window.innerWidth <= 768 || /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    setIsMobile(checkMobile);
+    
+    if (backgroundRef.current) {
+      backgroundRef.current.style.setProperty('--mouse-x', '50%');
+      backgroundRef.current.style.setProperty('--mouse-y', '50%');
+      backgroundRef.current.style.setProperty('--tilt-x', '50%');
+      backgroundRef.current.style.setProperty('--tilt-y', '50%');
+      backgroundRef.current.style.setProperty('--tilt-z', '50%');
+      
+      // Force background update for mobile
+      if (checkMobile) {
+        setTimeout(() => {
+          if (backgroundRef.current) {
+            backgroundRef.current.style.background = `
+              radial-gradient(circle at 50% 50%, #2e4c8b 0%, #4a6bb5 15%, #6b8dd6 30%, transparent 50%),
+              radial-gradient(circle at 70% 30%, #5d4a8a 0%, #7a6ba0 20%, #9d8cb6 40%, transparent 60%),
+              radial-gradient(circle at 25% 85%, #8fa9e5 0%, #b5c6f2 25%, #c8b5d4 50%, transparent 70%),
+              linear-gradient(135deg, #2e4c8b, #5d4a8a, #8fa9e5, #c8b5d4, #d4c2a8, #a8b5a0)
+            `;
+          }
+        }, 100);
+      }
+    }
+  }, []);
 
   // Mouse movement for paint swirling (desktop)
   useEffect(() => {
@@ -27,7 +56,7 @@ export default function MonetPaint() {
   // Device motion for paint swirling (mobile)
   useEffect(() => {
     const handleDeviceMotion = (event: DeviceMotionEvent) => {
-      if (window.innerWidth <= 768 && event.accelerationIncludingGravity) {
+      if (event.accelerationIncludingGravity) {
         const x = Math.max(-50, Math.min(50, (event.accelerationIncludingGravity.x || 0) * 5));
         const y = Math.max(-50, Math.min(50, (event.accelerationIncludingGravity.y || 0) * 5));
         const z = Math.max(-50, Math.min(50, (event.accelerationIncludingGravity.z || 0) * 5));
@@ -43,8 +72,7 @@ export default function MonetPaint() {
       }
     };
 
-    // Always set up event listener for mobile devices
-    if (window.innerWidth <= 768) {
+    if (isMobile) {
       // Request permission for device motion on iOS
       if (typeof DeviceMotionEvent !== 'undefined' && typeof (DeviceMotionEvent as any).requestPermission === 'function') {
         (DeviceMotionEvent as any).requestPermission().then((response: string) => {
@@ -58,7 +86,7 @@ export default function MonetPaint() {
     }
 
     return () => window.removeEventListener('devicemotion', handleDeviceMotion);
-  }, []);
+  }, [isMobile]); // Depend on isMobile to ensure it runs after mobile detection
 
   return (
     <div className="min-h-screen relative overflow-hidden">
