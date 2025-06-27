@@ -17,12 +17,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Try to fetch synchronized lyrics if we have a Spotify track ID
       if (trackId) {
         try {
+          console.log(`Attempting to fetch synced lyrics for track ID: ${trackId}`);
           const syncResponse = await fetch(`https://spotify-lyric-api.herokuapp.com/?trackid=${trackId}`);
+          console.log(`Sync API response status: ${syncResponse.status}`);
+          
           if (syncResponse.ok) {
             const syncData = await syncResponse.json();
+            console.log('Sync API response:', JSON.stringify(syncData, null, 2));
+            
             if (syncData.error === false && syncData.lines) {
               syncedLyrics = syncData.lines;
+              console.log(`Found ${syncedLyrics.length} synchronized lyric lines`);
+            } else {
+              console.log('No synchronized lyrics found or API returned error');
             }
+          } else {
+            console.log(`Sync API failed with status: ${syncResponse.status}`);
           }
         } catch (syncError) {
           console.warn('Failed to fetch synchronized lyrics:', syncError);
