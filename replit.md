@@ -110,6 +110,8 @@ Changelog:
 - June 27, 2025. Created 3D gyroscope visualizer - built interactive 3D device representation that rotates in real-time based on alpha, beta, gamma values. Features visual orientation indicators, screen simulation, rotation rings, and smooth CSS transitions for intuitive device orientation display.
 - June 27, 2025. Added comprehensive user information sections - implemented Location (GPS coordinates, accuracy, altitude, speed, heading), Device (platform, CPU cores, memory, screen specs, touch capabilities), and Browser (vendor details, privacy settings, feature support) sections with automatic data collection and permission management.
 - June 27, 2025. Built interactive roulette wheel project - created physics-based simulation with drag-to-spin controls, realistic ball bounce mechanics, European roulette layout (37 numbers), winning number detection, and touch/mouse support. Features glassmorphism styling and Georgia serif fonts.
+- June 27, 2025. Implemented interactive paint swirling background - replaced static gradient with mouse-responsive paint mixing effect on desktop and accelerometer-responsive swirling on mobile. Used Monet water lilies color palette with multiple layered radial gradients that follow cursor/device motion for realistic paint mixing simulation.
+- June 27, 2025. Created modular clock system - separated each clock type into individual pages (/projects/clock/hourglass, /sphere, /hand, /year). Main clock page now displays cards linking to each clock experience. All individual clocks maintain the interactive Monet-inspired paint swirling background and full functionality.
 ```
 
 ## User Preferences

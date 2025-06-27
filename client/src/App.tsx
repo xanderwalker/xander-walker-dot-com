@@ -12,6 +12,10 @@ import GlassOfWater from "@/pages/glass-of-water";
 import Balls333 from "@/pages/333-balls";
 import Clock from "@/pages/clock";
 import PixelClock from "@/pages/pixel-clock";
+import HourglassClock from "@/pages/hourglass-clock";
+import SphereClock from "@/pages/sphere-clock";
+import HandClock from "@/pages/hand-clock";
+import YearClock from "@/pages/year-clock";
 import Roulette from "@/pages/roulette";
 import Contact from "@/pages/contact";
 import NotFound from "@/pages/not-found";
@@ -27,6 +31,10 @@ function Router() {
       <Route path="/projects/glass-of-water" component={GlassOfWater} />
       <Route path="/projects/333-balls" component={Balls333} />
       <Route path="/projects/clock" component={Clock} />
+      <Route path="/projects/clock/hourglass" component={HourglassClock} />
+      <Route path="/projects/clock/sphere" component={SphereClock} />
+      <Route path="/projects/clock/hand" component={HandClock} />
+      <Route path="/projects/clock/year" component={YearClock} />
       <Route path="/projects/pixel-clock" component={PixelClock} />
       <Route path="/projects/roulette" component={Roulette} />
       <Route path="/contact" component={Contact} />
