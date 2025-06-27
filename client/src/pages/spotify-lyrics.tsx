@@ -48,11 +48,14 @@ export default function SpotifyLyrics() {
   // Spotify login
   const loginToSpotify = () => {
     const CLIENT_ID = import.meta.env.VITE_SPOTIFY_CLIENT_ID;
-    // Force HTTPS for production deployment
-    const REDIRECT_URI = window.location.hostname === 'localhost' 
+    // Use current origin for development, force HTTPS for production
+    const REDIRECT_URI = import.meta.env.DEV 
       ? `${window.location.origin}/projects/spotify-lyrics`
       : `https://xanderwalker.com/projects/spotify-lyrics`;
     const SCOPES = 'user-read-currently-playing user-read-playback-state';
+    
+    console.log('Redirect URI:', REDIRECT_URI);
+    console.log('Current origin:', window.location.origin);
     
     if (!CLIENT_ID) {
       setError('Spotify Client ID not configured. Please add VITE_SPOTIFY_CLIENT_ID to environment variables.');
