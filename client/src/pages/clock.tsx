@@ -90,20 +90,59 @@ export default function Clock() {
     const minutes = now.getMinutes();
     const hours = now.getHours() % 12;
     
-    // Helper function to create naturally settled balls
+    // Helper function to create naturally settled balls with proper spacing
     const createSettledBalls = (count: number) => {
       const balls: Ball[] = [];
+      const ballRadius = 8;
+      const minDistance = ballRadius * 2.2;
+      const cylinderWidth = 64; // 80px total - 16px margins
+      const cylinderLeft = 16;
+      
       for (let i = 0; i < count; i++) {
-        // Create balls with natural random positions within cylinder
-        const x = Math.random() * 48 + 16; // Random x within cylinder walls (16-64px)
-        const baseY = 304; // Bottom of cylinder
-        const layerHeight = Math.floor(i / 4) * 16; // Rough layering
-        const y = baseY - layerHeight - (Math.random() * 8); // Add some randomness
+        let attempts = 0;
+        let validPosition = false;
+        let x, y;
+        
+        // Try to find a valid position that doesn't overlap
+        while (!validPosition && attempts < 50) {
+          // Calculate rough layer based on how many balls we can fit per layer
+          const ballsPerLayer = Math.floor(cylinderWidth / minDistance);
+          const layer = Math.floor(i / ballsPerLayer);
+          const positionInLayer = i % ballsPerLayer;
+          
+          // Position within the layer with some randomness
+          x = cylinderLeft + (positionInLayer * minDistance) + (Math.random() * 8 - 4);
+          y = 304 - (layer * minDistance) - (Math.random() * 4);
+          
+          // Ensure within cylinder bounds
+          x = Math.max(cylinderLeft + ballRadius, Math.min(cylinderLeft + cylinderWidth - ballRadius, x));
+          y = Math.max(ballRadius, y);
+          
+          // Check if this position overlaps with existing balls
+          validPosition = true;
+          for (const existingBall of balls) {
+            const dx = x - existingBall.x;
+            const dy = y - existingBall.y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            
+            if (distance < minDistance) {
+              validPosition = false;
+              break;
+            }
+          }
+          attempts++;
+        }
+        
+        // If we couldn't find a good position, place it anyway (stacked higher)
+        if (!validPosition) {
+          x = cylinderLeft + ballRadius + (Math.random() * (cylinderWidth - ballRadius * 2));
+          y = 304 - i * 8; // Stack higher if needed
+        }
         
         balls.push({
           id: ballIdRef.current++,
-          x: x,
-          y: y,
+          x: x!,
+          y: y!,
           vx: 0,
           vy: 0,
           isSettled: true
@@ -141,24 +180,34 @@ export default function Clock() {
             }
 
             // Check collision with other balls and bottom
-            const settledBalls = prevBalls.filter(b => b.isSettled);
+            const otherBalls = prevBalls.filter(b => b.id !== ball.id);
             let hasCollision = false;
             
-            // Check collision with settled balls
-            for (const settledBall of settledBalls) {
-              const dx = newX - settledBall.x;
-              const dy = newY - settledBall.y;
+            // Check collision with other balls (both settled and moving)
+            for (const otherBall of otherBalls) {
+              const dx = newX - otherBall.x;
+              const dy = newY - otherBall.y;
               const distance = Math.sqrt(dx * dx + dy * dy);
+              const ballRadius = 8; // Half of 16px ball width
+              const minDistance = ballRadius * 2.2; // Slight spacing between balls
               
-              if (distance < 16) { // Ball radius * 2
-                // Simple collision response - bounce away
+              if (distance < minDistance && distance > 0) {
+                // Separate balls to prevent overlap
+                const overlap = minDistance - distance;
+                const separationForce = overlap * 0.5;
+                
                 const angle = Math.atan2(dy, dx);
-                newX = settledBall.x + Math.cos(angle) * 16;
-                newY = settledBall.y + Math.sin(angle) * 16;
-                newVx = Math.cos(angle) * 2;
-                newVy = Math.sin(angle) * 2;
+                newX += Math.cos(angle) * separationForce;
+                newY += Math.sin(angle) * separationForce;
+                
+                // Add bounce velocity if ball was moving
+                if (!ball.isSettled) {
+                  newVx += Math.cos(angle) * 1;
+                  newVy += Math.sin(angle) * 1;
+                  newVx *= 0.7; // Damping
+                  newVy *= 0.7;
+                }
                 hasCollision = true;
-                break;
               }
             }
             
