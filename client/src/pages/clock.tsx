@@ -507,12 +507,13 @@ const PixelClockComponent = ({ currentTime }: { currentTime: Date }) => {
   // Drop 10 balls every second
   useEffect(() => {
     const currentSecond = currentTime.getSeconds();
+    const currentMinute = currentTime.getMinutes();
     
     if (lastSecondRef.current !== currentSecond) {
       lastSecondRef.current = currentSecond;
       
-      // Clear all balls at the start of each minute
-      if (currentSecond === 0) {
+      // Clear all balls at the start of each hour (when minutes = 0 and seconds = 0)
+      if (currentMinute === 0 && currentSecond === 0) {
         setPixelBalls([]);
         return;
       }
@@ -522,7 +523,7 @@ const PixelClockComponent = ({ currentTime }: { currentTime: Date }) => {
       for (let i = 0; i < 10; i++) {
         newBalls.push({
           id: ballIdRef.current++,
-          x: 38 + Math.random() * 4, // Random position across cylinder width
+          x: 35 + Math.random() * 10, // Random position across 10-pixel width
           y: 0,
           vy: 0.5 + Math.random() * 0.5,
           isSettled: false
@@ -557,8 +558,8 @@ const PixelClockComponent = ({ currentTime }: { currentTime: Date }) => {
           let newIsSettled = false;
           
           const cylinderBottom = 278;
-          const cylinderLeft = 38;
-          const cylinderRight = 42;
+          const cylinderLeft = 35;
+          const cylinderRight = 45;
           
           // Add horizontal spreading force when ball is near settling
           if (ball.vy > 1) {
@@ -591,8 +592,8 @@ const PixelClockComponent = ({ currentTime }: { currentTime: Date }) => {
                 break;
               }
               
-              // If center occupied, spread outward
-              for (let spread = 1; spread <= 2 && !found; spread++) {
+              // If center occupied, spread outward across the 10-pixel width
+              for (let spread = 1; spread <= 5 && !found; spread++) {
                 const leftX = roundedX - spread;
                 const rightX = roundedX + spread;
                 
@@ -646,22 +647,23 @@ const PixelClockComponent = ({ currentTime }: { currentTime: Date }) => {
   return (
     <div className="flex justify-center">
       <div className="flex flex-col items-center">
-        <div className="font-serif text-lg mb-2 text-black" style={{fontFamily: 'Georgia, serif'}}>Seconds</div>
-        <div className="relative w-20 h-80 overflow-hidden" style={{
+        <div className="font-serif text-lg mb-2 text-black" style={{fontFamily: 'Georgia, serif'}}>Hour Clock</div>
+        <div className="relative h-80 overflow-hidden" style={{
+          width: '50px', // 10 pixels for tube + padding
           background: 'linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.7) 100%)',
           borderRadius: '8px',
           border: '2px solid rgba(0,0,0,0.1)',
           boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.1)'
         }}>
           
-          {/* Second markers */}
+          {/* Minute markers */}
           {[...Array(12)].map((_, i) => (
             <div key={i} className="absolute left-0 text-xs text-gray-600" style={{
               fontFamily: 'Georgia, serif',
               top: `${(i + 1) * (280 / 12) - 8}px`,
               fontSize: '8px'
             }}>
-              {60 - (i + 1) * 5}
+              {60 - (i + 1) * 5}m
             </div>
           ))}
           
