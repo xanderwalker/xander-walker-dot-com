@@ -45,7 +45,7 @@ export default function Clock() {
               vx: (Math.random() - 0.5) * 3, // More horizontal velocity for bounce
               vy: 0.5, // Small initial downward velocity
               isSettled: false,
-              ballSize: 16 // Regular size for minutes
+              ballSize: 20 // Calculated size for minutes (60 ball capacity)
             };
             const newBalls = [...prev, newBall];
             return newBalls.slice(-currentMinute || -60);
@@ -62,7 +62,7 @@ export default function Clock() {
                 vx: (Math.random() - 0.5) * 2.5, // More velocity for bigger bounces
                 vy: 0, 
                 isSettled: false,
-                ballSize: 32 // Larger size for hours
+                ballSize: 58 // Calculated size for hours (12 ball capacity)
               };
               const newBalls = [...prev, newBall];
               return newBalls.slice(-currentHour || -12);
@@ -77,7 +77,7 @@ export default function Clock() {
             vx: (Math.random() - 0.5) * 3, 
             vy: 0.5, 
             isSettled: false,
-            ballSize: 16 // Regular size for seconds
+            ballSize: 20 // Calculated size for seconds (60 ball capacity)
           };
           setSecondBalls(prev => [...prev, newBall]);
         }
@@ -163,9 +163,9 @@ export default function Clock() {
       return balls;
     };
     
-    setSecondBalls(createSettledBalls(seconds, 16));
-    setMinuteBalls(createSettledBalls(minutes, 16));
-    setHourBalls(createSettledBalls(hours, 32));
+    setSecondBalls(createSettledBalls(seconds, 20));
+    setMinuteBalls(createSettledBalls(minutes, 20));
+    setHourBalls(createSettledBalls(hours, 58));
   }, []);
 
   // Physics animation loop
@@ -322,9 +322,29 @@ export default function Clock() {
     label: string,
     unit: string 
   }) => {
-    // Determine ball size based on cylinder type
+    // Calculate ball sizes based on cylinder volume and capacity
     const isHourCylinder = label === "Hours";
-    const ballSize = isHourCylinder ? 32 : 16; // Hours: 32px (2x larger), others: 16px
+    
+    // Cylinder dimensions: 80px wide × 320px tall = 25,600 px² total area
+    // For seconds/minutes: 60 balls should fill cylinder (30 balls = 50% mark)
+    // For hours: 12 balls should fill cylinder (6 balls = 50% mark)
+    // Using ~70% packing efficiency to account for spacing and realistic physics
+    
+    const cylinderArea = 80 * 320;
+    const packingEfficiency = 0.7;
+    
+    let ballSize;
+    if (isHourCylinder) {
+      // 12 balls should fill the cylinder
+      const ballArea = (cylinderArea * packingEfficiency) / 12;
+      const ballRadius = Math.sqrt(ballArea / Math.PI);
+      ballSize = Math.round(ballRadius * 2);
+    } else {
+      // 60 balls should fill the cylinder  
+      const ballArea = (cylinderArea * packingEfficiency) / 60;
+      const ballRadius = Math.sqrt(ballArea / Math.PI);
+      ballSize = Math.round(ballRadius * 2);
+    }
     return (
       <div className="flex flex-col items-center">
         <div className="font-serif text-lg mb-2" style={{fontFamily: 'Georgia, serif'}}>{label}</div>

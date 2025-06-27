@@ -105,6 +105,7 @@ Changelog:
 - June 26, 2025. Added mobile touch support - implemented onTouchStart, touchmove, and touchend event handlers for bouncing navigation circles. Mobile users can now drag and throw the navigation circles with proper touch detection and velocity calculations.
 - June 26, 2025. Created interactive Projects page with physics simulation - removed bouncing navigation circles, added centered bold "XANDER WALKER" header, implemented 333 small physics balls (15px) with accelerometer responsiveness on mobile, ball-to-ball collision detection, and position-based color changes (coral, mint, sky blue, sage green). Desktop version uses gravity while mobile responds to device tilt.
 - June 27, 2025. Restructured projects into card-based overview - created main projects page with cards for "333 Balls" and "Clock" projects. Moved physics simulation to dedicated /projects/333-balls subpage. Added smooth gradient color transitions instead of quadrant-based color changes. Created modern clock interface at /projects/clock with real-time updates.
+- June 27, 2025. Implemented volume-based ball sizing for graduated cylinder clock - calculated proper ball sizes so 60 balls fill seconds/minutes cylinders (30 balls = 50% mark) and 12 balls fill hour cylinder (6 balls = 50% mark). Used 70% packing efficiency for realistic physics. Ball sizes: 20px for seconds/minutes, 58px for hours. Enhanced depth-based settling physics and corrected boundary collision detection.
 ```
 
 ## User Preferences
