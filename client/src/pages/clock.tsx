@@ -90,35 +90,31 @@ export default function Clock() {
     const minutes = now.getMinutes();
     const hours = now.getHours() % 12;
     
-    setSecondBalls(Array.from({ length: seconds }, (_, i) => ({
-      id: ballIdRef.current++,
-      x: 40,
-      y: 320 - (i * 16), // Stack settled balls from bottom
-      vx: 0,
-      vy: 0,
-      isSettled: true,
-      settledIndex: i
-    })));
+    // Helper function to create naturally settled balls
+    const createSettledBalls = (count: number) => {
+      const balls: Ball[] = [];
+      for (let i = 0; i < count; i++) {
+        // Create balls with natural random positions within cylinder
+        const x = Math.random() * 48 + 16; // Random x within cylinder walls (16-64px)
+        const baseY = 304; // Bottom of cylinder
+        const layerHeight = Math.floor(i / 4) * 16; // Rough layering
+        const y = baseY - layerHeight - (Math.random() * 8); // Add some randomness
+        
+        balls.push({
+          id: ballIdRef.current++,
+          x: x,
+          y: y,
+          vx: 0,
+          vy: 0,
+          isSettled: true
+        });
+      }
+      return balls;
+    };
     
-    setMinuteBalls(Array.from({ length: minutes }, (_, i) => ({
-      id: ballIdRef.current++,
-      x: 40,
-      y: 320 - (i * 16),
-      vx: 0,
-      vy: 0,
-      isSettled: true,
-      settledIndex: i
-    })));
-    
-    setHourBalls(Array.from({ length: hours }, (_, i) => ({
-      id: ballIdRef.current++,
-      x: 40,
-      y: 320 - (i * 16),
-      vx: 0,
-      vy: 0,
-      isSettled: true,
-      settledIndex: i
-    })));
+    setSecondBalls(createSettledBalls(seconds));
+    setMinuteBalls(createSettledBalls(minutes));
+    setHourBalls(createSettledBalls(hours));
   }, []);
 
   // Physics animation loop
@@ -132,39 +128,58 @@ export default function Clock() {
             let newX = ball.x + ball.vx;
             let newY = ball.y + ball.vy;
             let newVx = ball.vx;
-            let newVy = ball.vy + 0.5; // Gravity
+            let newVy = ball.vy + 0.4; // Gravity
 
             // Wall collisions (cylinder walls)
             if (newX <= 8) { // Left wall
               newX = 8;
-              newVx = -newVx * 0.7; // Bounce with damping
+              newVx = -newVx * 0.6; // Bounce with damping
             }
             if (newX >= 72) { // Right wall (80px - 8px for ball width)
               newX = 72;
-              newVx = -newVx * 0.7;
+              newVx = -newVx * 0.6;
             }
 
-            // Bottom collision (cylinder bottom)
+            // Check collision with other balls and bottom
             const settledBalls = prevBalls.filter(b => b.isSettled);
-            const expectedBottomY = 304 - (settledBalls.length * 16); // 320px - 16px for ball height
+            let hasCollision = false;
             
-            if (newY >= expectedBottomY) {
-              newY = expectedBottomY;
-              newVy = -newVy * 0.4; // Bounce with heavy damping
-              newVx *= 0.8; // Friction
+            // Check collision with settled balls
+            for (const settledBall of settledBalls) {
+              const dx = newX - settledBall.x;
+              const dy = newY - settledBall.y;
+              const distance = Math.sqrt(dx * dx + dy * dy);
               
-              // Check if ball should settle
-              if (Math.abs(newVy) < 1 && Math.abs(newVx) < 1) {
-                return {
-                  ...ball,
-                  x: 40, // Center
-                  y: expectedBottomY,
-                  vx: 0,
-                  vy: 0,
-                  isSettled: true,
-                  settledIndex: settledBalls.length
-                };
+              if (distance < 16) { // Ball radius * 2
+                // Simple collision response - bounce away
+                const angle = Math.atan2(dy, dx);
+                newX = settledBall.x + Math.cos(angle) * 16;
+                newY = settledBall.y + Math.sin(angle) * 16;
+                newVx = Math.cos(angle) * 2;
+                newVy = Math.sin(angle) * 2;
+                hasCollision = true;
+                break;
               }
+            }
+            
+            // Bottom collision (cylinder bottom)
+            if (newY >= 304) { // 320px cylinder height - 16px ball height
+              newY = 304;
+              newVy = -newVy * 0.3; // Bounce with heavy damping
+              newVx *= 0.7; // Friction
+              hasCollision = true;
+            }
+            
+            // Check if ball should settle (low energy and touching something)
+            if (hasCollision && Math.abs(newVy) < 0.5 && Math.abs(newVx) < 0.5) {
+              return {
+                ...ball,
+                x: newX,
+                y: newY,
+                vx: 0,
+                vy: 0,
+                isSettled: true
+              };
             }
 
             return {
