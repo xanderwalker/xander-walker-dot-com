@@ -1,0 +1,57 @@
+
+After doing this, you may fix the identity used for this commit with:
+
+    git commit --amend --reset-author
+
+ 1 file changed, 3 insertions(+)
+ create mode 100644 .env
+xander@alexanders-MacBook-Pro xanderwalkerdotcom % git push origin main
+
+fatal: 'origin' does not appear to be a git repository
+fatal: Could not read from remote repository.
+
+Please make sure you have the correct access rights
+and the repository exists.
+xander@alexanders-MacBook-Pro xanderwalkerdotcom % git remote add origin https://github.com/xanderwalker/xander-walker-dot-com.git
+
+error: could not lock config file .git/config: File exists
+fatal: could not set 'remote.origin.url' to 'https://github.com/xanderwalker/xander-walker-dot-com.git'
+xander@alexanders-MacBook-Pro xanderwalkerdotcom % git remote -v
+
+xander@alexanders-MacBook-Pro xanderwalkerdotcom % git push origin main
+
+fatal: 'origin' does not appear to be a git repository
+fatal: Could not read from remote repository.
+
+Please make sure you have the correct access rights
+and the repository exists.
+xander@alexanders-MacBook-Pro xanderwalkerdotcom % rm .git/config.lock
+
+xander@alexanders-MacBook-Pro xanderwalkerdotcom % git remote set-url origin https://github.com/xanderwalker/xander-walker-dot-com.git
+
+error: No such remote 'origin'
+xander@alexanders-MacBook-Pro xanderwalkerdotcom % git remote -v
+
+xander@alexanders-MacBook-Pro xanderwalkerdotcom % git push origin main
+
+fatal: 'origin' does not appear to be a git repository
+fatal: Could not read from remote repository.
+
+Please make sure you have the correct access rights
+and the repository exists.
+xander@alexanders-MacBook-Pro xanderwalkerdotcom % git remote remove origin
+
+error: No such remote: 'origin'
+xander@alexanders-MacBook-Pro xanderwalkerdotcom % git remote add origin https://github.com/xanderwalker/xander-walker-dot-com.git
+
+xander@alexanders-MacBook-Pro xanderwalkerdotcom % git push origin main
+
+To https://github.com/xanderwalker/xander-walker-dot-com.git
+ ! [rejected]        main -> main (fetch first)
+error: failed to push some refs to 'https://github.com/xanderwalker/xander-walker-dot-com.git'
+hint: Updates were rejected because the remote contains work that you do
+hint: not have locally. This is usually caused by another repository pushing
+hint: to the same ref. You may want to first integrate the remote changes
+hint: (e.g., 'git pull ...') before pushing again.
+hint: See the 'Note about fast-forwards' in 'git push --help' for details.
+xander@alexanders-MacBook-Pro xanderwalkerdotcom % 
