@@ -1,34 +1,26 @@
-# Files to Transfer to Clean Repository
+# Complete Files to Transfer to Clean Repository
 
-## Key Files That Need Updating:
+## ALL Updated Files:
 
-### 1. client/src/pages/clock.tsx
-- Hourglass sand physics with 2x1 pixel grains
-- Interactive paint-swirling background controls
-- Mouse movement and accelerometer integration
-- Multiple clock visualizations
+### Core Pages:
+1. **client/src/pages/333-balls.tsx** - 333 physics balls project with accelerometer
+2. **client/src/pages/clock.tsx** - Hourglass sand physics + paint-swirling background
+3. **client/src/pages/glass-of-water.tsx** - Interactive water physics
+4. **client/src/pages/pixel-clock.tsx** - Pixel ball clock with stacking
+5. **client/src/pages/sensor-dashboard.tsx** - 3D gyroscope + comprehensive sensors
+6. **client/src/pages/roulette.tsx** - Physics roulette wheel
+7. **client/src/pages/projects.tsx** - Updated project cards layout
 
-### 2. client/src/index.css  
-- Paint-swirl-bg CSS with Monet colors
-- Interactive radial gradients
-- Mobile accelerometer responsiveness
-- Georgia serif font styling
+### Styling:
+8. **client/src/index.css** - Paint-swirl-bg + Georgia fonts + glassmorphism
 
-### 3. client/src/pages/sensor-dashboard.tsx
-- 3D gyroscope visualizer
-- Comprehensive user information sections
-- Georgia serif typography updates
+### Documentation:
+9. **replit.md** - Complete changelog of all updates
+10. **client/src/App.tsx** - Updated routing for all new pages
 
-### 4. client/src/pages/roulette.tsx
-- Physics-based roulette wheel
-- Drag-to-spin controls
-- European roulette layout
-
-### 5. client/src/pages/projects.tsx
-- Updated project cards layout
-
-### 6. replit.md
-- Complete changelog of all updates
+### Components (if modified):
+11. **client/src/components/physics-balls.tsx** - Enhanced physics components
+12. **client/src/components/layout.tsx** - Any layout updates
 
 ## Next Steps:
 1. Open new imported Repl
