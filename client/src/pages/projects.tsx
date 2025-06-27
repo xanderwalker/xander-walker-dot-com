@@ -1,54 +1,54 @@
 import { Link } from 'wouter';
+import Layout from '../components/layout';
 
 export default function Projects() {
+  const projects = [
+    {
+      title: "333 BALLS",
+      description: "Interactive physics simulation with 333 colorful balls that respond to device motion. Features smooth gradient colors, collision detection, and accelerometer controls on mobile.",
+      tags: "Physics • Interactive • Mobile",
+      link: "/projects/333-balls"
+    },
+    {
+      title: "CLOCK",
+      description: "A modern digital clock interface with custom styling and real-time updates. Clean design with precise time display.",
+      tags: "Time • Design • Interface", 
+      link: "/projects/clock"
+    }
+  ];
+
   return (
-    <div className="min-h-screen bg-white">
-      {/* Header with navigation home */}
-      <header className="p-8 flex justify-center">
-        <a 
-          href="/" 
-          className="text-black font-xanman-wide font-bold text-4xl md:text-6xl hover:opacity-70 transition-opacity duration-200 cursor-pointer"
-        >
-          XANDER WALKER
-        </a>
-      </header>
-
-      {/* Projects Grid */}
-      <div className="flex flex-col items-center justify-center p-8">
-        <h2 className="font-xanman-wide text-3xl mb-12 text-center">PROJECTS</h2>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl w-full">
-          
-          {/* 333 Balls Project Card */}
-          <Link href="/projects/333-balls">
-            <div className="bg-white border-2 border-black p-8 hover:bg-gray-50 transition-colors cursor-pointer group">
-              <h3 className="font-xanman-wide text-2xl mb-4 group-hover:text-gray-600">333 BALLS</h3>
-              <p className="text-gray-700 mb-6 leading-relaxed">
-                Interactive physics simulation with 333 colorful balls that respond to device motion. 
-                Features smooth gradient colors, collision detection, and accelerometer controls on mobile.
-              </p>
-              <div className="text-sm text-gray-500 uppercase tracking-wider">
-                Physics • Interactive • Mobile
-              </div>
-            </div>
-          </Link>
-
-          {/* Clock Project Card */}
-          <Link href="/projects/clock">
-            <div className="bg-white border-2 border-black p-8 hover:bg-gray-50 transition-colors cursor-pointer group">
-              <h3 className="font-xanman-wide text-2xl mb-4 group-hover:text-gray-600">CLOCK</h3>
-              <p className="text-gray-700 mb-6 leading-relaxed">
-                A modern digital clock interface with custom styling and real-time updates.
-                Clean design with precise time display.
-              </p>
-              <div className="text-sm text-gray-500 uppercase tracking-wider">
-                Time • Design • Interface
-              </div>
-            </div>
-          </Link>
-
+    <Layout title="XANDER WALKER">
+      <div className="max-w-7xl mx-auto relative z-30">
+        {/* Projects Section */}
+        <div className="mb-12">
+          <h2 className="font-serif mb-12 text-center text-black" style={{fontSize: '55px', lineHeight: '1.2', fontFamily: 'Georgia, serif'}}>
+            PROJECTS
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {projects.map((project, index) => (
+              <Link key={index} href={project.link}>
+                <div className="glassmorphism rounded-2xl p-8 relative z-30 pointer-events-auto cursor-pointer hover:bg-opacity-90 transition-all duration-300 group">
+                  {/* Project Title */}
+                  <div className="font-xanman-wide text-2xl mb-6 text-center text-black group-hover:text-gray-600 transition-colors">
+                    {project.title}
+                  </div>
+                  
+                  {/* Project Description */}
+                  <div className="text-gray-700 mb-6 leading-relaxed text-center">
+                    {project.description}
+                  </div>
+                  
+                  {/* Project Tags */}
+                  <div className="text-sm text-gray-500 uppercase tracking-wider text-center">
+                    {project.tags}
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
         </div>
       </div>
-    </div>
+    </Layout>
   );
 }
