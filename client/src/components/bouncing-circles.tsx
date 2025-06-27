@@ -118,27 +118,27 @@ export default function BouncingCircles() {
             newVx = -newVx;
             newX = Math.max(0, Math.min(window.innerWidth - circle.size, newX));
             // Horizontal bounce deformation - squish horizontally, stretch vertically
-            newScaleX = 0.85;
-            newScaleY = 1.15;
-            newDeformDecay = 0.95;
+            newScaleX = 0.75;
+            newScaleY = 1.25;
+            newDeformDecay = 1.0;
           }
           if (newY <= 0 || newY >= window.innerHeight - circle.size) {
             newVy = -newVy;
             newY = Math.max(0, Math.min(window.innerHeight - circle.size, newY));
             // Vertical bounce deformation - squish vertically, stretch horizontally
-            newScaleX = 1.15;
-            newScaleY = 0.85;
-            newDeformDecay = 0.95;
+            newScaleX = 1.25;
+            newScaleY = 0.75;
+            newDeformDecay = 1.0;
           }
 
           // Gradually return to normal shape (bubble-like recovery)
           if (newDeformDecay > 0) {
-            newScaleX = newScaleX + (1 - newScaleX) * 0.08;
-            newScaleY = newScaleY + (1 - newScaleY) * 0.08;
-            newDeformDecay *= 0.98;
+            newScaleX = newScaleX + (1 - newScaleX) * 0.06;
+            newScaleY = newScaleY + (1 - newScaleY) * 0.06;
+            newDeformDecay *= 0.96;
             
             // Stop deformation when close to normal
-            if (Math.abs(newScaleX - 1) < 0.01 && Math.abs(newScaleY - 1) < 0.01) {
+            if (Math.abs(newScaleX - 1) < 0.02 && Math.abs(newScaleY - 1) < 0.02) {
               newScaleX = 1;
               newScaleY = 1;
               newDeformDecay = 0;
