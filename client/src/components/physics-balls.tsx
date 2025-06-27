@@ -128,23 +128,47 @@ export default function PhysicsBalls() {
     const width = window.innerWidth;
     const height = window.innerHeight;
     
-    // Divide screen into quadrants
-    const leftHalf = x < width / 2;
-    const topHalf = y < height / 2;
+    // Normalize position to 0-1 range
+    const normalizedX = Math.max(0, Math.min(1, x / width));
+    const normalizedY = Math.max(0, Math.min(1, y / height));
+    
+    // Define corner colors
+    let topLeft, topRight, bottomLeft, bottomRight;
     
     if (isLargeBall) {
-      // Color-blind friendly colors for large balls - high contrast, distinct hues
-      if (leftHalf && topHalf) return '#1A1A2E'; // dark navy - top left
-      if (!leftHalf && topHalf) return '#7209B7'; // deep purple - top right
-      if (leftHalf && !topHalf) return '#FF6B35'; // bright orange - bottom left
-      return '#16213E'; // midnight blue - bottom right
+      // Color-blind friendly colors for large balls
+      topLeft = [26, 26, 46]; // #1A1A2E - dark navy
+      topRight = [114, 9, 183]; // #7209B7 - deep purple
+      bottomLeft = [255, 107, 53]; // #FF6B35 - bright orange
+      bottomRight = [22, 33, 62]; // #16213E - midnight blue
     } else {
       // Regular colors for small balls
-      if (leftHalf && topHalf) return '#FF6B6B'; // coral - top left
-      if (!leftHalf && topHalf) return '#4ECDC4'; // mint - top right
-      if (leftHalf && !topHalf) return '#45B7D1'; // sky blue - bottom left
-      return '#96CEB4'; // sage green - bottom right
+      topLeft = [255, 107, 107]; // #FF6B6B - coral
+      topRight = [78, 205, 196]; // #4ECDC4 - mint
+      bottomLeft = [69, 183, 209]; // #45B7D1 - sky blue
+      bottomRight = [150, 206, 180]; // #96CEB4 - sage green
     }
+    
+    // Bilinear interpolation between four corner colors
+    const top = [
+      topLeft[0] * (1 - normalizedX) + topRight[0] * normalizedX,
+      topLeft[1] * (1 - normalizedX) + topRight[1] * normalizedX,
+      topLeft[2] * (1 - normalizedX) + topRight[2] * normalizedX
+    ];
+    
+    const bottom = [
+      bottomLeft[0] * (1 - normalizedX) + bottomRight[0] * normalizedX,
+      bottomLeft[1] * (1 - normalizedX) + bottomRight[1] * normalizedX,
+      bottomLeft[2] * (1 - normalizedX) + bottomRight[2] * normalizedX
+    ];
+    
+    const final = [
+      Math.round(top[0] * (1 - normalizedY) + bottom[0] * normalizedY),
+      Math.round(top[1] * (1 - normalizedY) + bottom[1] * normalizedY),
+      Math.round(top[2] * (1 - normalizedY) + bottom[2] * normalizedY)
+    ];
+    
+    return `rgb(${final[0]}, ${final[1]}, ${final[2]})`;
   };
 
   // Animation loop
