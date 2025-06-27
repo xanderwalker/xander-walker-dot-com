@@ -10,7 +10,19 @@ interface Ball {
   isSettled: boolean;
   settledIndex?: number;
   ballSize?: number;
+  color?: string;
 }
+
+// Function to generate random ball colors
+const getBallColor = (type: 'second' | 'minute' | 'hour') => {
+  const colors = {
+    second: ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', '#DDA0DD', '#FFB6C1', '#87CEEB'],
+    minute: ['#FF7675', '#00B894', '#0984E3', '#6C5CE7', '#FDCB6E', '#E17055', '#74B9FF', '#55A3FF'],
+    hour: ['#E74C3C', '#16A085', '#2980B9', '#8E44AD', '#F39C12', '#D35400', '#3498DB', '#9B59B6']
+  };
+  const colorArray = colors[type];
+  return colorArray[Math.floor(Math.random() * colorArray.length)];
+};
 
 export default function Clock() {
   const [time, setTime] = useState(new Date());
@@ -28,7 +40,7 @@ export default function Clock() {
       
       const currentSecond = now.getSeconds();
       const currentMinute = now.getMinutes();
-      const currentHour = now.getHours() % 12;
+      const currentHour = now.getHours(); // 24-hour time
       
       // Add new ball every second
       if (currentSecond !== lastSecondRef.current) {
@@ -45,7 +57,8 @@ export default function Clock() {
               vx: (Math.random() - 0.5) * 3, // More horizontal velocity for bounce
               vy: 0.5, // Small initial downward velocity
               isSettled: false,
-              ballSize: 20 // Calculated size for minutes (60 ball capacity)
+              ballSize: 20, // Calculated size for minutes (60 ball capacity)
+              color: getBallColor('minute')
             };
             const newBalls = [...prev, newBall];
             return newBalls.slice(-currentMinute || -60);
@@ -62,10 +75,11 @@ export default function Clock() {
                 vx: (Math.random() - 0.5) * 2.5, // More velocity for bigger bounces
                 vy: 0, 
                 isSettled: false,
-                ballSize: 58 // Calculated size for hours (12 ball capacity)
+                ballSize: 41, // Calculated size for hours (24 ball capacity)
+                color: getBallColor('hour')
               };
               const newBalls = [...prev, newBall];
-              return newBalls.slice(-currentHour || -12);
+              return newBalls.slice(-currentHour || -24);
             });
           }
         } else {
@@ -77,7 +91,8 @@ export default function Clock() {
             vx: (Math.random() - 0.5) * 3, 
             vy: 0.5, 
             isSettled: false,
-            ballSize: 20 // Calculated size for seconds (60 ball capacity)
+            ballSize: 20, // Calculated size for seconds (60 ball capacity)
+            color: getBallColor('second')
           };
           setSecondBalls(prev => [...prev, newBall]);
         }
@@ -92,10 +107,10 @@ export default function Clock() {
     const now = new Date();
     const seconds = now.getSeconds();
     const minutes = now.getMinutes();
-    const hours = now.getHours() % 12;
+    const hours = now.getHours(); // 24-hour time
     
     // Helper function to create naturally settled balls with proper spacing
-    const createSettledBalls = (count: number, ballSize: number = 16) => {
+    const createSettledBalls = (count: number, ballSize: number = 16, ballType: 'second' | 'minute' | 'hour' = 'second') => {
       const balls: Ball[] = [];
       const ballRadius = ballSize / 2;
       const minDistance = ballRadius * 2.2;
@@ -157,15 +172,16 @@ export default function Clock() {
           vx: (Math.random() - 0.5) * 0.5, // Small random velocity for subtle movement
           vy: (Math.random() - 0.5) * 0.3,
           isSettled: false, // Start as dynamic, not settled
-          ballSize: ballSize
+          ballSize: ballSize,
+          color: getBallColor(ballType)
         });
       }
       return balls;
     };
     
-    setSecondBalls(createSettledBalls(seconds, 20));
-    setMinuteBalls(createSettledBalls(minutes, 20));
-    setHourBalls(createSettledBalls(hours, 58));
+    setSecondBalls(createSettledBalls(seconds, 20, 'second'));
+    setMinuteBalls(createSettledBalls(minutes, 20, 'minute'));
+    setHourBalls(createSettledBalls(hours, 41, 'hour'));
   }, []);
 
   // Physics animation loop
@@ -335,8 +351,8 @@ export default function Clock() {
     
     let ballSize;
     if (isHourCylinder) {
-      // 12 balls should fill the cylinder
-      const ballArea = (cylinderArea * packingEfficiency) / 12;
+      // 24 balls should fill the cylinder (24-hour time)
+      const ballArea = (cylinderArea * packingEfficiency) / 24;
       const ballRadius = Math.sqrt(ballArea / Math.PI);
       ballSize = Math.round(ballRadius * 2);
     } else {
@@ -348,7 +364,17 @@ export default function Clock() {
     return (
       <div className="flex flex-col items-center">
         <div className="font-serif text-lg mb-2" style={{fontFamily: 'Georgia, serif'}}>{label}</div>
-        <div className="relative w-20 h-80 border-2 border-black rounded-b-lg bg-white overflow-hidden">
+        <div className="relative w-20 h-80 overflow-hidden" style={{
+          background: 'linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(230,230,230,0.7) 50%, rgba(255,255,255,0.9) 100%)',
+          borderRadius: '0 0 20px 20px',
+          border: '3px solid rgba(200,200,200,0.8)',
+          borderTop: '1px solid rgba(150,150,150,0.5)',
+          boxShadow: 'inset -8px 0 16px rgba(0,0,0,0.1), inset 8px 0 16px rgba(255,255,255,0.3), 0 8px 32px rgba(0,0,0,0.15)',
+          backdropFilter: 'blur(2px)'
+        }}>
+          {/* Glass highlight effect */}
+          <div className="absolute left-1 top-0 w-1 h-full bg-gradient-to-b from-white via-transparent to-transparent opacity-40 rounded-full"></div>
+          <div className="absolute right-1 top-0 w-2 h-full bg-gradient-to-b from-transparent via-black to-transparent opacity-10 rounded-full"></div>
           {/* Graduated markings - quarter intervals */}
           {Array.from({ length: 5 }, (_, i) => (
             <div key={i} className="absolute right-0 w-full border-t border-gray-300" 
@@ -362,15 +388,19 @@ export default function Clock() {
           {/* Balls */}
           {balls.map((ball) => {
             const currentBallSize = ball.ballSize || ballSize;
+            const ballColor = ball.color || '#4ECDC4';
             return (
               <div
                 key={ball.id}
-                className="absolute bg-blue-500 rounded-full border border-blue-700"
+                className="absolute rounded-full"
                 style={{
                   width: `${currentBallSize}px`,
                   height: `${currentBallSize}px`,
                   left: `${ball.x - currentBallSize/2}px`, // Center the ball
                   bottom: `${320 - ball.y - currentBallSize}px`, // Position from bottom
+                  background: `radial-gradient(circle at 30% 30%, ${ballColor}ff, ${ballColor}cc, ${ballColor}99)`,
+                  border: `2px solid ${ballColor}88`,
+                  boxShadow: `inset -2px -2px 4px rgba(0,0,0,0.2), inset 2px 2px 4px rgba(255,255,255,0.3), 0 2px 8px rgba(0,0,0,0.15)`,
                   transition: 'none', // Let physics handle movement
                   zIndex: 5 // All balls have same z-index since they're all dynamic
                 }}
