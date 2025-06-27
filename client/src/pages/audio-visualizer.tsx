@@ -605,33 +605,69 @@ export default function AudioVisualizer() {
         </div>
       )}
 
-      {/* Debug panel for troubleshooting */}
-      <div className="absolute top-6 right-6 z-20 max-w-sm">
-        <div className="bg-black/20 backdrop-blur-sm rounded-lg px-4 py-2 border border-white/10 text-white/60 text-xs">
-          <div>Token: {accessToken ? 'YES' : 'NO'}</div>
-          <div>Connected: {isConnected ? 'YES' : 'NO'}</div>
-          <div>Track: {currentTrack ? currentTrack.name : 'NONE'}</div>
-          <div>Audio Features: {audioFeatures ? 'LOADED' : 'NONE'}</div>
-          <div className="mt-1 text-yellow-400">
-            Add to Spotify: {window.location.origin}/projects/audio-visualizer
-          </div>
-          {audioFeatures && (
-            <div className="mt-1">
-              <div>Energy: {audioFeatures.energy.toFixed(2)}</div>
-              <div>Dance: {audioFeatures.danceability.toFixed(2)}</div>
-              <div>Mood: {audioFeatures.valence.toFixed(2)}</div>
+      {/* Album Art & Connection Status (top right) */}
+      {currentTrack && (
+        <div className="absolute top-6 right-6 z-20">
+          <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/20 max-w-xs">
+            {/* Album Art */}
+            {currentTrack.album.images[0] && (
+              <img 
+                src={currentTrack.album.images[0].url} 
+                alt={currentTrack.album.name}
+                className="w-24 h-24 rounded-lg mb-3 object-cover mx-auto"
+              />
+            )}
+            
+            {/* Track Info */}
+            <div className="text-center">
+              <div className="text-white font-xanman-wide text-sm truncate mb-1">
+                {currentTrack.name}
+              </div>
+              <div className="text-white/70 font-xanman-wide text-xs truncate mb-2">
+                {currentTrack.artists[0]?.name}
+              </div>
+              
+              {/* Connection Status */}
+              <div className="flex items-center justify-center gap-2 text-xs">
+                <div className={`w-2 h-2 rounded-full ${currentTrack.is_playing ? 'bg-green-400' : 'bg-orange-400'}`}></div>
+                <span className="text-white/60 font-xanman-wide">
+                  {currentTrack.is_playing ? 'PLAYING' : 'PAUSED'}
+                </span>
+              </div>
+              
+              {/* Audio Features Status */}
+              <div className="flex items-center justify-center gap-2 text-xs mt-1">
+                <div className={`w-2 h-2 rounded-full ${audioFeatures ? 'bg-green-400' : 'bg-red-400'}`}></div>
+                <span className="text-white/60 font-xanman-wide">
+                  {audioFeatures ? 'VISUALIZING' : 'NO FEATURES'}
+                </span>
+              </div>
             </div>
-          )}
-          {accessToken && (
-            <button 
-              onClick={loginToSpotify}
-              className="mt-2 px-2 py-1 bg-green-600/20 hover:bg-green-600/40 rounded text-white/80 text-xs transition-colors"
-            >
-              Re-authenticate
-            </button>
-          )}
+          </div>
         </div>
-      </div>
+      )}
+
+      {/* Debug panel when no track */}
+      {!currentTrack && (
+        <div className="absolute top-6 right-6 z-20 max-w-sm">
+          <div className="bg-black/20 backdrop-blur-sm rounded-lg px-4 py-2 border border-white/10 text-white/60 text-xs">
+            <div>Token: {accessToken ? 'YES' : 'NO'}</div>
+            <div>Connected: {isConnected ? 'YES' : 'NO'}</div>
+            <div>Track: NONE</div>
+            <div className="mt-1 text-yellow-400">
+              Add to Spotify: {window.location.origin}/projects/audio-visualizer
+            </div>
+            {accessToken && (
+              <button 
+                onClick={loginToSpotify}
+                className="mt-2 px-2 py-1 bg-green-600/20 hover:bg-green-600/40 rounded text-white/80 text-xs transition-colors"
+              >
+                Re-authenticate
+              </button>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
