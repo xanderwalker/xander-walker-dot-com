@@ -496,10 +496,10 @@ const AnalogClock = ({ currentTime }: { currentTime: Date }) => {
   const minutes = currentTime.getMinutes();
   const seconds = currentTime.getSeconds();
   
-  // Calculate angles for each hand
-  const secondAngle = (seconds * 6) - 90; // 6 degrees per second
-  const minuteAngle = (minutes * 6) + (seconds * 0.1) - 90; // 6 degrees per minute + smooth seconds
-  const hourAngle = (hours * 30) + (minutes * 0.5) - 90; // 30 degrees per hour + smooth minutes
+  // Calculate angles for each hand (starting from 12 o'clock position)
+  const secondAngle = (seconds * 6) - 90; // 6 degrees per second, -90 to start from top
+  const minuteAngle = (minutes * 6) + (seconds * 0.1) - 90; // 6 degrees per minute + smooth seconds movement
+  const hourAngle = (hours * 30) + (minutes * 0.5) - 90; // 30 degrees per hour + smooth minute movement
   
   return (
     <div className="flex flex-col items-center space-y-4">
@@ -507,7 +507,7 @@ const AnalogClock = ({ currentTime }: { currentTime: Date }) => {
         {/* Clock face numbers */}
         {[...Array(12)].map((_, i) => {
           const number = i === 0 ? 12 : i;
-          const angle = (i * 30) - 90;
+          const angle = (i * 30) - 90; // Start from 12 o'clock (top)
           const x = Math.cos(angle * Math.PI / 180) * 130;
           const y = Math.sin(angle * Math.PI / 180) * 130;
           
