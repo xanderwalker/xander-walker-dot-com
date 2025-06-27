@@ -379,8 +379,8 @@ export default function AudioVisualizer() {
       {/* Minimal top navigation */}
       <div className="absolute top-6 left-6 z-20">
         <Link href="/projects">
-          <button className="text-white/80 hover:text-white transition-colors text-sm font-serif bg-white/10 backdrop-blur-sm px-3 py-2 rounded-lg border border-white/20" style={{fontFamily: 'Georgia, serif'}}>
-            ← Back
+          <button className="text-white/80 hover:text-white transition-colors font-xanman-wide bg-white/10 backdrop-blur-sm px-6 py-4 rounded-lg border border-white/20" style={{fontSize: '25px', lineHeight: '1'}}>
+            ← BACK
           </button>
         </Link>
       </div>
@@ -389,7 +389,7 @@ export default function AudioVisualizer() {
       {!accessToken && !isConnected && (
         <div className="absolute inset-0 flex items-center justify-center z-30">
           <div className="relative">
-            <svg width="300" height="200" viewBox="0 0 300 200" className="cursor-pointer" onClick={loginToSpotify}>
+            <svg width="800" height="400" viewBox="0 0 800 400" className="cursor-pointer" onClick={loginToSpotify}>
               <defs>
                 <filter id="buttonBlur" x="-20%" y="-20%" width="140%" height="140%">
                   <feGaussianBlur in="SourceGraphic" stdDeviation="4" />
@@ -402,7 +402,7 @@ export default function AudioVisualizer() {
               </defs>
               
               <path
-                d={generateAmoebaButtonPath(150, 100, 80, 0.7, 0)}
+                d={generateAmoebaButtonPath(400, 200, 180, 0.7, 0)}
                 fill="url(#spotifyGradient)"
                 filter="url(#buttonBlur)"
                 className="transition-all duration-300 hover:scale-105"
@@ -415,11 +415,11 @@ export default function AudioVisualizer() {
             {/* Button Text */}
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
               <div className="text-center">
-                <div className="text-white font-serif text-xl font-bold mb-2" style={{fontFamily: 'Georgia, serif'}}>
-                  Connect Spotify
+                <div className="text-white font-xanman-wide font-bold mb-2" style={{fontSize: '100px', lineHeight: '1'}}>
+                  CONNECT SPOTIFY
                 </div>
-                <div className="text-white/80 font-serif text-sm" style={{fontFamily: 'Georgia, serif'}}>
-                  Experience music visualization
+                <div className="text-white/80 font-xanman-wide" style={{fontSize: '70px', lineHeight: '1'}}>
+                  EXPERIENCE MUSIC VISUALIZATION
                 </div>
               </div>
             </div>
@@ -536,12 +536,12 @@ export default function AudioVisualizer() {
 
       {/* Minimal track info (bottom corner) */}
       {currentTrack && (
-        <div className="absolute bottom-6 left-6 z-20 max-w-xs">
-          <div className="bg-white/10 backdrop-blur-sm rounded-lg px-3 py-2 border border-white/20">
-            <div className="text-white/90 text-xs font-serif truncate" style={{fontFamily: 'Georgia, serif'}}>
+        <div className="absolute bottom-6 left-6 z-20 max-w-2xl">
+          <div className="bg-white/10 backdrop-blur-sm rounded-lg px-6 py-4 border border-white/20">
+            <div className="text-white/90 font-xanman-wide truncate" style={{fontSize: '60px', lineHeight: '1.2'}}>
               {currentTrack.name}
             </div>
-            <div className="text-white/60 text-xs font-serif truncate" style={{fontFamily: 'Georgia, serif'}}>
+            <div className="text-white/60 font-xanman-wide truncate" style={{fontSize: '40px', lineHeight: '1.2'}}>
               {currentTrack.artists[0]?.name}
             </div>
           </div>
