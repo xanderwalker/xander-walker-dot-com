@@ -123,8 +123,8 @@ export default function PhysicsBalls() {
           id: i,
           x: isNaN(x) ? 100 : x,
           y: isNaN(y) ? 100 : y,
-          vx: (Math.random() - 0.5) * 2,
-          vy: (Math.random() - 0.5) * 2,
+          vx: 0, // Start stationary - only move with accelerometer
+          vy: 0, // Start stationary - only move with accelerometer
           size: 15, // uniform 15px balls (3x smaller)
           color: colors[Math.floor(Math.random() * colors.length)]
         });
@@ -140,8 +140,8 @@ export default function PhysicsBalls() {
           id: i,
           x: isNaN(x) ? 100 : x,
           y: isNaN(y) ? 100 : y,
-          vx: (Math.random() - 0.5) * 3, // Faster movement for letters
-          vy: (Math.random() - 0.5) * 3,
+          vx: 0, // Start stationary - only move with accelerometer
+          vy: 0, // Start stationary - only move with accelerometer
           size: 80, // Larger size for letters
           color: '#000000', // Black letters
           isLetter: true,
@@ -206,13 +206,11 @@ export default function PhysicsBalls() {
           let newRotation = ball.rotation || 0;
 
           if (isMobile) {
-            // Apply accelerometer forces
+            // Apply accelerometer forces ONLY
             newVx += acceleration.x * 0.1;
             newVy += -acceleration.y * 0.1; // Invert Y for natural movement
-          } else {
-            // Desktop: apply gravity
-            newVy += 0.2;
           }
+          // No gravity or automatic movement on desktop
 
           // Update rotation for letters
           if (ball.isLetter) {
