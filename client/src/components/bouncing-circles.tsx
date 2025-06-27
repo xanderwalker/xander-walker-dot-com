@@ -41,6 +41,9 @@ export default function BouncingCircles() {
   };
 
   useEffect(() => {
+    // Detect mobile for performance optimization
+    const isMobile = window.innerWidth <= 768 || /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    
     const initialCircles: Circle[] = [
       {
         id: 'bio',
@@ -102,7 +105,19 @@ export default function BouncingCircles() {
 
     setCircles(initialCircles);
 
+    // Performance optimization for mobile
+    let frameCount = 0;
+    const mobileFrameSkip = 2; // Skip every 2nd frame on mobile for 30fps instead of 60fps
+
     const animate = () => {
+      frameCount++;
+      
+      // Skip frames on mobile for better performance
+      if (isMobile && frameCount % mobileFrameSkip !== 0) {
+        animationRef.current = requestAnimationFrame(animate);
+        return;
+      }
+
       setCircles(prevCircles => 
         prevCircles.map(circle => {
           let newX = circle.x + circle.vx;
@@ -112,18 +127,15 @@ export default function BouncingCircles() {
           let newScaleX = circle.scaleX;
           let newScaleY = circle.scaleY;
           let newDeformDecay = circle.deformDecay;
-
-          // Detect mobile for enhanced deformation
-          const isMobile = window.innerWidth <= 768 || /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
           
-          // Bounce off edges with deformation
+          // Bounce off edges with simplified deformation for mobile
           if (newX <= 0 || newX >= window.innerWidth - circle.size) {
             newVx = -newVx;
             newX = Math.max(0, Math.min(window.innerWidth - circle.size, newX));
-            // Enhanced horizontal bounce deformation for mobile - more pronounced squish
             if (isMobile) {
-              newScaleX = 0.6; // More extreme squish
-              newScaleY = 1.4; // More stretch
+              // Simplified deformation for mobile performance
+              newScaleX = 0.75;
+              newScaleY = 1.25;
             } else {
               newScaleX = 0.75;
               newScaleY = 1.25;
@@ -133,10 +145,10 @@ export default function BouncingCircles() {
           if (newY <= 0 || newY >= window.innerHeight - circle.size) {
             newVy = -newVy;
             newY = Math.max(0, Math.min(window.innerHeight - circle.size, newY));
-            // Enhanced vertical bounce deformation for mobile - more pronounced squish
             if (isMobile) {
-              newScaleX = 1.4; // More stretch
-              newScaleY = 0.6; // More extreme squish
+              // Simplified deformation for mobile performance
+              newScaleX = 1.25;
+              newScaleY = 0.75;
             } else {
               newScaleX = 1.25;
               newScaleY = 0.75;
@@ -144,18 +156,17 @@ export default function BouncingCircles() {
             newDeformDecay = 1.0;
           }
 
-          // Gradually return to normal shape (bubble-like recovery)
+          // Simplified recovery for mobile performance
           if (newDeformDecay > 0) {
-            // Slower, smoother recovery for mobile devices
-            const recoverySpeed = isMobile ? 0.035 : 0.06; // Slower on mobile
-            const decayRate = isMobile ? 0.98 : 0.96; // Slower decay on mobile
+            const recoverySpeed = isMobile ? 0.08 : 0.06; // Faster recovery on mobile
+            const decayRate = isMobile ? 0.92 : 0.96; // Faster decay on mobile
             
             newScaleX = newScaleX + (1 - newScaleX) * recoverySpeed;
             newScaleY = newScaleY + (1 - newScaleY) * recoverySpeed;
             newDeformDecay *= decayRate;
             
-            // Stop deformation when close to normal (tighter tolerance for mobile)
-            const tolerance = isMobile ? 0.015 : 0.02;
+            // Looser tolerance for mobile performance
+            const tolerance = isMobile ? 0.05 : 0.02;
             if (Math.abs(newScaleX - 1) < tolerance && Math.abs(newScaleY - 1) < tolerance) {
               newScaleX = 1;
               newScaleY = 1;
@@ -188,10 +199,19 @@ export default function BouncingCircles() {
     };
   }, []);
 
-  // Global mouse and touch event listeners for dragging (mobile support added)
+  // Global mouse and touch event listeners for dragging (optimized for mobile)
   useEffect(() => {
+    const isMobile = window.innerWidth <= 768 || /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    let lastUpdate = 0;
+    const updateInterval = isMobile ? 16 : 8; // 60fps on desktop, 30fps on mobile
+
     const handleGlobalMove = (e: MouseEvent | TouchEvent) => {
       if (!draggedCircle) return;
+      
+      // Throttle updates on mobile for better performance
+      const now = Date.now();
+      if (isMobile && now - lastUpdate < updateInterval) return;
+      lastUpdate = now;
       
       const rect = containerRef.current?.getBoundingClientRect();
       if (!rect) return;
@@ -357,7 +377,10 @@ export default function BouncingCircles() {
             fontSize: window.innerWidth < 768 ? '100px' : '80px',
             lineHeight: '1',
             transform: `scaleX(${circle.scaleX}) scaleY(${circle.scaleY})`,
-            transformOrigin: 'center center'
+            transformOrigin: 'center center',
+            willChange: 'transform, left, top', // Optimize for GPU acceleration
+            backfaceVisibility: 'hidden', // Reduce repaints
+            WebkitFontSmoothing: 'antialiased' // Better text rendering on mobile
           }}
           onMouseDown={(e) => handleStart(e, circle.id)}
           onTouchStart={(e) => handleStart(e, circle.id)}
