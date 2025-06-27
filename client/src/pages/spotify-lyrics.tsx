@@ -26,35 +26,102 @@ export default function SpotifyLyrics() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Check for access token in URL after Spotify redirect
-  useEffect(() => {
-    console.log('Page loaded, checking for token...');
-    console.log('Current URL:', window.location.href);
-    console.log('Hash:', window.location.hash);
-    
-    const hash = window.location.hash;
-    if (hash) {
-      console.log('Found hash, parsing token...');
-      const token = hash.substring(1).split('&').find(elem => elem.startsWith('access_token'))?.split('=')[1];
-      console.log('Extracted token:', token ? 'Found' : 'Not found');
-      if (token) {
-        setAccessToken(token);
-        window.location.hash = '';
-        localStorage.setItem('spotify_access_token', token);
-        console.log('Token saved to localStorage');
+  // Exchange authorization code for access token
+  const exchangeCodeForToken = async (code: string) => {
+    const CLIENT_ID = import.meta.env.VITE_SPOTIFY_CLIENT_ID;
+    const REDIRECT_URI = import.meta.env.DEV 
+      ? `${window.location.origin}/projects/spotify-lyrics`
+      : `https://xanderwalker.com/projects/spotify-lyrics`;
+    const codeVerifier = localStorage.getItem('code_verifier');
+
+    if (!codeVerifier) {
+      setError('Code verifier not found. Please try logging in again.');
+      return;
+    }
+
+    try {
+      const response = await fetch('https://accounts.spotify.com/api/token', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({
+          client_id: CLIENT_ID,
+          grant_type: 'authorization_code',
+          code: code,
+          redirect_uri: REDIRECT_URI,
+          code_verifier: codeVerifier,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to exchange code for token');
       }
+
+      const data = await response.json();
+      setAccessToken(data.access_token);
+      localStorage.setItem('spotify_access_token', data.access_token);
+      localStorage.removeItem('code_verifier');
+      
+      // Clean up URL
+      window.history.replaceState({}, document.title, window.location.pathname);
+    } catch (error) {
+      setError('Failed to authenticate with Spotify');
+      console.error('Token exchange error:', error);
+    }
+  };
+
+  // Check for authorization code in URL after Spotify redirect
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const code = urlParams.get('code');
+    const error = urlParams.get('error');
+
+    if (error) {
+      setError(`Spotify authentication error: ${error}`);
+      return;
+    }
+
+    if (code) {
+      exchangeCodeForToken(code);
     } else {
       // Check if token exists in localStorage
       const savedToken = localStorage.getItem('spotify_access_token');
-      console.log('Checking localStorage for saved token:', savedToken ? 'Found' : 'Not found');
       if (savedToken) {
         setAccessToken(savedToken);
       }
     }
   }, []);
 
-  // Spotify login
-  const loginToSpotify = () => {
+  // Generate code verifier and challenge for PKCE
+  const generateCodeChallenge = async () => {
+    const codeVerifier = generateRandomString(128);
+    const data = new TextEncoder().encode(codeVerifier);
+    const digest = await window.crypto.subtle.digest('SHA-256', data);
+    const hashArray = new Uint8Array(digest);
+    const bytes: number[] = [];
+    for (let i = 0; i < hashArray.length; i++) {
+      bytes.push(hashArray[i]);
+    }
+    const codeChallenge = btoa(String.fromCharCode(...bytes))
+      .replace(/\+/g, '-')
+      .replace(/\//g, '_')
+      .replace(/=+$/, '');
+    
+    return { codeVerifier, codeChallenge };
+  };
+
+  const generateRandomString = (length: number) => {
+    let text = '';
+    const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    for (let i = 0; i < length; i++) {
+      text += possible.charAt(Math.floor(Math.random() * possible.length));
+    }
+    return text;
+  };
+
+  // Spotify login with PKCE
+  const loginToSpotify = async () => {
     const CLIENT_ID = import.meta.env.VITE_SPOTIFY_CLIENT_ID;
     // Use current origin for development, force HTTPS for production
     const REDIRECT_URI = import.meta.env.DEV 
@@ -62,23 +129,29 @@ export default function SpotifyLyrics() {
       : `https://xanderwalker.com/projects/spotify-lyrics`;
     const SCOPES = 'user-read-currently-playing user-read-playback-state';
     
-    console.log('Starting Spotify auth...');
-    console.log('Client ID:', CLIENT_ID);
-    console.log('Redirect URI:', REDIRECT_URI);
-    
     if (!CLIENT_ID) {
       setError('Spotify Client ID not configured. Please add VITE_SPOTIFY_CLIENT_ID to environment variables.');
       return;
     }
 
-    const authUrl = `https://accounts.spotify.com/authorize?` +
-      `client_id=${CLIENT_ID}&` +
-      `response_type=token&` +
-      `redirect_uri=${encodeURIComponent(REDIRECT_URI)}&` +
-      `scope=${encodeURIComponent(SCOPES)}`;
+    try {
+      const { codeVerifier, codeChallenge } = await generateCodeChallenge();
+      
+      // Store code verifier for later use
+      localStorage.setItem('code_verifier', codeVerifier);
 
-    console.log('Auth URL:', authUrl);
-    window.location.href = authUrl;
+      const authUrl = `https://accounts.spotify.com/authorize?` +
+        `client_id=${CLIENT_ID}&` +
+        `response_type=code&` +
+        `redirect_uri=${encodeURIComponent(REDIRECT_URI)}&` +
+        `scope=${encodeURIComponent(SCOPES)}&` +
+        `code_challenge_method=S256&` +
+        `code_challenge=${codeChallenge}`;
+
+      window.location.href = authUrl;
+    } catch (error) {
+      setError('Failed to generate authentication challenge');
+    }
   };
 
   // Get currently playing track
