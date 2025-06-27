@@ -77,7 +77,9 @@ export default function SpotifyApiTest() {
   const connectToSpotify = () => {
     const clientId = import.meta.env.VITE_SPOTIFY_CLIENT_ID || '05e9ec0109e04f81bf9f3b19d491db05';
     const redirectUri = `${window.location.origin}/projects/spotify-api-test`;
+    console.log('Client ID being used:', clientId);
     console.log('Redirect URI being used:', redirectUri);
+    console.log('Window location origin:', window.location.origin);
     const scopes = [
       'user-read-currently-playing',
       'user-read-playback-state',
