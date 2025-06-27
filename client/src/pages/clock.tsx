@@ -496,10 +496,10 @@ const AnalogClock = ({ currentTime }: { currentTime: Date }) => {
   const minutes = currentTime.getMinutes();
   const seconds = currentTime.getSeconds();
   
-  // Calculate angles for each hand (starting from 12 o'clock position)
-  const secondAngle = (seconds * 6) - 90; // 6 degrees per second, -90 to start from top
-  const minuteAngle = (minutes * 6) + (seconds * 0.1) - 90; // 6 degrees per minute + smooth seconds movement
-  const hourAngle = (hours * 30) + (minutes * 0.5) - 90; // 30 degrees per hour + smooth minute movement
+  // Calculate angles for each hand (0 degrees = 12 o'clock, clockwise)
+  const secondAngle = seconds * 6; // 6 degrees per second
+  const minuteAngle = minutes * 6 + (seconds * 0.1); // 6 degrees per minute + smooth seconds movement
+  const hourAngle = hours * 30 + (minutes * 0.5); // 30 degrees per hour + smooth minute movement
   
   return (
     <div className="flex flex-col items-center space-y-4">
@@ -572,7 +572,7 @@ const AnalogClock = ({ currentTime }: { currentTime: Date }) => {
             left: '50%',
             top: '50%',
             transformOrigin: 'bottom center',
-            transform: `translateX(-50%) translateY(-100%) rotate(${hourAngle}deg)`
+            transform: `translateX(-50%) translateY(-100%) rotate(${hourAngle - 90}deg)`
           }}
         />
         
@@ -584,7 +584,7 @@ const AnalogClock = ({ currentTime }: { currentTime: Date }) => {
             left: '50%',
             top: '50%',
             transformOrigin: 'bottom center',
-            transform: `translateX(-50%) translateY(-100%) rotate(${minuteAngle}deg)`
+            transform: `translateX(-50%) translateY(-100%) rotate(${minuteAngle - 90}deg)`
           }}
         />
         
@@ -596,7 +596,7 @@ const AnalogClock = ({ currentTime }: { currentTime: Date }) => {
             left: '50%',
             top: '50%',
             transformOrigin: 'bottom center',
-            transform: `translateX(-50%) translateY(-100%) rotate(${secondAngle}deg)`
+            transform: `translateX(-50%) translateY(-100%) rotate(${secondAngle - 90}deg)`
           }}
         />
         
@@ -617,6 +617,9 @@ const AnalogClock = ({ currentTime }: { currentTime: Date }) => {
             minute: '2-digit',
             second: '2-digit'
           })}
+        </div>
+        <div className="text-xs text-gray-400">
+          H:{hours} M:{minutes} S:{seconds} | H°:{Math.round(hourAngle)} M°:{Math.round(minuteAngle)} S°:{Math.round(secondAngle)}
         </div>
       </div>
     </div>
