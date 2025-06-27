@@ -4,6 +4,12 @@ import Layout from '../components/layout';
 export default function Projects() {
   const projects = [
     {
+      title: "SENSOR DASHBOARD",
+      description: "Comprehensive device sensor monitoring with visual indicators. Displays accelerometer, compass, gyroscope, sound level, brightness, battery, temperature, and proximity sensors in real-time.",
+      tags: "Sensors • Hardware • Monitoring",
+      link: "/projects/sensor-dashboard"
+    },
+    {
       title: "GLASS OF WATER",
       description: "Realistic water simulation that responds to device tilting. Water particles slosh around the screen using accelerometer data for authentic physics.",
       tags: "Physics • Accelerometer • Fluid",
