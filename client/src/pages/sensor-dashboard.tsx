@@ -249,6 +249,54 @@ export default function SensorDashboard() {
     );
   };
 
+  const GyroscopeVisualizer = () => {
+    const { alpha, beta, gamma } = sensorData.gyroscope;
+    
+    return (
+      <div 
+        className="relative w-24 h-24 flex items-center justify-center"
+        style={{ perspective: '1000px' }}
+      >
+        {/* 3D Device representation */}
+        <div
+          className="w-16 h-20 bg-gradient-to-br from-gray-400 to-gray-600 rounded-lg border-2 border-gray-300 transition-all duration-300 relative"
+          style={{
+            transform: `
+              rotateX(${beta * 0.5}deg) 
+              rotateY(${gamma * 0.5}deg) 
+              rotateZ(${alpha * 0.2}deg)
+            `,
+            transformStyle: 'preserve-3d'
+          }}
+        >
+          {/* Screen representation */}
+          <div className="absolute inset-1 bg-black rounded-sm flex items-center justify-center">
+            <div className="w-1 h-1 bg-white rounded-full" />
+          </div>
+          
+          {/* Side indicators for rotation axes */}
+          <div className="absolute -top-1 left-1/2 w-0.5 h-2 bg-red-400 transform -translate-x-1/2" />
+          <div className="absolute -right-1 top-1/2 w-2 h-0.5 bg-green-400 transform -translate-y-1/2" />
+          <div className="absolute -bottom-1 left-1/2 w-0.5 h-2 bg-blue-400 transform -translate-x-1/2" />
+        </div>
+        
+        {/* Rotation rings */}
+        <div 
+          className="absolute w-20 h-20 border border-red-300 rounded-full opacity-30"
+          style={{ transform: `rotateX(${beta * 0.3}deg)` }}
+        />
+        <div 
+          className="absolute w-22 h-22 border border-green-300 rounded-full opacity-30"
+          style={{ transform: `rotateY(${gamma * 0.3}deg)` }}
+        />
+        <div 
+          className="absolute w-24 h-24 border border-blue-300 rounded-full opacity-30"
+          style={{ transform: `rotateZ(${alpha * 0.2}deg)` }}
+        />
+      </div>
+    );
+  };
+
   const SoundLevelMeter = () => {
     return (
       <div className="w-24 h-4 bg-gray-200 rounded-full overflow-hidden">
@@ -338,10 +386,13 @@ export default function SensorDashboard() {
         {/* Gyroscope */}
         <div className="glassmorphism rounded-2xl p-6">
           <h3 className="font-serif text-xl mb-4 text-center" style={{fontFamily: 'Georgia, serif'}}>GYROSCOPE</h3>
-          <div className="text-sm space-y-2 font-serif" style={{fontFamily: 'Georgia, serif'}}>
-            <div>Alpha: {sensorData.gyroscope.alpha}°</div>
-            <div>Beta: {sensorData.gyroscope.beta}°</div>
-            <div>Gamma: {sensorData.gyroscope.gamma}°</div>
+          <div className="flex flex-col items-center space-y-4">
+            <GyroscopeVisualizer />
+            <div className="text-xs space-y-1 text-center font-serif" style={{fontFamily: 'Georgia, serif'}}>
+              <div>α: {sensorData.gyroscope.alpha}°</div>
+              <div>β: {sensorData.gyroscope.beta}°</div>
+              <div>γ: {sensorData.gyroscope.gamma}°</div>
+            </div>
           </div>
         </div>
 
