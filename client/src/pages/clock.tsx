@@ -1,5 +1,6 @@
 import { Link } from 'wouter';
 import { useState, useEffect, useRef } from 'react';
+import BouncingCircles from '@/components/bouncing-circles';
 
 interface Ball {
   id: number;
@@ -816,64 +817,7 @@ export default function Clock() {
   const lastSecondRef = useRef(-1);
   const animationFrameRef = useRef<number>();
   
-  // Paint swirling state
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-  const [deviceMotion, setDeviceMotion] = useState({ x: 0, y: 0, z: 0 });
-  const backgroundRef = useRef<HTMLDivElement>(null);
 
-  // Mouse movement for paint swirling (desktop)
-  useEffect(() => {
-    const handleMouseMove = (event: MouseEvent) => {
-      const x = (event.clientX / window.innerWidth) * 100;
-      const y = (event.clientY / window.innerHeight) * 100;
-      setMousePosition({ x, y });
-      
-      // Update CSS custom properties for paint swirling
-      if (backgroundRef.current) {
-        backgroundRef.current.style.setProperty('--mouse-x', `${x}%`);
-        backgroundRef.current.style.setProperty('--mouse-y', `${y}%`);
-      }
-    };
-
-    window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
-  }, []);
-
-  // Device motion for paint swirling (mobile)
-  useEffect(() => {
-    const handleDeviceMotion = (event: DeviceMotionEvent) => {
-      if (window.innerWidth <= 768 && event.accelerationIncludingGravity) {
-        const x = Math.max(-50, Math.min(50, (event.accelerationIncludingGravity.x || 0) * 5));
-        const y = Math.max(-50, Math.min(50, (event.accelerationIncludingGravity.y || 0) * 5));
-        const z = Math.max(-50, Math.min(50, (event.accelerationIncludingGravity.z || 0) * 5));
-        
-        setDeviceMotion({ x, y, z });
-        
-        // Update CSS custom properties for paint swirling
-        if (backgroundRef.current) {
-          backgroundRef.current.style.setProperty('--tilt-x', `${x + 50}%`);
-          backgroundRef.current.style.setProperty('--tilt-y', `${y + 50}%`);
-          backgroundRef.current.style.setProperty('--tilt-z', `${z + 50}%`);
-        }
-      }
-    };
-
-    // Always set up event listener for mobile devices
-    if (window.innerWidth <= 768) {
-      // Request permission for device motion on iOS
-      if (typeof DeviceMotionEvent !== 'undefined' && typeof (DeviceMotionEvent as any).requestPermission === 'function') {
-        (DeviceMotionEvent as any).requestPermission().then((response: string) => {
-          if (response === 'granted') {
-            window.addEventListener('devicemotion', handleDeviceMotion);
-          }
-        });
-      } else {
-        window.addEventListener('devicemotion', handleDeviceMotion);
-      }
-    }
-
-    return () => window.removeEventListener('devicemotion', handleDeviceMotion);
-  }, []);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -1257,30 +1201,19 @@ export default function Clock() {
   };
 
   return (
-    <div className="min-h-screen relative overflow-hidden">
-      {/* Interactive paint swirling background */}
-      <div 
-        ref={backgroundRef}
-        className="fixed inset-0 paint-swirl-bg -z-10" 
-        style={{
-          '--mouse-x': '50%',
-          '--mouse-y': '50%',
-          '--tilt-x': '50%',
-          '--tilt-y': '50%',
-          '--tilt-z': '50%'
-        } as React.CSSProperties}
-      />
+    <div className="min-h-screen relative overflow-hidden bg-white">
+      <BouncingCircles />
       
       {/* Header with navigation back to projects */}
-      <header className="p-8 flex justify-between items-center relative z-10">
+      <header className="p-8 flex justify-between items-center relative z-40">
         <Link href="/projects">
-          <button className="text-white hover:text-gray-200 transition-colors text-lg backdrop-blur-sm bg-black/20 px-4 py-2 rounded-lg border border-white/20">
+          <button className="text-black hover:text-gray-600 transition-colors text-lg backdrop-blur-sm bg-white/20 px-4 py-2 rounded-lg border border-black/20">
             ← BACK TO PROJECTS
           </button>
         </Link>
         
         <Link href="/">
-          <h1 className="text-white font-xanman-wide font-bold text-4xl md:text-6xl hover:opacity-70 transition-opacity duration-200 cursor-pointer drop-shadow-lg">
+          <h1 className="text-black font-xanman-wide font-bold text-4xl md:text-6xl hover:opacity-70 transition-opacity duration-200 cursor-pointer drop-shadow-lg">
             XANDER WALKER
           </h1>
         </Link>
@@ -1289,7 +1222,7 @@ export default function Clock() {
       </header>
 
       {/* Clocks Display */}
-      <div className="flex flex-col items-center justify-center min-h-[calc(100vh-200px)] space-y-12">
+      <div className="flex flex-col items-center justify-center min-h-[calc(100vh-200px)] space-y-12 relative z-40">
         
         {/* Pixel Ball Drop Clock */}
         <div className="glassmorphism rounded-2xl p-8">

@@ -16,6 +16,7 @@ import Roulette from "@/pages/roulette";
 import Camera from "@/pages/camera";
 import SpotifyLyrics from "@/pages/spotify-lyrics";
 import SpotifyApiTest from "@/pages/spotify-api-test";
+import MonetPaint from "@/pages/monet-paint";
 import Contact from "@/pages/contact";
 import NotFound from "@/pages/not-found";
 
@@ -35,6 +36,7 @@ function Router() {
       <Route path="/projects/camera" component={Camera} />
       <Route path="/projects/spotify-lyrics" component={SpotifyLyrics} />
       <Route path="/projects/spotify-api-test" component={SpotifyApiTest} />
+      <Route path="/projects/monet-paint" component={MonetPaint} />
       <Route path="/contact" component={Contact} />
       <Route component={NotFound} />
     </Switch>

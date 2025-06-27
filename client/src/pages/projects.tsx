@@ -4,6 +4,12 @@ import Layout from '../components/layout';
 export default function Projects() {
   const projects = [
     {
+      title: "MONET PAINT SWIRLING",
+      description: "Interactive paint mixing inspired by Claude Monet's water lily paintings. Mouse movement or device tilting creates beautiful color gradients that blend and morph in real-time like watercolors.",
+      tags: "Interactive • Art • Sensors",
+      link: "/projects/monet-paint"
+    },
+    {
       title: "SPOTIFY LYRICS",
       description: "Real-time lyrics display for your currently playing Spotify track. Connect with your Spotify account to view synchronized lyrics for any song you're listening to.",
       tags: "Music • API • Real-time",
