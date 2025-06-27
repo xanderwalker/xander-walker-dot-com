@@ -48,60 +48,88 @@ const getDayOfYear = (date: Date) => {
 const YearClock = ({ currentDate }: { currentDate: Date }) => {
   const currentYear = currentDate.getFullYear();
   const currentDayOfYear = getDayOfYear(currentDate);
+  const totalDays = 365;
   
-  const allDays = [];
-  let dayCounter = 1;
-  
-  for (let month = 1; month <= 12; month++) {
-    const daysInMonth = getDaysInMonth(month, currentYear);
-    
-    for (let day = 1; day <= daysInMonth; day++) {
-      const isPassed = isDayPassed(dayCounter, currentDayOfYear);
-      const isToday = dayCounter === currentDayOfYear;
-      const isFirstDayOfMonth = day === 1;
-      
-      allDays.push({
-        day,
-        month,
-        dayOfYear: dayCounter,
-        isPassed,
-        isToday,
-        isFirstDayOfMonth
-      });
-      dayCounter++;
-    }
-  }
+  // Quarter boundaries (approximately)
+  const quarters = [
+    { name: 'Q1', end: 90 },   // ~March 31
+    { name: 'Q2', end: 181 },  // ~June 30
+    { name: 'Q3', end: 273 },  // ~September 30
+    { name: 'Q4', end: 365 }   // December 31
+  ];
   
   return (
-    <div className="w-full max-w-4xl">
-      <div className="text-center mb-4">
+    <div className="w-full max-w-5xl">
+      <div className="text-center mb-6">
         <h3 className="font-serif text-lg text-black mb-1" style={{fontFamily: 'Georgia, serif'}}>
           Year Progress {currentYear}
         </h3>
         <div className="font-serif text-2xl font-bold text-black" style={{fontFamily: 'Georgia, serif'}}>
-          {Math.round((currentDayOfYear / 365) * 100)}%
+          {Math.round((currentDayOfYear / totalDays) * 100)}%
         </div>
         <div className="text-sm text-gray-600">
-          Day {currentDayOfYear} of 365
+          Day {currentDayOfYear} of {totalDays}
         </div>
       </div>
-      <div className="flex flex-wrap justify-center gap-px bg-gray-200 p-2 rounded-lg">
-        {allDays.map((dayData) => (
+      
+      {/* Quarter Labels */}
+      <div className="flex justify-between mb-2 px-1">
+        {quarters.map((quarter, index) => (
+          <div key={quarter.name} className="text-xs text-gray-600 font-serif" style={{fontFamily: 'Georgia, serif'}}>
+            {quarter.name}
+          </div>
+        ))}
+      </div>
+      
+      {/* Progress Bar with Hash Marks */}
+      <div className="relative">
+        {/* Background bar */}
+        <div className="w-full h-6 bg-gray-200 rounded-lg overflow-hidden">
+          {/* Progress fill */}
+          <div 
+            className="h-full bg-gradient-to-r from-gray-700 to-gray-800 transition-all duration-1000"
+            style={{ width: `${(currentDayOfYear / totalDays) * 100}%` }}
+          />
+          
+          {/* Current day indicator */}
+          <div 
+            className="absolute top-0 w-1 h-6 bg-blue-500 shadow-lg"
+            style={{ left: `${(currentDayOfYear / totalDays) * 100}%` }}
+          />
+        </div>
+        
+        {/* Hash marks for every 5 days */}
+        <div className="absolute top-0 w-full h-6 pointer-events-none">
+          {Array.from({ length: Math.floor(totalDays / 5) }, (_, i) => {
+            const day = (i + 1) * 5;
+            const isQuarterEnd = quarters.some(q => Math.abs(q.end - day) < 3);
+            return (
+              <div
+                key={day}
+                className={`absolute top-0 ${isQuarterEnd ? 'w-0.5 h-6 bg-black' : 'w-px h-3 bg-gray-500'}`}
+                style={{ left: `${(day / totalDays) * 100}%` }}
+              />
+            );
+          })}
+        </div>
+        
+        {/* Quarter dividers */}
+        {quarters.slice(0, 3).map((quarter) => (
           <div
-            key={dayData.dayOfYear}
-            className={`
-              w-2 h-2 transition-all duration-200
-              ${dayData.isFirstDayOfMonth ? 'ml-1' : ''}
-              ${dayData.isToday 
-                ? 'bg-blue-500 shadow-sm' 
-                : dayData.isPassed 
-                  ? 'bg-gray-700' 
-                  : 'bg-white hover:bg-gray-100'
-              }
-            `}
-            title={`${getMonthName(dayData.month - 1)} ${dayData.day}, ${currentYear} (Day ${dayData.dayOfYear})`}
+            key={quarter.name}
+            className="absolute top-0 w-0.5 h-6 bg-black"
+            style={{ left: `${(quarter.end / totalDays) * 100}%` }}
           />
         ))}
+      </div>
+      
+      {/* Day scale */}
+      <div className="flex justify-between mt-2 text-xs text-gray-500">
+        <span>Jan 1</span>
+        <span>Apr 1</span>
+        <span>Jul 1</span>
+        <span>Oct 1</span>
+        <span>Dec 31</span>
       </div>
     </div>
   );
