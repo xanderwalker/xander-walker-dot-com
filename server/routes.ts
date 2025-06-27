@@ -6,10 +6,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Lyrics API route
   app.post('/api/lyrics', async (req, res) => {
     try {
-      const { track, artist } = req.body;
+      const { track, artist, trackId } = req.body;
       
       if (!track || !artist) {
         return res.status(400).json({ error: 'Track and artist are required' });
+      }
+
+      let syncedLyrics = null;
+      
+      // Try to fetch synchronized lyrics if we have a Spotify track ID
+      if (trackId) {
+        try {
+          const syncResponse = await fetch(`https://spotify-lyric-api.herokuapp.com/?trackid=${trackId}`);
+          if (syncResponse.ok) {
+            const syncData = await syncResponse.json();
+            if (syncData.error === false && syncData.lines) {
+              syncedLyrics = syncData.lines;
+            }
+          }
+        } catch (syncError) {
+          console.warn('Failed to fetch synchronized lyrics:', syncError);
+        }
       }
 
       // Try to fetch lyrics from Lyrics.ovh API (free service)
@@ -19,14 +36,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const lyricsData = await lyricsResponse.json();
         return res.json({
           lyrics: lyricsData.lyrics || 'Lyrics not available for this track',
-          source: 'Lyrics.ovh'
+          source: 'Lyrics.ovh',
+          syncedLyrics: syncedLyrics
         });
       }
 
       // Fallback: Try another lyrics API or return not found
       return res.json({
         lyrics: 'Lyrics not available for this track',
-        source: 'system'
+        source: 'system',
+        syncedLyrics: syncedLyrics
       });
       
     } catch (error) {

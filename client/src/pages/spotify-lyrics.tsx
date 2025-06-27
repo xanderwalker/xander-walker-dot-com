@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import Layout from '../components/layout';
 
 interface SpotifyTrack {
+  id: string;
   name: string;
   artists: { name: string }[];
   album: {
@@ -17,6 +18,13 @@ interface SpotifyTrack {
 interface LyricsData {
   lyrics: string;
   source: string;
+  syncedLyrics?: SyncedLyric[];
+}
+
+interface SyncedLyric {
+  startTimeMs: string;
+  words: string;
+  endTimeMs?: string;
 }
 
 export default function SpotifyLyrics() {
@@ -25,6 +33,7 @@ export default function SpotifyLyrics() {
   const [lyrics, setLyrics] = useState<LyricsData | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [currentPosition, setCurrentPosition] = useState<number>(0);
 
   // Exchange authorization code for access token
   const exchangeCodeForToken = async (code: string) => {
@@ -187,9 +196,10 @@ export default function SpotifyLyrics() {
       const data = await response.json();
       if (data.item) {
         setCurrentTrack(data.item);
+        setCurrentPosition(data.progress_ms || 0);
         setError(null);
         // Fetch lyrics for this track
-        await fetchLyrics(data.item.name, data.item.artists[0].name);
+        await fetchLyrics(data.item.name, data.item.artists[0].name, data.item.id);
       } else {
         setCurrentTrack(null);
         setError('No track currently playing');
@@ -202,7 +212,7 @@ export default function SpotifyLyrics() {
   };
 
   // Fetch lyrics from backend
-  const fetchLyrics = async (trackName: string, artistName: string) => {
+  const fetchLyrics = async (trackName: string, artistName: string, trackId?: string) => {
     try {
       const response = await fetch('/api/lyrics', {
         method: 'POST',
@@ -211,7 +221,8 @@ export default function SpotifyLyrics() {
         },
         body: JSON.stringify({
           track: trackName,
-          artist: artistName
+          artist: artistName,
+          trackId: trackId
         })
       });
 
@@ -235,6 +246,34 @@ export default function SpotifyLyrics() {
       return () => clearInterval(interval);
     }
   }, [accessToken]);
+
+  // Update position in real-time when music is playing
+  useEffect(() => {
+    if (currentTrack?.is_playing) {
+      const timer = setInterval(() => {
+        setCurrentPosition(prev => prev + 1000);
+      }, 1000);
+      return () => clearInterval(timer);
+    }
+  }, [currentTrack?.is_playing]);
+
+  // Find current lyric line based on position
+  const getCurrentLyricIndex = () => {
+    if (!lyrics?.syncedLyrics) return -1;
+    
+    for (let i = 0; i < lyrics.syncedLyrics.length; i++) {
+      const currentLine = lyrics.syncedLyrics[i];
+      const nextLine = lyrics.syncedLyrics[i + 1];
+      
+      const currentTime = parseInt(currentLine.startTimeMs);
+      const nextTime = nextLine ? parseInt(nextLine.startTimeMs) : Infinity;
+      
+      if (currentPosition >= currentTime && currentPosition < nextTime) {
+        return i;
+      }
+    }
+    return -1;
+  };
 
   // Logout
   const logout = () => {
@@ -363,15 +402,45 @@ export default function SpotifyLyrics() {
                 {lyrics && (
                   <div className="bg-white/10 rounded-2xl p-6">
                     <h3 className="font-serif text-xl mb-4 text-center" style={{fontFamily: 'Georgia, serif'}}>
-                      LYRICS
+                      LYRICS {lyrics.syncedLyrics && '(SYNCHRONIZED)'}
                     </h3>
                     <div className="bg-white/5 rounded-lg p-4 max-h-96 overflow-y-auto">
-                      <pre className="font-serif text-sm whitespace-pre-wrap leading-relaxed" style={{fontFamily: 'Georgia, serif'}}>
-                        {lyrics.lyrics}
-                      </pre>
+                      {lyrics.syncedLyrics ? (
+                        // Synchronized lyrics display
+                        <div className="font-serif text-sm leading-relaxed space-y-2" style={{fontFamily: 'Georgia, serif'}}>
+                          {lyrics.syncedLyrics.map((line, index) => {
+                            const isCurrentLine = getCurrentLyricIndex() === index;
+                            return (
+                              <div
+                                key={index}
+                                className={`transition-all duration-300 ${
+                                  isCurrentLine 
+                                    ? 'text-white font-bold text-lg scale-105' 
+                                    : 'text-gray-300 text-sm'
+                                }`}
+                                style={{
+                                  transform: isCurrentLine ? 'translateX(10px)' : 'translateX(0)',
+                                }}
+                              >
+                                {line.words}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      ) : (
+                        // Static lyrics display
+                        <pre className="font-serif text-sm whitespace-pre-wrap leading-relaxed" style={{fontFamily: 'Georgia, serif'}}>
+                          {lyrics.lyrics}
+                        </pre>
+                      )}
                     </div>
                     <div className="text-center mt-4 text-xs text-gray-500 font-serif" style={{fontFamily: 'Georgia, serif'}}>
                       Lyrics provided by {lyrics.source}
+                      {currentTrack?.is_playing && lyrics.syncedLyrics && (
+                        <span className="ml-2">
+                          • Position: {Math.floor(currentPosition / 1000)}s
+                        </span>
+                      )}
                     </div>
                   </div>
                 )}
