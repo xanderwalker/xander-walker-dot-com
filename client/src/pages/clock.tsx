@@ -62,7 +62,7 @@ export default function Clock() {
                 vx: (Math.random() - 0.5) * 2.5, // More velocity for bigger bounces
                 vy: 0, 
                 isSettled: false,
-                ballSize: 48 // Much larger size for hours
+                ballSize: 32 // Larger size for hours
               };
               const newBalls = [...prev, newBall];
               return newBalls.slice(-currentHour || -12);
@@ -162,7 +162,7 @@ export default function Clock() {
     
     setSecondBalls(createSettledBalls(seconds, 16));
     setMinuteBalls(createSettledBalls(minutes, 16));
-    setHourBalls(createSettledBalls(hours, 48));
+    setHourBalls(createSettledBalls(hours, 32));
   }, []);
 
   // Physics animation loop
@@ -179,9 +179,15 @@ export default function Clock() {
             let newVx = ball.vx;
             let newVy = ball.vy + 0.6; // Stronger gravity for more bounce
             
-            // Add small random forces to keep balls moving subtly
-            newVx += (Math.random() - 0.5) * 0.02;
-            newVy += (Math.random() - 0.5) * 0.02;
+            // Calculate depth-based stability (balls lower in cylinder are more stable)
+            const cylinderHeight = 320;
+            const depthRatio = Math.max(0, (cylinderHeight - ball.y) / cylinderHeight); // 0 at top, 1 at bottom
+            const stabilityFactor = Math.pow(depthRatio, 2); // Quadratic for more dramatic effect
+            
+            // Add random forces - less for deeper balls
+            const randomForce = 0.02 * (1 - stabilityFactor * 0.8); // Reduce random forces for deep balls
+            newVx += (Math.random() - 0.5) * randomForce;
+            newVy += (Math.random() - 0.5) * randomForce;
 
             // Get ball size and radius for calculations
             const currentBallSize = ball.ballSize || 16;
@@ -220,15 +226,22 @@ export default function Clock() {
                 newX += Math.cos(angle) * separationForce;
                 newY += Math.sin(angle) * separationForce;
                 
-                // Enhanced bouncing - all balls bounce off each other regardless of settled state
-                const bounceForce = 2.0; // Stronger bounce force
+                // Enhanced bouncing - strength depends on depth of both balls
+                const otherDepthRatio = Math.max(0, (cylinderHeight - otherBall.y) / cylinderHeight);
+                const otherStabilityFactor = Math.pow(otherDepthRatio, 2);
+                const avgStability = (stabilityFactor + otherStabilityFactor) / 2;
+                
+                const bounceForce = 2.0 * (1 - avgStability * 0.6); // Reduce bounce for stable balls
                 const relativeVelocity = Math.sqrt((ball.vx - otherBall.vx) ** 2 + (ball.vy - otherBall.vy) ** 2);
-                const velocityMultiplier = Math.max(0.5, Math.min(2.0, relativeVelocity * 0.3));
+                const velocityMultiplier = Math.max(0.3, Math.min(2.0, relativeVelocity * 0.3));
                 
                 newVx += Math.cos(angle) * bounceForce * velocityMultiplier;
                 newVy += Math.sin(angle) * bounceForce * velocityMultiplier;
-                newVx *= 0.9; // Minimal damping for sustained bouncing
-                newVy *= 0.9;
+                
+                // More damping for deeper balls
+                const dampingFactor = 0.9 - (stabilityFactor * 0.3);
+                newVx *= dampingFactor;
+                newVy *= dampingFactor;
                 
                 hasCollision = true;
               }
@@ -243,13 +256,15 @@ export default function Clock() {
               hasCollision = true;
             }
             
-            // Apply minimal velocity damping to prevent excessive energy buildup
-            if (Math.abs(newVx) > 10) newVx *= 0.95; // Cap horizontal velocity
-            if (Math.abs(newVy) > 15) newVy *= 0.95; // Cap vertical velocity
+            // Apply velocity caps
+            if (Math.abs(newVx) > 10) newVx *= 0.95;
+            if (Math.abs(newVy) > 15) newVy *= 0.95;
             
-            // Very minimal energy damping for overall stability
-            newVx *= 0.999;
-            newVy *= 0.999;
+            // Depth-based energy damping - deeper balls lose energy faster
+            const baseDamping = 0.999;
+            const depthDamping = baseDamping - (stabilityFactor * 0.005); // More damping for deeper balls
+            newVx *= depthDamping;
+            newVy *= depthDamping;
 
             return {
               ...ball,
@@ -304,7 +319,7 @@ export default function Clock() {
   }) => {
     // Determine ball size based on cylinder type
     const isHourCylinder = label === "Hours";
-    const ballSize = isHourCylinder ? 48 : 16; // Hours: 48px (3x larger), others: 16px
+    const ballSize = isHourCylinder ? 32 : 16; // Hours: 32px (2x larger), others: 16px
     return (
       <div className="flex flex-col items-center">
         <div className="font-serif text-lg mb-2" style={{fontFamily: 'Georgia, serif'}}>{label}</div>
