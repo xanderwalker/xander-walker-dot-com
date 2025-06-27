@@ -113,32 +113,50 @@ export default function BouncingCircles() {
           let newScaleY = circle.scaleY;
           let newDeformDecay = circle.deformDecay;
 
+          // Detect mobile for enhanced deformation
+          const isMobile = window.innerWidth <= 768 || /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+          
           // Bounce off edges with deformation
           if (newX <= 0 || newX >= window.innerWidth - circle.size) {
             newVx = -newVx;
             newX = Math.max(0, Math.min(window.innerWidth - circle.size, newX));
-            // Horizontal bounce deformation - squish horizontally, stretch vertically
-            newScaleX = 0.75;
-            newScaleY = 1.25;
+            // Enhanced horizontal bounce deformation for mobile - more pronounced squish
+            if (isMobile) {
+              newScaleX = 0.6; // More extreme squish
+              newScaleY = 1.4; // More stretch
+            } else {
+              newScaleX = 0.75;
+              newScaleY = 1.25;
+            }
             newDeformDecay = 1.0;
           }
           if (newY <= 0 || newY >= window.innerHeight - circle.size) {
             newVy = -newVy;
             newY = Math.max(0, Math.min(window.innerHeight - circle.size, newY));
-            // Vertical bounce deformation - squish vertically, stretch horizontally
-            newScaleX = 1.25;
-            newScaleY = 0.75;
+            // Enhanced vertical bounce deformation for mobile - more pronounced squish
+            if (isMobile) {
+              newScaleX = 1.4; // More stretch
+              newScaleY = 0.6; // More extreme squish
+            } else {
+              newScaleX = 1.25;
+              newScaleY = 0.75;
+            }
             newDeformDecay = 1.0;
           }
 
           // Gradually return to normal shape (bubble-like recovery)
           if (newDeformDecay > 0) {
-            newScaleX = newScaleX + (1 - newScaleX) * 0.06;
-            newScaleY = newScaleY + (1 - newScaleY) * 0.06;
-            newDeformDecay *= 0.96;
+            // Slower, smoother recovery for mobile devices
+            const recoverySpeed = isMobile ? 0.035 : 0.06; // Slower on mobile
+            const decayRate = isMobile ? 0.98 : 0.96; // Slower decay on mobile
             
-            // Stop deformation when close to normal
-            if (Math.abs(newScaleX - 1) < 0.02 && Math.abs(newScaleY - 1) < 0.02) {
+            newScaleX = newScaleX + (1 - newScaleX) * recoverySpeed;
+            newScaleY = newScaleY + (1 - newScaleY) * recoverySpeed;
+            newDeformDecay *= decayRate;
+            
+            // Stop deformation when close to normal (tighter tolerance for mobile)
+            const tolerance = isMobile ? 0.015 : 0.02;
+            if (Math.abs(newScaleX - 1) < tolerance && Math.abs(newScaleY - 1) < tolerance) {
               newScaleX = 1;
               newScaleY = 1;
               newDeformDecay = 0;

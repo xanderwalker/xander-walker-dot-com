@@ -5,6 +5,8 @@ export default function MonetPaint() {
   const [mousePosition, setMousePosition] = useState({ x: 50, y: 50 });
   const [deviceMotion, setDeviceMotion] = useState({ x: 0, y: 0, z: 0 });
   const [isMobile, setIsMobile] = useState(false);
+  const [sensorEnabled, setSensorEnabled] = useState(false);
+  const [permissionStatus, setPermissionStatus] = useState<'unknown' | 'granted' | 'denied'>('unknown');
   const backgroundRef = useRef<HTMLDivElement>(null);
 
   // Detect mobile and initialize background on component mount
@@ -53,8 +55,35 @@ export default function MonetPaint() {
     return () => window.removeEventListener('mousemove', handleMouseMove);
   }, []);
 
+  // Function to request sensor permissions and enable motion
+  const enableSensorMotion = async () => {
+    if (!isMobile) return;
+
+    try {
+      // Request permission for device motion on iOS
+      if (typeof DeviceMotionEvent !== 'undefined' && typeof (DeviceMotionEvent as any).requestPermission === 'function') {
+        const response = await (DeviceMotionEvent as any).requestPermission();
+        if (response === 'granted') {
+          setPermissionStatus('granted');
+          setSensorEnabled(true);
+        } else {
+          setPermissionStatus('denied');
+        }
+      } else {
+        // For Android and other devices
+        setPermissionStatus('granted');
+        setSensorEnabled(true);
+      }
+    } catch (error) {
+      console.error('Error requesting device motion permission:', error);
+      setPermissionStatus('denied');
+    }
+  };
+
   // Device motion for paint swirling (mobile)
   useEffect(() => {
+    if (!sensorEnabled || !isMobile) return;
+
     const handleDeviceMotion = (event: DeviceMotionEvent) => {
       if (event.accelerationIncludingGravity) {
         const x = Math.max(-50, Math.min(50, (event.accelerationIncludingGravity.x || 0) * 5));
@@ -72,21 +101,9 @@ export default function MonetPaint() {
       }
     };
 
-    if (isMobile) {
-      // Request permission for device motion on iOS
-      if (typeof DeviceMotionEvent !== 'undefined' && typeof (DeviceMotionEvent as any).requestPermission === 'function') {
-        (DeviceMotionEvent as any).requestPermission().then((response: string) => {
-          if (response === 'granted') {
-            window.addEventListener('devicemotion', handleDeviceMotion);
-          }
-        });
-      } else {
-        window.addEventListener('devicemotion', handleDeviceMotion);
-      }
-    }
-
+    window.addEventListener('devicemotion', handleDeviceMotion);
     return () => window.removeEventListener('devicemotion', handleDeviceMotion);
-  }, [isMobile]); // Depend on isMobile to ensure it runs after mobile detection
+  }, [sensorEnabled, isMobile]);
 
   return (
     <div className="min-h-screen relative overflow-hidden">
@@ -120,6 +137,28 @@ export default function MonetPaint() {
         <div className="w-48"></div> {/* Spacer for center alignment */}
       </header>
 
+      {/* Sensor activation button for mobile */}
+      {isMobile && !sensorEnabled && (
+        <div className="fixed top-24 left-1/2 transform -translate-x-1/2 z-30">
+          <button
+            onClick={enableSensorMotion}
+            className="bg-white/20 backdrop-blur-md text-white px-6 py-3 rounded-lg border border-white/30 hover:bg-white/30 transition-all duration-300 shadow-lg"
+            style={{ fontFamily: 'Georgia, serif' }}
+          >
+            Enable Motion Sensors
+          </button>
+        </div>
+      )}
+
+      {/* Sensor status indicator */}
+      {isMobile && sensorEnabled && (
+        <div className="fixed top-24 left-1/2 transform -translate-x-1/2 z-30">
+          <div className="bg-green-500/20 backdrop-blur-md text-white px-4 py-2 rounded-lg border border-green-400/30 shadow-lg">
+            <span style={{ fontFamily: 'Georgia, serif' }}>Motion Sensors Active</span>
+          </div>
+        </div>
+      )}
+
       {/* Main content */}
       <div className="flex flex-col items-center justify-center min-h-[calc(100vh-200px)] space-y-12 px-8">
         
@@ -148,9 +187,10 @@ export default function MonetPaint() {
             <div className="glassmorphism rounded-xl p-6">
               <h3 className="font-xanman-wide text-xl mb-4 text-black">MOBILE</h3>
               <p className="text-gray-600" style={{fontFamily: 'Georgia, serif'}}>
-                Tilt and rotate your device to control the paint mixing. 
-                The accelerometer responds to your device's orientation, 
-                creating immersive color flows that react to your movements.
+                {sensorEnabled || !isMobile
+                  ? "Tilt and rotate your device to control the paint mixing. The accelerometer responds to your device's orientation, creating immersive color flows that react to your movements."
+                  : "Tap the 'Enable Motion Sensors' button above to activate device tilt controls. Once enabled, tilt and rotate your device to control the paint mixing."
+                }
               </p>
             </div>
           </div>
