@@ -85,9 +85,15 @@ export default function AudioVisualizer() {
   };
 
   const loginToSpotify = () => {
+    // Clear any existing token to force fresh auth
+    localStorage.removeItem('spotify_access_token');
+    setAccessToken(null);
+    setIsConnected(false);
+    setShowMinimized(false);
+    
     const clientId = import.meta.env.VITE_SPOTIFY_CLIENT_ID;
     const redirectUri = `${window.location.origin}/projects/audio-visualizer`;
-    const scope = 'user-read-currently-playing user-read-playback-state';
+    const scope = 'user-read-currently-playing user-read-playback-state user-top-read';
     
     const params = new URLSearchParams({
       response_type: 'code',
@@ -96,7 +102,8 @@ export default function AudioVisualizer() {
       redirect_uri: redirectUri,
       code_challenge_method: 'S256',
       code_challenge: 'dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk',
-      state: 'spotify-auth'
+      state: 'spotify-auth',
+      show_dialog: 'true' // Force consent screen to show new permissions
     });
 
     window.location.href = `https://accounts.spotify.com/authorize?${params}`;
@@ -595,6 +602,14 @@ export default function AudioVisualizer() {
               <div>Dance: {audioFeatures.danceability.toFixed(2)}</div>
               <div>Mood: {audioFeatures.valence.toFixed(2)}</div>
             </div>
+          )}
+          {accessToken && (
+            <button 
+              onClick={loginToSpotify}
+              className="mt-2 px-2 py-1 bg-green-600/20 hover:bg-green-600/40 rounded text-white/80 text-xs transition-colors"
+            >
+              Re-authenticate
+            </button>
           )}
         </div>
       </div>
