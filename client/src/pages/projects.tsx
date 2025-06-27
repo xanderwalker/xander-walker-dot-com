@@ -28,19 +28,19 @@ export default function Projects() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {projects.map((project, index) => (
               <Link key={index} href={project.link}>
-                <div className="glassmorphism rounded-2xl p-8 relative z-30 pointer-events-auto cursor-pointer hover:bg-opacity-90 transition-all duration-300 group">
+                <div className="glassmorphism rounded-2xl p-6 relative z-30 pointer-events-auto cursor-pointer hover:bg-opacity-90 transition-all duration-300 group">
                   {/* Project Title */}
-                  <div className="font-serif text-8xl mb-8 text-center text-black group-hover:text-gray-600 transition-colors" style={{fontFamily: 'Georgia, serif'}}>
+                  <div className="font-serif text-black mb-4 text-center group-hover:text-gray-600 transition-colors" style={{fontSize: '32px', lineHeight: '1.2', fontFamily: 'Georgia, serif'}}>
                     {project.title}
                   </div>
                   
                   {/* Project Description */}
-                  <div className="text-gray-700 font-serif text-4xl mb-8 leading-relaxed text-center" style={{fontFamily: 'Georgia, serif'}}>
+                  <div className="text-black font-serif text-center mb-4" style={{fontSize: '18px', lineHeight: '1.3', fontFamily: 'Georgia, serif'}}>
                     {project.description}
                   </div>
                   
                   {/* Project Tags */}
-                  <div className="text-2xl font-serif text-gray-500 uppercase tracking-wider text-center" style={{fontFamily: 'Georgia, serif'}}>
+                  <div className="font-serif text-gray-500 text-center" style={{fontSize: '14px', lineHeight: '1.3', fontFamily: 'Georgia, serif'}}>
                     {project.tags}
                   </div>
                 </div>
