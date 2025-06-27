@@ -17,7 +17,6 @@ import Camera from "@/pages/camera";
 import SpotifyLyrics from "@/pages/spotify-lyrics";
 import SpotifyApiTest from "@/pages/spotify-api-test";
 import MonetPaint from "@/pages/monet-paint";
-import EyeTracking from "@/pages/eye-tracking";
 import Contact from "@/pages/contact";
 import NotFound from "@/pages/not-found";
 
@@ -38,7 +37,6 @@ function Router() {
       <Route path="/projects/spotify-lyrics" component={SpotifyLyrics} />
       <Route path="/projects/spotify-api-test" component={SpotifyApiTest} />
       <Route path="/projects/monet-paint" component={MonetPaint} />
-      <Route path="/projects/eye-tracking" component={EyeTracking} />
       <Route path="/contact" component={Contact} />
       <Route component={NotFound} />
     </Switch>
