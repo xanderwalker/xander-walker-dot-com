@@ -263,9 +263,9 @@ export default function AudioVisualizer() {
     if (!currentBeat || !audioFeatures || !canvasRef.current) return;
 
     const canvas = canvasRef.current;
-    const energy = audioFeatures.energy;
-    const valence = audioFeatures.valence;
-    const danceability = audioFeatures.danceability;
+    const energy = audioFeatures.energy || 0.5;
+    const valence = audioFeatures.valence || 0.5;
+    const danceability = audioFeatures.danceability || 0.5;
 
     // Create new particles on each beat
     const newParticles: VisualizerParticle[] = Array.from({ length: Math.floor(energy * 20) }, () => ({
@@ -424,11 +424,11 @@ export default function AudioVisualizer() {
               <div className="fixed top-4 right-4 bg-black/70 backdrop-blur-sm rounded-lg p-4 max-w-sm">
                 <h3 className="font-bold mb-2">Audio Features</h3>
                 <div className="text-sm space-y-1">
-                  <div>Tempo: {Math.round(audioFeatures.tempo)} BPM</div>
-                  <div>Energy: {Math.round(audioFeatures.energy * 100)}%</div>
-                  <div>Danceability: {Math.round(audioFeatures.danceability * 100)}%</div>
-                  <div>Valence: {Math.round(audioFeatures.valence * 100)}%</div>
-                  <div>Loudness: {audioFeatures.loudness.toFixed(1)} dB</div>
+                  <div>Tempo: {Math.round(audioFeatures.tempo || 0)} BPM</div>
+                  <div>Energy: {Math.round((audioFeatures.energy || 0) * 100)}%</div>
+                  <div>Danceability: {Math.round((audioFeatures.danceability || 0) * 100)}%</div>
+                  <div>Valence: {Math.round((audioFeatures.valence || 0) * 100)}%</div>
+                  <div>Loudness: {(audioFeatures.loudness || 0).toFixed(1)} dB</div>
                 </div>
               </div>
             )}
@@ -437,8 +437,8 @@ export default function AudioVisualizer() {
             {currentBeat && (
               <div className="fixed bottom-4 left-4 bg-black/70 backdrop-blur-sm rounded-lg p-4">
                 <div className="text-sm">
-                  <div>Current Beat: {currentBeat.start.toFixed(2)}s</div>
-                  <div>Confidence: {Math.round(currentBeat.confidence * 100)}%</div>
+                  <div>Current Beat: {(currentBeat.start || 0).toFixed(2)}s</div>
+                  <div>Confidence: {Math.round((currentBeat.confidence || 0) * 100)}%</div>
                 </div>
               </div>
             )}
