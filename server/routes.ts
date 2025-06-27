@@ -92,10 +92,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/spotify/callback', async (req, res) => {
     try {
       const { code } = req.body;
-      const clientId = process.env.VITE_SPOTIFY_CLIENT_ID;
+      const clientId = process.env.SPOTIFY_CLIENT_ID;
       const clientSecret = process.env.SPOTIFY_CLIENT_SECRET;
       
+      console.log('Spotify callback - Client ID:', clientId ? 'present' : 'missing');
+      console.log('Spotify callback - Client Secret:', clientSecret ? 'present' : 'missing');
+      
       if (!clientId || !clientSecret) {
+        console.log('Missing credentials - clientId:', !!clientId, 'clientSecret:', !!clientSecret);
         return res.status(400).json({ error: 'Spotify credentials not configured' });
       }
 
