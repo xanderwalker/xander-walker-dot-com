@@ -105,45 +105,58 @@ export default function PhysicsBalls() {
 
   // Initialize balls
   useEffect(() => {
-    // Ensure we have valid window dimensions
-    const width = window.innerWidth || 800;
-    const height = window.innerHeight || 600;
-    
-    const initialBalls: Ball[] = [];
-    const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4']; // coral, mint, sky blue, sage green
+    // Wait for window to be fully available
+    const initializeBalls = () => {
+      // Ensure we have valid window dimensions
+      const width = typeof window !== 'undefined' ? (window.innerWidth || 800) : 800;
+      const height = typeof window !== 'undefined' ? (window.innerHeight || 600) : 600;
+      
+      const initialBalls: Ball[] = [];
+      const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4']; // coral, mint, sky blue, sage green
 
-    // Add 333 regular balls
-    for (let i = 0; i < 333; i++) {
-      initialBalls.push({
-        id: i,
-        x: Math.random() * Math.max(width - 20, 100),
-        y: Math.random() * Math.max(height - 20, 100),
-        vx: (Math.random() - 0.5) * 2,
-        vy: (Math.random() - 0.5) * 2,
-        size: 15, // uniform 15px balls (3x smaller)
-        color: colors[Math.floor(Math.random() * colors.length)]
-      });
-    }
+      // Add 333 regular balls
+      for (let i = 0; i < 333; i++) {
+        const x = Math.random() * Math.max(width - 20, 100);
+        const y = Math.random() * Math.max(height - 20, 100);
+        
+        initialBalls.push({
+          id: i,
+          x: isNaN(x) ? 100 : x,
+          y: isNaN(y) ? 100 : y,
+          vx: (Math.random() - 0.5) * 2,
+          vy: (Math.random() - 0.5) * 2,
+          size: 15, // uniform 15px balls (3x smaller)
+          color: colors[Math.floor(Math.random() * colors.length)]
+        });
+      }
 
-    // Add floating X and W letters
-    const letters = ['X', 'W'];
-    for (let i = 333; i < 335; i++) {
-      initialBalls.push({
-        id: i,
-        x: Math.random() * Math.max(width - 80, 100),
-        y: Math.random() * Math.max(height - 80, 100),
-        vx: (Math.random() - 0.5) * 3, // Faster movement for letters
-        vy: (Math.random() - 0.5) * 3,
-        size: 80, // Larger size for letters
-        color: '#000000', // Black letters
-        isLetter: true,
-        letter: letters[i - 333],
-        rotation: Math.random() * 360,
-        rotationSpeed: (Math.random() - 0.5) * 8 // Random rotation speed
-      });
-    }
+      // Add floating X and W letters
+      const letters = ['X', 'W'];
+      for (let i = 333; i < 335; i++) {
+        const x = Math.random() * Math.max(width - 80, 100);
+        const y = Math.random() * Math.max(height - 80, 100);
+        
+        initialBalls.push({
+          id: i,
+          x: isNaN(x) ? 100 : x,
+          y: isNaN(y) ? 100 : y,
+          vx: (Math.random() - 0.5) * 3, // Faster movement for letters
+          vy: (Math.random() - 0.5) * 3,
+          size: 80, // Larger size for letters
+          color: '#000000', // Black letters
+          isLetter: true,
+          letter: letters[i - 333],
+          rotation: Math.random() * 360,
+          rotationSpeed: (Math.random() - 0.5) * 8 // Random rotation speed
+        });
+      }
 
-    setBalls(initialBalls);
+      setBalls(initialBalls);
+    };
+
+    // Small delay to ensure window is ready
+    const timer = setTimeout(initializeBalls, 100);
+    return () => clearTimeout(timer);
   }, []);
 
   // Get color based on position (for mobile)
@@ -174,11 +187,16 @@ export default function PhysicsBalls() {
   useEffect(() => {
     const animate = () => {
       setBalls(prevBalls => {
+        // Safety check: ensure we have valid balls
+        if (!prevBalls.length) return prevBalls;
+        
         // Create a copy of balls array to work with
         let updatedBalls = prevBalls.map(ball => ({
           ...ball,
-          vx: ball.vx,
-          vy: ball.vy
+          vx: ball.vx || 0,
+          vy: ball.vy || 0,
+          x: ball.x || 0,
+          y: ball.y || 0
         }));
 
         // Apply physics forces first
@@ -307,19 +325,19 @@ export default function PhysicsBalls() {
 
   return (
     <div ref={containerRef} className="fixed inset-0 z-10">
-      {balls.map(ball => (
+      {balls.filter(ball => !isNaN(ball.x) && !isNaN(ball.y) && !isNaN(ball.size)).map(ball => (
         ball.isLetter ? (
           <div
             key={ball.id}
             className="absolute pointer-events-none font-xanman-wide font-bold flex items-center justify-center border-2 border-black rounded-full"
             style={{
-              left: ball.x,
-              top: ball.y,
-              width: ball.size,
-              height: ball.size,
+              left: `${ball.x}px`,
+              top: `${ball.y}px`,
+              width: `${ball.size}px`,
+              height: `${ball.size}px`,
               fontSize: `${ball.size * 0.9}px`,
               color: ball.color,
-              transform: `rotate(${ball.rotation}deg)`,
+              transform: `rotate(${ball.rotation || 0}deg)`,
               lineHeight: '1'
             }}
           >
@@ -330,10 +348,10 @@ export default function PhysicsBalls() {
             key={ball.id}
             className="absolute rounded-full pointer-events-none"
             style={{
-              left: ball.x,
-              top: ball.y,
-              width: ball.size,
-              height: ball.size,
+              left: `${ball.x}px`,
+              top: `${ball.y}px`,
+              width: `${ball.size}px`,
+              height: `${ball.size}px`,
               backgroundColor: ball.color,
               transition: isMobile ? 'background-color 0.3s ease' : 'none'
             }}
