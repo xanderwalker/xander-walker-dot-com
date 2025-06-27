@@ -3,8 +3,12 @@ import { useState, useEffect, useRef } from 'react';
 
 interface Ball {
   id: number;
+  x: number;
   y: number;
+  vx: number;
+  vy: number;
   isSettled: boolean;
+  settledIndex?: number;
 }
 
 export default function Clock() {
@@ -14,6 +18,7 @@ export default function Clock() {
   const [hourBalls, setHourBalls] = useState<Ball[]>([]);
   const ballIdRef = useRef(0);
   const lastSecondRef = useRef(-1);
+  const animationFrameRef = useRef<number>();
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -32,7 +37,15 @@ export default function Clock() {
           // Reset seconds, add to minutes
           setSecondBalls([]);
           setMinuteBalls(prev => {
-            const newBalls = [...prev, { id: ballIdRef.current++, y: 0, isSettled: false }];
+            const newBall: Ball = { 
+              id: ballIdRef.current++, 
+              x: 40, // Center of cylinder (80px width / 2)
+              y: -20, // Start above cylinder
+              vx: (Math.random() - 0.5) * 2, // Random horizontal velocity
+              vy: 0, // Start with no vertical velocity
+              isSettled: false 
+            };
+            const newBalls = [...prev, newBall];
             return newBalls.slice(-currentMinute || -60);
           });
           
@@ -40,13 +53,29 @@ export default function Clock() {
           if (currentMinute === 0) {
             setMinuteBalls([]);
             setHourBalls(prev => {
-              const newBalls = [...prev, { id: ballIdRef.current++, y: 0, isSettled: false }];
+              const newBall: Ball = { 
+                id: ballIdRef.current++, 
+                x: 40, 
+                y: -20, 
+                vx: (Math.random() - 0.5) * 2, 
+                vy: 0, 
+                isSettled: false 
+              };
+              const newBalls = [...prev, newBall];
               return newBalls.slice(-currentHour || -12);
             });
           }
         } else {
           // Add ball to seconds
-          setSecondBalls(prev => [...prev, { id: ballIdRef.current++, y: 0, isSettled: false }]);
+          const newBall: Ball = { 
+            id: ballIdRef.current++, 
+            x: 40, 
+            y: -20, 
+            vx: (Math.random() - 0.5) * 2, 
+            vy: 0, 
+            isSettled: false 
+          };
+          setSecondBalls(prev => [...prev, newBall]);
         }
       }
     }, 1000);
@@ -63,22 +92,107 @@ export default function Clock() {
     
     setSecondBalls(Array.from({ length: seconds }, (_, i) => ({
       id: ballIdRef.current++,
-      y: 0,
-      isSettled: true
+      x: 40,
+      y: 320 - (i * 16), // Stack settled balls from bottom
+      vx: 0,
+      vy: 0,
+      isSettled: true,
+      settledIndex: i
     })));
     
     setMinuteBalls(Array.from({ length: minutes }, (_, i) => ({
       id: ballIdRef.current++,
-      y: 0,
-      isSettled: true
+      x: 40,
+      y: 320 - (i * 16),
+      vx: 0,
+      vy: 0,
+      isSettled: true,
+      settledIndex: i
     })));
     
     setHourBalls(Array.from({ length: hours }, (_, i) => ({
       id: ballIdRef.current++,
-      y: 0,
-      isSettled: true
+      x: 40,
+      y: 320 - (i * 16),
+      vx: 0,
+      vy: 0,
+      isSettled: true,
+      settledIndex: i
     })));
   }, []);
+
+  // Physics animation loop
+  useEffect(() => {
+    const animate = () => {
+      const updateBalls = (balls: Ball[], setBalls: React.Dispatch<React.SetStateAction<Ball[]>>) => {
+        setBalls(prevBalls => 
+          prevBalls.map(ball => {
+            if (ball.isSettled) return ball;
+
+            let newX = ball.x + ball.vx;
+            let newY = ball.y + ball.vy;
+            let newVx = ball.vx;
+            let newVy = ball.vy + 0.5; // Gravity
+
+            // Wall collisions (cylinder walls)
+            if (newX <= 8) { // Left wall
+              newX = 8;
+              newVx = -newVx * 0.7; // Bounce with damping
+            }
+            if (newX >= 72) { // Right wall (80px - 8px for ball width)
+              newX = 72;
+              newVx = -newVx * 0.7;
+            }
+
+            // Bottom collision (cylinder bottom)
+            const settledBalls = prevBalls.filter(b => b.isSettled);
+            const expectedBottomY = 304 - (settledBalls.length * 16); // 320px - 16px for ball height
+            
+            if (newY >= expectedBottomY) {
+              newY = expectedBottomY;
+              newVy = -newVy * 0.4; // Bounce with heavy damping
+              newVx *= 0.8; // Friction
+              
+              // Check if ball should settle
+              if (Math.abs(newVy) < 1 && Math.abs(newVx) < 1) {
+                return {
+                  ...ball,
+                  x: 40, // Center
+                  y: expectedBottomY,
+                  vx: 0,
+                  vy: 0,
+                  isSettled: true,
+                  settledIndex: settledBalls.length
+                };
+              }
+            }
+
+            return {
+              ...ball,
+              x: newX,
+              y: newY,
+              vx: newVx,
+              vy: newVy
+            };
+          })
+        );
+      };
+
+      updateBalls(secondBalls, setSecondBalls);
+      updateBalls(minuteBalls, setMinuteBalls);
+      updateBalls(hourBalls, setHourBalls);
+
+      animationFrameRef.current = requestAnimationFrame(animate);
+    };
+
+    animationFrameRef.current = requestAnimationFrame(animate);
+
+    return () => {
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+      }
+    };
+  }, [secondBalls, minuteBalls, hourBalls]);
 
   const formatTime = (date: Date) => {
     return date.toLocaleTimeString('en-US', { 
@@ -119,15 +233,15 @@ export default function Clock() {
           ))}
           
           {/* Balls */}
-          {balls.map((ball, index) => (
+          {balls.map((ball) => (
             <div
               key={ball.id}
               className="absolute w-4 h-4 bg-blue-500 rounded-full border border-blue-700"
               style={{
-                bottom: `${(index * 16) + 4}px`,
-                left: '50%',
-                transform: 'translateX(-50%)',
-                transition: ball.isSettled ? 'none' : 'bottom 0.5s ease-out'
+                left: `${ball.x - 8}px`, // Center the ball (16px width / 2)
+                bottom: `${320 - ball.y - 16}px`, // Position from bottom
+                transition: 'none', // Let physics handle movement
+                zIndex: ball.isSettled ? 1 : 10 // Falling balls appear above settled ones
               }}
             />
           ))}
