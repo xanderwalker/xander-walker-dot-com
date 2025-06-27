@@ -64,61 +64,13 @@ const YearClock = ({ currentDate }: { currentDate: Date }) => {
         </div>
       </div>
       
-      {/* Glass Progress Bar */}
-      <div className="relative">
-        {/* Glass background bar */}
+      {/* Simple Progress Bar */}
+      <div className="w-full h-8 bg-gray-200 rounded-lg overflow-hidden">
+        {/* Red progress fill */}
         <div 
-          className="w-full h-8 rounded-lg overflow-hidden"
-          style={{
-            background: 'linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(230,230,230,0.6) 50%, rgba(255,255,255,0.9) 100%)',
-            border: '2px solid rgba(200,200,200,0.6)',
-            boxShadow: 'inset -4px 0 8px rgba(0,0,0,0.1), inset 4px 0 8px rgba(255,255,255,0.4), 0 4px 16px rgba(0,0,0,0.15)',
-            backdropFilter: 'blur(2px)'
-          }}
-        >
-          {/* Red progress fill */}
-          <div 
-            className="h-full transition-all duration-1000"
-            style={{ 
-              width: `${(currentDayOfYear / totalDays) * 100}%`,
-              background: 'linear-gradient(135deg, #FF4444 0%, #CC0000 50%, #FF4444 100%)',
-              boxShadow: 'inset 0 2px 4px rgba(255,255,255,0.3), inset 0 -2px 4px rgba(0,0,0,0.2)'
-            }}
-          />
-          
-          {/* Glass highlight effects */}
-          <div className="absolute top-1 left-1 right-1 h-1 bg-gradient-to-r from-white via-transparent to-transparent opacity-60 rounded-full"></div>
-          <div className="absolute bottom-1 left-1 right-1 h-1 bg-gradient-to-r from-transparent via-black to-transparent opacity-20 rounded-full"></div>
-          
-          {/* Current day indicator */}
-          <div 
-            className="absolute top-0 w-1 h-8 bg-white shadow-lg"
-            style={{ 
-              left: `${(currentDayOfYear / totalDays) * 100}%`,
-              boxShadow: '0 0 8px rgba(255,255,255,0.8), inset 0 0 4px rgba(0,0,0,0.3)'
-            }}
-          />
-        </div>
-        
-        {/* Hash marks for every 5 days */}
-        <div className="absolute top-0 w-full h-8 pointer-events-none">
-          {Array.from({ length: Math.floor(totalDays / 5) }, (_, i) => {
-            const day = (i + 1) * 5;
-            return (
-              <div
-                key={day}
-                className="absolute top-1 w-px h-6 bg-black opacity-30"
-                style={{ left: `${(day / totalDays) * 100}%` }}
-              />
-            );
-          })}
-        </div>
-      </div>
-      
-      {/* Simple day markers */}
-      <div className="flex justify-between mt-3 font-xanman-wide text-xs text-gray-500">
-        <span>JAN 1</span>
-        <span>DEC 31</span>
+          className="h-full bg-red-500 transition-all duration-1000"
+          style={{ width: `${(currentDayOfYear / totalDays) * 100}%` }}
+        />
       </div>
     </div>
   );
