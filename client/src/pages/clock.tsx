@@ -74,9 +74,17 @@ const YearClock = ({ currentDate }: { currentDate: Date }) => {
   
   return (
     <div className="w-full max-w-4xl">
-      <h3 className="font-serif text-lg mb-4 text-center text-black" style={{fontFamily: 'Georgia, serif'}}>
-        Year Progress {currentYear} - Day {currentDayOfYear} of 365
-      </h3>
+      <div className="text-center mb-4">
+        <h3 className="font-serif text-lg text-black mb-1" style={{fontFamily: 'Georgia, serif'}}>
+          Year Progress {currentYear}
+        </h3>
+        <div className="font-serif text-2xl font-bold text-black" style={{fontFamily: 'Georgia, serif'}}>
+          {Math.round((currentDayOfYear / 365) * 100)}%
+        </div>
+        <div className="text-sm text-gray-600">
+          Day {currentDayOfYear} of 365
+        </div>
+      </div>
       <div className="flex flex-wrap justify-center gap-px bg-gray-200 p-2 rounded-lg">
         {allDays.map((dayData) => (
           <div
@@ -94,9 +102,6 @@ const YearClock = ({ currentDate }: { currentDate: Date }) => {
             title={`${getMonthName(dayData.month - 1)} ${dayData.day}, ${currentYear} (Day ${dayData.dayOfYear})`}
           />
         ))}
-      </div>
-      <div className="mt-2 text-center text-xs text-gray-600">
-        {Math.round((currentDayOfYear / 365) * 100)}% of year complete
       </div>
     </div>
   );
