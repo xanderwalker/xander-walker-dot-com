@@ -49,14 +49,7 @@ interface BrowserData {
   pdfViewerEnabled: boolean;
 }
 
-interface CameraDevice {
-  deviceId: string;
-  label: string;
-  kind: MediaDeviceKind;
-  facing: 'user' | 'environment' | 'unknown';
-  stream?: MediaStream;
-  videoRef?: React.RefObject<HTMLVideoElement>;
-}
+
 
 export default function SensorDashboard() {
   const [sensorData, setSensorData] = useState<SensorData>({
@@ -114,108 +107,14 @@ export default function SensorDashboard() {
     location: false
   });
 
-  const [cameras, setCameras] = useState<CameraDevice[]>([]);
-  const [camerasActive, setCamerasActive] = useState(false);
+
   
   const audioContextRef = useRef<AudioContext | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
   const microphoneRef = useRef<MediaStreamAudioSourceNode | null>(null);
   const animationFrameRef = useRef<number>();
 
-  // Detect and initialize all cameras
-  const detectAndInitializeCameras = async () => {
-    try {
-      // Get all available media devices
-      const devices = await navigator.mediaDevices.enumerateDevices();
-      const videoDevices = devices.filter(device => device.kind === 'videoinput');
-      
-      if (videoDevices.length === 0) {
-        console.log('No camera devices found');
-        return;
-      }
 
-      const cameraDevices: CameraDevice[] = [];
-      
-      // Create video refs for each camera
-      for (const device of videoDevices) {
-        // Determine camera facing direction from label
-        let facing: 'user' | 'environment' | 'unknown' = 'unknown';
-        const label = device.label.toLowerCase();
-        
-        if (label.includes('front') || label.includes('user') || label.includes('facetime')) {
-          facing = 'user';
-        } else if (label.includes('back') || label.includes('rear') || label.includes('environment')) {
-          facing = 'environment';
-        }
-
-        const cameraDevice: CameraDevice = {
-          deviceId: device.deviceId,
-          label: device.label || `Camera ${cameraDevices.length + 1}`,
-          kind: device.kind,
-          facing,
-          videoRef: { current: null }
-        };
-
-        cameraDevices.push(cameraDevice);
-      }
-
-      setCameras(cameraDevices);
-      setPermissions(prev => ({ ...prev, camera: true }));
-      
-    } catch (error) {
-      console.error('Camera detection failed:', error);
-      setPermissions(prev => ({ ...prev, camera: false }));
-    }
-  };
-
-  // Start all camera streams
-  const startAllCameras = async () => {
-    if (cameras.length === 0) return;
-
-    const updatedCameras = [...cameras];
-    
-    for (let i = 0; i < updatedCameras.length; i++) {
-      try {
-        const constraints = {
-          video: {
-            deviceId: { exact: updatedCameras[i].deviceId },
-            width: { ideal: 320 },
-            height: { ideal: 240 }
-          }
-        };
-
-        const stream = await navigator.mediaDevices.getUserMedia(constraints);
-        updatedCameras[i].stream = stream;
-
-        // Start video stream
-        setTimeout(() => {
-          const videoElement = document.getElementById(`camera-${i}`) as HTMLVideoElement;
-          if (videoElement && stream) {
-            videoElement.srcObject = stream;
-            videoElement.play();
-          }
-        }, 100);
-
-      } catch (error) {
-        console.error(`Failed to start camera ${updatedCameras[i].label}:`, error);
-      }
-    }
-
-    setCameras(updatedCameras);
-    setCamerasActive(true);
-  };
-
-  // Stop all camera streams
-  const stopAllCameras = () => {
-    cameras.forEach(camera => {
-      if (camera.stream) {
-        camera.stream.getTracks().forEach(track => track.stop());
-      }
-    });
-    
-    setCameras(cameras.map(camera => ({ ...camera, stream: undefined })));
-    setCamerasActive(false);
-  };
 
   // Request all sensor permissions
   const requestAllPermissions = async () => {
@@ -237,13 +136,14 @@ export default function SensorDashboard() {
         console.error('Audio permission denied:', error);
       }
 
-      // Detect and initialize all cameras
-      await detectAndInitializeCameras();
-      
-      // Start all camera streams after detection
-      setTimeout(() => {
-        startAllCameras();
-      }, 500);
+      // Camera permission for ambient light (if available)
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        stream.getTracks().forEach(track => track.stop()); // Stop immediately, just testing permission
+        setPermissions(prev => ({ ...prev, camera: true }));
+      } catch (error) {
+        console.error('Camera permission denied:', error);
+      }
 
       // Location permission
       try {
@@ -676,56 +576,7 @@ export default function SensorDashboard() {
           </div>
         </div>
 
-        {/* Camera */}
-        <div className="glassmorphism rounded-2xl p-6 col-span-full">
-          <h3 className="font-serif text-xl mb-4 text-center" style={{fontFamily: 'Georgia, serif'}}>CAMERAS</h3>
-          <div className="space-y-4">
-            <div className="text-center text-sm font-serif" style={{fontFamily: 'Georgia, serif'}}>
-              {cameras.length > 0 ? (
-                <>
-                  <div className="mb-2">Detected {cameras.length} camera(s)</div>
-                  <div className="flex justify-center space-x-4 mb-4">
-                    <button
-                      onClick={startAllCameras}
-                      disabled={camerasActive}
-                      className="px-4 py-2 bg-green-600 text-white rounded-lg disabled:bg-gray-400 hover:bg-green-700 transition-colors"
-                    >
-                      Start All Cameras
-                    </button>
-                    <button
-                      onClick={stopAllCameras}
-                      disabled={!camerasActive}
-                      className="px-4 py-2 bg-red-600 text-white rounded-lg disabled:bg-gray-400 hover:bg-red-700 transition-colors"
-                    >
-                      Stop All Cameras
-                    </button>
-                  </div>
-                </>
-              ) : (
-                <div className="text-gray-500">No cameras detected or permission denied</div>
-              )}
-            </div>
-            
-            {cameras.length > 0 && (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {cameras.map((camera, index) => (
-                  <div key={camera.deviceId} className="bg-black rounded-lg overflow-hidden">
-                    <div className="p-2 bg-gray-800 text-white text-xs text-center font-serif" style={{fontFamily: 'Georgia, serif'}}>
-                      {camera.label} ({camera.facing === 'user' ? 'Front' : camera.facing === 'environment' ? 'Rear' : 'Unknown'})
-                    </div>
-                    <video
-                      id={`camera-${index}`}
-                      className="w-full h-40 object-cover bg-gray-900"
-                      autoPlay
-                      playsInline
-                      muted
-                    />
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
+
 
         {/* Temperature */}
         <div className="glassmorphism rounded-2xl p-6">

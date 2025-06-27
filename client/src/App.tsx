@@ -13,6 +13,7 @@ import Balls333 from "@/pages/333-balls";
 import Clock from "@/pages/clock";
 import PixelClock from "@/pages/pixel-clock";
 import Roulette from "@/pages/roulette";
+import Camera from "@/pages/camera";
 import Contact from "@/pages/contact";
 import NotFound from "@/pages/not-found";
 
@@ -29,6 +30,7 @@ function Router() {
       <Route path="/projects/clock" component={Clock} />
       <Route path="/projects/pixel-clock" component={PixelClock} />
       <Route path="/projects/roulette" component={Roulette} />
+      <Route path="/projects/camera" component={Camera} />
       <Route path="/contact" component={Contact} />
       <Route component={NotFound} />
     </Switch>

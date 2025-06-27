@@ -4,6 +4,12 @@ import Layout from '../components/layout';
 export default function Projects() {
   const projects = [
     {
+      title: "CAMERA SYSTEM",
+      description: "Multi-camera detection and live video streaming system. Automatically detects all available cameras (front/rear) and displays simultaneous video feeds with device identification.",
+      tags: "Camera • Video • Hardware",
+      link: "/projects/camera"
+    },
+    {
       title: "SENSOR DASHBOARD",
       description: "Comprehensive device sensor monitoring with visual indicators. Displays accelerometer, compass, gyroscope, sound level, brightness, battery, temperature, and proximity sensors in real-time.",
       tags: "Sensors • Hardware • Monitoring",
