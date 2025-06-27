@@ -236,50 +236,79 @@
   transition: background 0.3s ease-out;
 }
 
-/* Mobile paint washing effect - simulates wet paint flowing in tilted tray */
+/* Mobile paint washing effect - smooth paint mixing in tilted tray */
 @media (max-width: 768px) {
   .paint-swirl-bg {
     background: 
-      /* Primary paint pool that flows to tilt direction */
-      radial-gradient(ellipse calc(var(--flow-radius, 50%) * 1.5) calc(var(--flow-radius, 50%)) at var(--flow-x, 50%) var(--flow-y, 50%), 
-        #2e4c8b 0%, 
-        #4a6bb5 25%, 
-        #6b8dd6 50%, 
-        transparent 75%
-      ),
-      /* Secondary wash flowing in opposite direction */
-      radial-gradient(ellipse calc(var(--flow-radius, 50%) * 1.2) calc(var(--flow-radius, 50%) * 0.8) at calc(100% - var(--flow-x, 50%)) calc(100% - var(--flow-y, 50%)), 
-        #5d4a8a 0%, 
-        #7a6ba0 30%, 
-        #9d8cb6 60%, 
-        transparent 80%
-      ),
-      /* Tertiary color pooling at edges */
-      radial-gradient(ellipse calc(var(--flow-radius, 50%) * 0.8) calc(var(--flow-radius, 50%) * 1.3) at calc(var(--flow-x, 50%) * 0.3) calc(var(--flow-y, 50%) * 1.7), 
-        #8fa9e5 0%, 
-        #b5c6f2 35%, 
-        #c8b5d4 70%, 
+      /* Multiple layered paint flows for smooth mixing */
+      radial-gradient(
+        ellipse calc(200px + var(--flow-radius, 50px)) calc(150px + var(--flow-radius, 50px)) 
+        at calc(var(--flow-x, 50%) * 1vw) calc(var(--flow-y, 50%) * 1vh), 
+        rgba(46, 76, 139, 0.8) 0%, 
+        rgba(74, 107, 181, 0.6) 30%, 
+        rgba(107, 141, 214, 0.4) 60%, 
         transparent 85%
       ),
-      /* Directional gradient that follows tilt angle */
-      linear-gradient(calc(var(--flow-angle, 0deg) + 45deg), 
-        rgba(212, 194, 168, calc(var(--tilt-intensity, 0.3))) 0%,
-        rgba(168, 181, 160, calc(var(--tilt-intensity, 0.3))) 25%,
-        rgba(143, 169, 229, calc(var(--tilt-intensity, 0.3))) 50%,
-        rgba(200, 181, 212, calc(var(--tilt-intensity, 0.3))) 75%,
-        rgba(93, 74, 138, calc(var(--tilt-intensity, 0.3))) 100%
+      radial-gradient(
+        ellipse calc(180px + var(--flow-radius, 50px)) calc(120px + var(--flow-radius, 50px)) 
+        at calc((100 - var(--flow-x, 50%)) * 1vw) calc((100 - var(--flow-y, 50%)) * 1vh), 
+        rgba(93, 74, 138, 0.7) 0%, 
+        rgba(122, 107, 160, 0.5) 35%, 
+        rgba(157, 140, 182, 0.3) 70%, 
+        transparent 90%
       ),
-      /* Base color wash */
-      linear-gradient(calc(var(--flow-angle, 0deg)), 
-        #2e4c8b, #5d4a8a, #8fa9e5, #c8b5d4, #d4c2a8, #a8b5a0
+      radial-gradient(
+        ellipse calc(160px + var(--flow-radius, 40px)) calc(200px + var(--flow-radius, 60px)) 
+        at calc((var(--flow-x, 50%) * 0.7 + 15) * 1vw) calc((var(--flow-y, 50%) * 1.3 + 20) * 1vh), 
+        rgba(143, 169, 229, 0.6) 0%, 
+        rgba(181, 198, 242, 0.4) 40%, 
+        rgba(200, 181, 212, 0.2) 80%, 
+        transparent 95%
+      ),
+      radial-gradient(
+        ellipse calc(140px + var(--flow-radius, 30px)) calc(140px + var(--flow-radius, 30px)) 
+        at calc((var(--flow-x, 50%) * 0.4 + 30) * 1vw) calc((var(--flow-y, 50%) * 0.6 + 40) * 1vh), 
+        rgba(212, 194, 168, calc(0.3 + var(--tilt-intensity, 0) * 0.4)) 0%, 
+        rgba(168, 181, 160, calc(0.2 + var(--tilt-intensity, 0) * 0.3)) 50%, 
+        transparent 100%
+      ),
+      /* Smooth directional flow gradient */
+      linear-gradient(
+        calc(var(--flow-angle, 0deg) + 30deg), 
+        rgba(46, 76, 139, 0.3) 0%,
+        rgba(93, 74, 138, 0.25) 20%,
+        rgba(143, 169, 229, 0.2) 40%,
+        rgba(200, 181, 212, 0.15) 60%,
+        rgba(212, 194, 168, 0.1) 80%,
+        rgba(168, 181, 160, 0.05) 100%
+      ),
+      /* Base gradient for seamless color mixing */
+      linear-gradient(
+        calc(var(--flow-angle, 0deg) - 45deg), 
+        #2e4c8b 0%, 
+        #4a5d7a 15%,
+        #5d4a8a 30%, 
+        #7a6ba0 45%,
+        #8fa9e5 60%, 
+        #b5c6f2 75%,
+        #c8b5d4 85%,
+        #d4c2a8 95%,
+        #a8b5a0 100%
       );
-    background-size: 
-      calc(80% + var(--flow-radius, 50%)) calc(60% + var(--flow-radius, 50%)), 
-      calc(70% + var(--flow-radius, 50%)) calc(50% + var(--flow-radius, 50%)), 
-      calc(60% + var(--flow-radius, 50%)) calc(80% + var(--flow-radius, 50%)),
-      200% 200%,
-      300% 300%;
-    transition: background 0.1s ease-out;
+    
+    /* Smooth transitions for paint-like behavior */
+    transition: 
+      background-position 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+      background-size 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    
+    /* Animate the background position for flowing effect */
+    background-position:
+      calc(var(--flow-x, 50%) * 1vw - 50px) calc(var(--flow-y, 50%) * 1vh - 50px),
+      calc((100 - var(--flow-x, 50%)) * 1vw + 30px) calc((100 - var(--flow-y, 50%)) * 1vh + 30px),
+      calc(var(--flow-x, 50%) * 0.7vw + 20px) calc(var(--flow-y, 50%) * 1.3vh + 40px),
+      calc(var(--flow-x, 50%) * 0.4vw + 60px) calc(var(--flow-y, 50%) * 0.6vh + 80px),
+      50% 50%,
+      0% 0%;
   }
 }
 

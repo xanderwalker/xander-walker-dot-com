@@ -80,7 +80,17 @@ export default function MonetPaint() {
   useEffect(() => {
     if (!sensorEnabled || !isMobile) return;
 
+    let lastUpdate = 0;
+    const updateInterval = 100; // Update every 100ms for smoother transitions
+    let smoothedTiltX = 0;
+    let smoothedTiltY = 0;
+    const smoothingFactor = 0.1; // Lower = more smoothing
+
     const handleDeviceMotion = (event: DeviceMotionEvent) => {
+      const now = Date.now();
+      if (now - lastUpdate < updateInterval) return; // Throttle updates
+      lastUpdate = now;
+
       if (event.accelerationIncludingGravity) {
         // Get gravity-adjusted acceleration for tilt detection
         const x = (event.accelerationIncludingGravity.x || 0);
@@ -88,37 +98,37 @@ export default function MonetPaint() {
         const z = (event.accelerationIncludingGravity.z || 0);
         
         // Calculate tilt angles (convert to degrees for easier understanding)
-        // X-axis tilt: positive = tilted right, negative = tilted left
-        // Y-axis tilt: positive = tilted away from user, negative = tilted toward user
-        const tiltX = Math.atan2(x, z) * (180 / Math.PI);
-        const tiltY = Math.atan2(y, z) * (180 / Math.PI);
+        const rawTiltX = Math.atan2(x, z) * (180 / Math.PI);
+        const rawTiltY = Math.atan2(y, z) * (180 / Math.PI);
         
-        // Map tilt to paint flow positions (0-100%)
-        // Center the flow around 50% and let extreme tilts push toward edges
-        const flowX = Math.max(10, Math.min(90, 50 + (tiltX * 2))); // ±40% range from center
-        const flowY = Math.max(10, Math.min(90, 50 + (tiltY * 2))); // ±40% range from center
+        // Apply smoothing to reduce jerkiness
+        smoothedTiltX = smoothedTiltX + (rawTiltX - smoothedTiltX) * smoothingFactor;
+        smoothedTiltY = smoothedTiltY + (rawTiltY - smoothedTiltY) * smoothingFactor;
+        
+        // Map tilt to paint flow positions (0-100%) with smaller range for subtlety
+        const flowX = Math.max(20, Math.min(80, 50 + (smoothedTiltX * 0.8))); // ±24% range from center
+        const flowY = Math.max(20, Math.min(80, 50 + (smoothedTiltY * 0.8))); // ±24% range from center
         
         // Create directional gradient based on tilt intensity
-        const tiltIntensity = Math.sqrt(tiltX * tiltX + tiltY * tiltY);
-        const flowRadius = Math.max(30, Math.min(80, tiltIntensity + 30)); // Radius grows with tilt
+        const tiltIntensity = Math.sqrt(smoothedTiltX * smoothedTiltX + smoothedTiltY * smoothedTiltY);
+        const flowRadius = Math.max(40, Math.min(80, tiltIntensity * 1.5 + 40)); // More responsive radius
         
-        setDeviceMotion({ x: tiltX, y: tiltY, z: tiltIntensity });
+        setDeviceMotion({ x: smoothedTiltX, y: smoothedTiltY, z: tiltIntensity });
         
-        // Debug logging for mobile testing
-        if (tiltIntensity > 5) {
-          console.log(`Tilt detected - X: ${tiltX.toFixed(1)}°, Y: ${tiltY.toFixed(1)}°, Intensity: ${tiltIntensity.toFixed(1)}`);
-          console.log(`Paint flow - X: ${flowX.toFixed(1)}%, Y: ${flowY.toFixed(1)}%, Radius: ${flowRadius.toFixed(1)}%`);
+        // Minimal debug logging for mobile testing
+        if (tiltIntensity > 15 && Math.random() < 0.02) {
+          console.log(`Paint flowing to: X: ${flowX.toFixed(1)}, Y: ${flowY.toFixed(1)}`);
         }
         
         // Update CSS custom properties for paint washing effect
         if (backgroundRef.current) {
-          backgroundRef.current.style.setProperty('--flow-x', `${flowX}%`);
-          backgroundRef.current.style.setProperty('--flow-y', `${flowY}%`);
-          backgroundRef.current.style.setProperty('--flow-radius', `${flowRadius}%`);
-          backgroundRef.current.style.setProperty('--tilt-intensity', `${Math.min(1, tiltIntensity / 30)}`);
+          backgroundRef.current.style.setProperty('--flow-x', `${flowX}`);
+          backgroundRef.current.style.setProperty('--flow-y', `${flowY}`);
+          backgroundRef.current.style.setProperty('--flow-radius', `${flowRadius}px`);
+          backgroundRef.current.style.setProperty('--tilt-intensity', `${Math.min(0.8, tiltIntensity / 50)}`);
           
           // Create dynamic gradient rotation based on tilt direction
-          const gradientAngle = Math.atan2(tiltY, tiltX) * (180 / Math.PI);
+          const gradientAngle = Math.atan2(smoothedTiltY, smoothedTiltX) * (180 / Math.PI);
           backgroundRef.current.style.setProperty('--flow-angle', `${gradientAngle}deg`);
         }
       }
