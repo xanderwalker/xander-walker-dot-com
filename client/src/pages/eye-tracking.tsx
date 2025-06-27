@@ -1,5 +1,4 @@
 import { useRef, useEffect, useState } from 'react';
-import Layout from '@/components/layout';
 
 interface EyeData {
   leftEye: { x: number; y: number; isOpen: boolean };
@@ -66,11 +65,10 @@ export default function EyeTracking() {
       const data = imageData.data;
       
       // Simple eye detection approximation
-      // This is a simplified version - real eye tracking would use ML models
       const centerX = canvas.width / 2;
       const centerY = canvas.height / 2;
       
-      // Simulate eye position based on face movement approximation
+      // Simulate eye position based on face movement
       let avgBrightness = 0;
       let darkSpots = [];
       
@@ -96,7 +94,6 @@ export default function EyeTracking() {
       let rightEyeY = centerY * 0.8;
       
       if (darkSpots.length >= 2) {
-        // Simple approximation of eye positions
         const eye1 = darkSpots[0];
         const eye2 = darkSpots[1];
         
@@ -119,19 +116,19 @@ export default function EyeTracking() {
       const normalizedRightX = ((rightEyeX / canvas.width) - 0.5) * 2;
       const normalizedRightY = ((rightEyeY / canvas.height) - 0.5) * 2;
       
-      // Detect blinking (simplified - based on overall darkness in eye regions)
+      // Detect blinking (simplified)
       const eyeRegionBrightness = avgBrightness / (darkSpots.length || 1);
       const isBlinking = eyeRegionBrightness < 50;
       
       setEyeData({
         leftEye: { 
-          x: normalizedLeftX * 0.3, // Reduce sensitivity
-          y: normalizedLeftY * 0.3,
+          x: normalizedLeftX * 0.4,
+          y: normalizedLeftY * 0.4,
           isOpen: !isBlinking 
         },
         rightEye: { 
-          x: normalizedRightX * 0.3,
-          y: normalizedRightY * 0.3,
+          x: normalizedRightX * 0.4,
+          y: normalizedRightY * 0.4,
           isOpen: !isBlinking 
         },
         isDetecting: true
@@ -154,8 +151,16 @@ export default function EyeTracking() {
   }, []);
 
   return (
-    <Layout title="EYE TRACKING" subtitle="Real-time eye movement detection and mirroring">
-      <div className="min-h-screen bg-black text-white p-8 font-serif">
+    <div className="min-h-screen bg-black text-white">
+      {/* Simple header without bouncing navigation */}
+      <div className="fixed top-0 left-0 right-0 z-20 bg-black/80 backdrop-blur-sm">
+        <div className="p-6 text-center">
+          <h1 className="text-4xl font-xanman-wide text-white mb-2">EYE TRACKING</h1>
+          <p className="text-gray-300" style={{ fontFamily: 'Georgia, serif' }}>Real-time eye movement detection and mirroring</p>
+        </div>
+      </div>
+      
+      <div className="pt-24 p-8 font-serif">
         
         {/* Camera Section */}
         <div className="mb-8">
@@ -190,7 +195,7 @@ export default function EyeTracking() {
               />
               <canvas
                 ref={canvasRef}
-                className="hidden" // Hidden canvas for image analysis
+                className="hidden"
               />
               {eyeData.isDetecting && (
                 <div className="absolute top-2 left-2 bg-green-500/20 text-green-400 px-3 py-1 rounded text-sm">
@@ -208,10 +213,10 @@ export default function EyeTracking() {
           <div className="bg-gray-900/30 backdrop-blur-md p-8 rounded-lg border border-gray-700">
             <div className="flex justify-center items-center space-x-16">
               
-              {/* Left Eye - Inspired by user's sketch */}
+              {/* Left Eye */}
               <div className="relative">
                 <svg width="140" height="90" viewBox="0 0 140 90" className="drop-shadow-lg">
-                  {/* Eye outline - more elongated like the sketch */}
+                  {/* Eye outline */}
                   <path 
                     d={eyeData.leftEye.isOpen 
                       ? "M 20 45 Q 70 15 120 45 Q 70 75 20 45 Z" 
@@ -234,7 +239,7 @@ export default function EyeTracking() {
                     />
                   )}
                   
-                  {/* Iris - larger and more prominent */}
+                  {/* Iris */}
                   {eyeData.leftEye.isOpen && (
                     <circle 
                       cx={70 + (eyeData.leftEye.x * 18)} 
@@ -247,21 +252,7 @@ export default function EyeTracking() {
                     />
                   )}
                   
-                  {/* Iris pattern */}
-                  {eyeData.leftEye.isOpen && (
-                    <circle 
-                      cx={70 + (eyeData.leftEye.x * 18)} 
-                      cy={45 + (eyeData.leftEye.y * 12)} 
-                      r="18" 
-                      fill="none"
-                      stroke="#3b82f6"
-                      strokeWidth="0.5"
-                      opacity="0.7"
-                      className="transition-all duration-100"
-                    />
-                  )}
-                  
-                  {/* Pupil - more prominent */}
+                  {/* Pupil */}
                   {eyeData.leftEye.isOpen && (
                     <circle 
                       cx={70 + (eyeData.leftEye.x * 18)} 
@@ -272,7 +263,7 @@ export default function EyeTracking() {
                     />
                   )}
                   
-                  {/* Highlight - sketch-like */}
+                  {/* Highlight */}
                   {eyeData.leftEye.isOpen && (
                     <ellipse 
                       cx={73 + (eyeData.leftEye.x * 18)} 
@@ -288,10 +279,10 @@ export default function EyeTracking() {
                 <p className="text-center text-sm mt-2" style={{ fontFamily: 'Georgia, serif' }}>Left Eye</p>
               </div>
 
-              {/* Right Eye - Inspired by user's sketch */}
+              {/* Right Eye */}
               <div className="relative">
                 <svg width="140" height="90" viewBox="0 0 140 90" className="drop-shadow-lg">
-                  {/* Eye outline - more elongated like the sketch */}
+                  {/* Eye outline */}
                   <path 
                     d={eyeData.rightEye.isOpen 
                       ? "M 20 45 Q 70 15 120 45 Q 70 75 20 45 Z" 
@@ -314,7 +305,7 @@ export default function EyeTracking() {
                     />
                   )}
                   
-                  {/* Iris - larger and more prominent */}
+                  {/* Iris */}
                   {eyeData.rightEye.isOpen && (
                     <circle 
                       cx={70 + (eyeData.rightEye.x * 18)} 
@@ -327,21 +318,7 @@ export default function EyeTracking() {
                     />
                   )}
                   
-                  {/* Iris pattern */}
-                  {eyeData.rightEye.isOpen && (
-                    <circle 
-                      cx={70 + (eyeData.rightEye.x * 18)} 
-                      cy={45 + (eyeData.rightEye.y * 12)} 
-                      r="18" 
-                      fill="none"
-                      stroke="#3b82f6"
-                      strokeWidth="0.5"
-                      opacity="0.7"
-                      className="transition-all duration-100"
-                    />
-                  )}
-                  
-                  {/* Pupil - more prominent */}
+                  {/* Pupil */}
                   {eyeData.rightEye.isOpen && (
                     <circle 
                       cx={70 + (eyeData.rightEye.x * 18)} 
@@ -352,7 +329,7 @@ export default function EyeTracking() {
                     />
                   )}
                   
-                  {/* Highlight - sketch-like */}
+                  {/* Highlight */}
                   {eyeData.rightEye.isOpen && (
                     <ellipse 
                       cx={73 + (eyeData.rightEye.x * 18)} 
@@ -400,6 +377,6 @@ export default function EyeTracking() {
           </ul>
         </div>
       </div>
-    </Layout>
+    </div>
   );
 }
