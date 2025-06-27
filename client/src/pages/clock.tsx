@@ -119,8 +119,10 @@ export default function Clock() {
           x = cylinderLeft + (positionInLayer * minDistance) + (Math.random() * 8 - 4);
           y = bottomY - (layer * minDistance) - (Math.random() * 4);
           
-          // Ensure within cylinder bounds
-          x = Math.max(cylinderLeft + ballRadius, Math.min(cylinderLeft + cylinderWidth - ballRadius, x));
+          // Ensure within cylinder bounds with proper radius consideration
+          const minX = cylinderLeft + ballRadius;
+          const maxX = cylinderLeft + cylinderWidth - ballRadius;
+          x = Math.max(minX, Math.min(maxX, x));
           y = Math.max(ballRadius, y);
           
           // Check if this position overlaps with existing balls
@@ -141,9 +143,10 @@ export default function Clock() {
           attempts++;
         }
         
-        // If we couldn't find a good position, place it anyway (stacked higher)
+        // If we couldn't find a good position, place it safely within bounds
         if (!validPosition) {
-          x = cylinderLeft + ballRadius + (Math.random() * (cylinderWidth - ballRadius * 2));
+          const safeX = cylinderLeft + ballRadius + (Math.random() * (cylinderWidth - ballRadius * 2));
+          x = Math.max(cylinderLeft + ballRadius, Math.min(cylinderLeft + cylinderWidth - ballRadius, safeX));
           y = bottomY - i * ballRadius; // Stack higher if needed
         }
         
@@ -193,15 +196,17 @@ export default function Clock() {
             const currentBallSize = ball.ballSize || 16;
             const currentBallRadius = currentBallSize / 2;
 
-            // Wall collisions (cylinder walls) - allow balls to get closer to walls
-            const wallMargin = currentBallRadius * 0.1; // Much smaller margin, balls can almost touch walls
-            if (newX <= 18 + wallMargin) { // Left wall
-              newX = 18 + wallMargin;
-              newVx = -newVx * 0.8; // More bounce, less damping
+            // Wall collisions (cylinder walls) - proper boundary enforcement
+            const leftWall = 18 + currentBallRadius; // Ball center must be at least radius away from wall
+            const rightWall = 76 - currentBallRadius;
+            
+            if (newX <= leftWall) { // Left wall
+              newX = leftWall;
+              newVx = -newVx * 0.8;
             }
-            if (newX >= 76 - wallMargin) { // Right wall  
-              newX = 76 - wallMargin;
-              newVx = -newVx * 0.8; // More bounce, less damping
+            if (newX >= rightWall) { // Right wall  
+              newX = rightWall;
+              newVx = -newVx * 0.8;
             }
 
             // Check collision with other balls and bottom
@@ -215,12 +220,12 @@ export default function Clock() {
               const distance = Math.sqrt(dx * dx + dy * dy);
               const otherBallSize = otherBall.ballSize || 16;
               const otherBallRadius = otherBallSize / 2;
-              const minDistance = (currentBallRadius + otherBallRadius) * 1.1; // Slight spacing between balls
+              const minDistance = currentBallRadius + otherBallRadius; // Exact contact, no overlap
               
               if (distance < minDistance && distance > 0) {
-                // Separate balls to prevent overlap
+                // Separate balls to prevent overlap - stronger separation
                 const overlap = minDistance - distance;
-                const separationForce = overlap * 0.6;
+                const separationForce = overlap * 1.0; // Stronger separation
                 
                 const angle = Math.atan2(dy, dx);
                 newX += Math.cos(angle) * separationForce;
@@ -247,10 +252,10 @@ export default function Clock() {
               }
             }
             
-            // Bottom collision (cylinder bottom)
-            const bottomY = 320 - currentBallSize - 8; // Cylinder height minus ball size and margin
-            if (newY >= bottomY) {
-              newY = bottomY;
+            // Bottom collision (cylinder bottom) - proper boundary enforcement
+            const bottomBoundary = 320 - currentBallRadius - 8; // Ball center position at bottom
+            if (newY >= bottomBoundary) {
+              newY = bottomBoundary;
               newVy = -newVy * 0.6; // More bounce, less damping
               newVx *= 0.85; // Less friction for more natural movement
               hasCollision = true;
