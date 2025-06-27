@@ -1,0 +1,60 @@
+Last login: Fri Jun 27 16:05:10 on ttys003
+xander@alexanders-MacBook-Pro ~ % cd Downloads/xanderwalkerdotcom
+xander@alexanders-MacBook-Pro xanderwalkerdotcom % cd Downloads/[extracted-folder-name]
+
+zsh: no matches found: Downloads/[extracted-folder-name]
+xander@alexanders-MacBook-Pro xanderwalkerdotcom % git remote add origin https://github.com/xanderwalker/xander-walker-dot-com.git
+
+error: could not lock config file .git/config: File exists
+fatal: could not set 'remote.origin.url' to 'https://github.com/xanderwalker/xander-walker-dot-com.git'
+xander@alexanders-MacBook-Pro xanderwalkerdotcom % git remote set-url origin https://github.com/xanderwalker/xander-walker-dot-com.git
+
+error: No such remote 'origin'
+xander@alexanders-MacBook-Pro xanderwalkerdotcom % rm -f .git/index.lock
+
+xander@alexanders-MacBook-Pro xanderwalkerdotcom % git remote -v
+
+xander@alexanders-MacBook-Pro xanderwalkerdotcom % git remote add origin https://github.com/xanderwalker/xander-walker-dot-com.git
+
+error: could not lock config file .git/config: File exists
+fatal: could not set 'remote.origin.url' to 'https://github.com/xanderwalker/xander-walker-dot-com.git'
+xander@alexanders-MacBook-Pro xanderwalkerdotcom % git status
+
+On branch main
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+	.env
+
+nothing added to commit but untracked files present (use "git add" to track)
+xander@alexanders-MacBook-Pro xanderwalkerdotcom % git add .
+
+xander@alexanders-MacBook-Pro xanderwalkerdotcom % git commit -m "Complete website update with mobile optimizations
+- Enhanced mobile bubble navigation performance (30fps)
+- Perfected smooth paint washing effects with exponential smoothing
+- Removed eye tracking experiment
+- GPU acceleration optimizations for mobile
+- All interactive projects working optimally"
+[main 02d31fc] Complete website update with mobile optimizations - Enhanced mobile bubble navigation performance (30fps) - Perfected smooth paint washing effects with exponential smoothing - Removed eye tracking experiment - GPU acceleration optimizations for mobile - All interactive projects working optimally
+ Committer: alexander walker <xander@alexanders-MacBook-Pro.local>
+Your name and email address were configured automatically based
+on your username and hostname. Please check that they are accurate.
+You can suppress this message by setting them explicitly. Run the
+following command and follow the instructions in your editor to edit
+your configuration file:
+
+    git config --global --edit
+
+After doing this, you may fix the identity used for this commit with:
+
+    git commit --amend --reset-author
+
+ 1 file changed, 3 insertions(+)
+ create mode 100644 .env
+xander@alexanders-MacBook-Pro xanderwalkerdotcom % git push origin main
+
+fatal: 'origin' does not appear to be a git repository
+fatal: Could not read from remote repository.
+
+Please make sure you have the correct access rights
+and the repository exists.
+xander@alexanders-MacBook-Pro xanderwalkerdotcom % 
