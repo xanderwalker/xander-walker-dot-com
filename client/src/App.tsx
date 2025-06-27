@@ -15,6 +15,7 @@ import PixelClock from "@/pages/pixel-clock";
 import Roulette from "@/pages/roulette";
 import Camera from "@/pages/camera";
 import SpotifyLyrics from "@/pages/spotify-lyrics";
+import SpotifyApiTest from "@/pages/spotify-api-test";
 import Contact from "@/pages/contact";
 import NotFound from "@/pages/not-found";
 
@@ -33,6 +34,7 @@ function Router() {
       <Route path="/projects/roulette" component={Roulette} />
       <Route path="/projects/camera" component={Camera} />
       <Route path="/projects/spotify-lyrics" component={SpotifyLyrics} />
+      <Route path="/projects/spotify-api-test" component={SpotifyApiTest} />
       <Route path="/contact" component={Contact} />
       <Route component={NotFound} />
     </Switch>

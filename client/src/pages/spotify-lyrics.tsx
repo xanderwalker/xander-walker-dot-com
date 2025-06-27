@@ -463,7 +463,7 @@ export default function SpotifyLyrics() {
                               const distanceFromCenter = Math.abs(relativeIndex - 4); // Distance from center (index 4)
                               
                               // Size mapping: center=6, +/-1=5, +/-2=4, +/-3=3, +/-4=2
-                              const sizeMap = {
+                              const sizeMap: { [key: number]: string } = {
                                 0: 'text-6xl md:text-8xl', // Center line (largest)
                                 1: 'text-5xl md:text-7xl', // Adjacent lines
                                 2: 'text-4xl md:text-6xl', // 2 lines away
