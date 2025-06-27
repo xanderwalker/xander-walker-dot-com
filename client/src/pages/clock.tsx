@@ -491,6 +491,131 @@ const AmoebaWithHandsClockComponent = ({ currentTime }: { currentTime: Date }) =
 };
 
 // Year Clock Component
+const AnalogClock = ({ currentTime }: { currentTime: Date }) => {
+  const hours = currentTime.getHours() % 12;
+  const minutes = currentTime.getMinutes();
+  const seconds = currentTime.getSeconds();
+  
+  // Calculate angles for each hand
+  const secondAngle = (seconds * 6) - 90; // 6 degrees per second
+  const minuteAngle = (minutes * 6) + (seconds * 0.1) - 90; // 6 degrees per minute + smooth seconds
+  const hourAngle = (hours * 30) + (minutes * 0.5) - 90; // 30 degrees per hour + smooth minutes
+  
+  return (
+    <div className="flex flex-col items-center space-y-4">
+      <div className="relative w-80 h-80 bg-white bg-opacity-10 backdrop-blur-lg rounded-full border border-white border-opacity-30 shadow-xl">
+        {/* Clock face numbers */}
+        {[...Array(12)].map((_, i) => {
+          const number = i === 0 ? 12 : i;
+          const angle = (i * 30) - 90;
+          const x = Math.cos(angle * Math.PI / 180) * 130;
+          const y = Math.sin(angle * Math.PI / 180) * 130;
+          
+          return (
+            <div
+              key={i}
+              className="absolute text-white font-serif text-2xl font-bold"
+              style={{
+                fontFamily: 'Georgia, serif',
+                left: `calc(50% + ${x}px - 12px)`,
+                top: `calc(50% + ${y}px - 16px)`,
+                transform: 'translate(-50%, -50%)'
+              }}
+            >
+              {number}
+            </div>
+          );
+        })}
+        
+        {/* Hour markers */}
+        {[...Array(12)].map((_, i) => {
+          const angle = i * 30;
+          return (
+            <div
+              key={i}
+              className="absolute w-1 h-8 bg-white bg-opacity-60"
+              style={{
+                left: '50%',
+                top: '10px',
+                transformOrigin: 'bottom center',
+                transform: `translateX(-50%) rotate(${angle}deg)`
+              }}
+            />
+          );
+        })}
+        
+        {/* Minute markers */}
+        {[...Array(60)].map((_, i) => {
+          if (i % 5 !== 0) { // Skip hour positions
+            const angle = i * 6;
+            return (
+              <div
+                key={i}
+                className="absolute w-0.5 h-4 bg-white bg-opacity-40"
+                style={{
+                  left: '50%',
+                  top: '10px',
+                  transformOrigin: 'bottom center',
+                  transform: `translateX(-50%) rotate(${angle}deg)`
+                }}
+              />
+            );
+          }
+          return null;
+        })}
+        
+        {/* Hour hand */}
+        <div
+          className="absolute w-2 bg-white rounded-full shadow-lg z-30"
+          style={{
+            height: '80px',
+            left: '50%',
+            top: '50%',
+            transformOrigin: 'bottom center',
+            transform: `translateX(-50%) translateY(-100%) rotate(${hourAngle}deg)`
+          }}
+        />
+        
+        {/* Minute hand */}
+        <div
+          className="absolute w-1.5 bg-white rounded-full shadow-lg z-20"
+          style={{
+            height: '110px',
+            left: '50%',
+            top: '50%',
+            transformOrigin: 'bottom center',
+            transform: `translateX(-50%) translateY(-100%) rotate(${minuteAngle}deg)`
+          }}
+        />
+        
+        {/* Second hand */}
+        <div
+          className="absolute w-0.5 bg-red-400 rounded-full shadow-lg z-10"
+          style={{
+            height: '120px',
+            left: '50%',
+            top: '50%',
+            transformOrigin: 'bottom center',
+            transform: `translateX(-50%) translateY(-100%) rotate(${secondAngle}deg)`
+          }}
+        />
+        
+        {/* Center dot */}
+        <div className="absolute w-4 h-4 bg-white rounded-full shadow-lg z-40" style={{
+          left: '50%',
+          top: '50%',
+          transform: 'translate(-50%, -50%)'
+        }} />
+      </div>
+      
+      <div className="text-white text-center font-serif" style={{fontFamily: 'Georgia, serif'}}>
+        <div className="text-lg">Analog Clock</div>
+        <div className="text-sm text-gray-300">{formatTime(currentTime)}</div>
+      </div>
+    </div>
+  );
+};
+
 const YearClock = ({ currentDate }: { currentDate: Date }) => {
   const currentYear = currentDate.getFullYear();
   const currentDayOfYear = getDayOfYear(currentDate);
@@ -933,6 +1058,14 @@ export default function Clock() {
 
       {/* Clocks Display */}
       <div className="flex flex-col items-center justify-center min-h-[calc(100vh-200px)] space-y-12">
+        
+        {/* Simple Analog Clock */}
+        <div className="glassmorphism rounded-2xl p-8">
+          <h2 className="font-serif text-2xl mb-8 text-center text-black" style={{fontFamily: 'Georgia, serif'}}>
+            ANALOG CLOCK
+          </h2>
+          <AnalogClock currentTime={time} />
+        </div>
         
         {/* Enhanced Amoeba Clock with Hands */}
         <div className="glassmorphism rounded-2xl p-8">
