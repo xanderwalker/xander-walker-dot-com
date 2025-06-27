@@ -503,6 +503,46 @@ const PixelClockComponent = ({ currentTime }: { currentTime: Date }) => {
   const ballIdRef = useRef(0);
   const lastSecondRef = useRef(-1);
   const animationFrameRef = useRef<number>();
+  const initializedRef = useRef(false);
+
+  // Initialize balls based on current time
+  useEffect(() => {
+    if (!initializedRef.current) {
+      initializedRef.current = true;
+      const currentMinutes = currentTime.getMinutes();
+      const currentSeconds = currentTime.getSeconds();
+      
+      // Calculate total seconds passed in current hour
+      const totalSecondsInHour = currentMinutes * 60 + currentSeconds;
+      
+      // Create initial balls positioned properly from bottom up
+      const initialBalls: PixelBall[] = [];
+      const settledPositions = new Set<string>();
+      
+      for (let i = 0; i < totalSecondsInHour * 10; i++) {
+        let placed = false;
+        // Fill from bottom layer by layer
+        for (let y = 278; y >= 0 && !placed; y--) {
+          for (let x = 5; x <= 15 && !placed; x++) {
+            if (!settledPositions.has(`${x},${y}`)) {
+              initialBalls.push({
+                id: ballIdRef.current++,
+                x: x,
+                y: y,
+                vy: 0,
+                isSettled: true
+              });
+              settledPositions.add(`${x},${y}`);
+              placed = true;
+            }
+          }
+        }
+      }
+      
+      setPixelBalls(initialBalls);
+      lastSecondRef.current = currentSeconds;
+    }
+  }, [currentTime]);
 
   // Drop 10 balls every second
   useEffect(() => {
@@ -523,7 +563,7 @@ const PixelClockComponent = ({ currentTime }: { currentTime: Date }) => {
       for (let i = 0; i < 10; i++) {
         newBalls.push({
           id: ballIdRef.current++,
-          x: 35 + Math.random() * 10, // Random position across 10-pixel width
+          x: 5 + Math.random() * 10, // Random position across 10-pixel width (0-10 range)
           y: 0,
           vy: 0.5 + Math.random() * 0.5,
           isSettled: false
@@ -558,13 +598,13 @@ const PixelClockComponent = ({ currentTime }: { currentTime: Date }) => {
           let newIsSettled = false;
           
           const cylinderBottom = 278;
-          const cylinderLeft = 35;
-          const cylinderRight = 45;
+          const cylinderLeft = 5;
+          const cylinderRight = 15;
           
           // Add horizontal spreading force when ball is near settling
           if (ball.vy > 1) {
-            // Add small random horizontal movement for better spreading
-            newX += (Math.random() - 0.5) * 0.3;
+            // Add stronger random horizontal movement for better spreading
+            newX += (Math.random() - 0.5) * 1.5;
           }
           
           // Constrain to cylinder walls
@@ -649,7 +689,7 @@ const PixelClockComponent = ({ currentTime }: { currentTime: Date }) => {
       <div className="flex flex-col items-center">
         <div className="font-serif text-lg mb-2 text-black" style={{fontFamily: 'Georgia, serif'}}>Hour Clock</div>
         <div className="relative h-80 overflow-hidden" style={{
-          width: '50px', // 10 pixels for tube + padding
+          width: '30px', // Exactly 10 pixels for tube + minimal padding
           background: 'linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.7) 100%)',
           borderRadius: '8px',
           border: '2px solid rgba(0,0,0,0.1)',
