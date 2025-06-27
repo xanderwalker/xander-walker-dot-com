@@ -12,6 +12,7 @@ interface Ball {
   letter?: string;
   rotation?: number;
   rotationSpeed?: number;
+  isBeachBall?: boolean;
 }
 
 export default function PhysicsBalls() {
@@ -118,21 +119,19 @@ export default function PhysicsBalls() {
       });
     }
 
-    // Add floating X and W letters
-    const letters = ['X', 'W'];
+    // Add two beach balls (replacing X and W letters)
+    const beachBallColors = ['#FF6B35', '#4ECDC4']; // Orange and teal beach balls
     for (let i = 333; i < 335; i++) {
       initialBalls.push({
         id: i,
         x: Math.random() * (window.innerWidth - 60),
         y: Math.random() * (window.innerHeight - 60),
-        vx: (Math.random() - 0.5) * 3, // Faster movement for letters
-        vy: (Math.random() - 0.5) * 3,
-        size: 60, // Large size for letters
-        color: '#000000', // Black letters
-        isLetter: true,
-        letter: letters[i - 333],
-        rotation: Math.random() * 360,
-        rotationSpeed: (Math.random() - 0.5) * 8 // Random rotation speed
+        vx: (Math.random() - 0.5) * 2, // Moderate movement
+        vy: (Math.random() - 0.5) * 2,
+        size: 60, // Large beach balls
+        color: beachBallColors[i - 333],
+        isLetter: false, // No longer letters
+        isBeachBall: true // Mark as beach balls
       });
     }
 
@@ -297,7 +296,29 @@ export default function PhysicsBalls() {
   return (
     <div ref={containerRef} className="fixed inset-0 z-10">
       {balls.map(ball => (
-        ball.isLetter ? (
+        ball.isBeachBall ? (
+          <div
+            key={ball.id}
+            className="absolute rounded-full pointer-events-none"
+            style={{
+              left: ball.x,
+              top: ball.y,
+              width: ball.size,
+              height: ball.size,
+              background: `radial-gradient(circle at 30% 30%, 
+                rgba(255,255,255,0.8) 0%, 
+                ${ball.color} 20%, 
+                ${ball.color} 70%, 
+                rgba(0,0,0,0.3) 100%)`,
+              boxShadow: `
+                inset -3px -3px 8px rgba(0,0,0,0.4),
+                inset 3px 3px 8px rgba(255,255,255,0.7),
+                3px 3px 12px rgba(0,0,0,0.3)
+              `,
+              border: '2px solid rgba(255,255,255,0.4)'
+            }}
+          />
+        ) : ball.isLetter ? (
           <div
             key={ball.id}
             className="absolute pointer-events-none font-xanman-wide font-bold flex items-center justify-center"
