@@ -109,6 +109,8 @@ export default function AudioVisualizer() {
     const redirectUri = `${window.location.origin}/projects/audio-visualizer`;
     const scope = 'user-read-currently-playing user-read-playback-state user-top-read';
     
+    console.log('Redirect URI being used:', redirectUri);
+    
     const params = new URLSearchParams({
       response_type: 'code',
       client_id: clientId,
@@ -610,6 +612,9 @@ export default function AudioVisualizer() {
           <div>Connected: {isConnected ? 'YES' : 'NO'}</div>
           <div>Track: {currentTrack ? currentTrack.name : 'NONE'}</div>
           <div>Audio Features: {audioFeatures ? 'LOADED' : 'NONE'}</div>
+          <div className="mt-1 text-yellow-400">
+            Add to Spotify: {window.location.origin}/projects/audio-visualizer
+          </div>
           {audioFeatures && (
             <div className="mt-1">
               <div>Energy: {audioFeatures.energy.toFixed(2)}</div>
