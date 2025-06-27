@@ -28,17 +28,25 @@ export default function SpotifyLyrics() {
 
   // Check for access token in URL after Spotify redirect
   useEffect(() => {
+    console.log('Page loaded, checking for token...');
+    console.log('Current URL:', window.location.href);
+    console.log('Hash:', window.location.hash);
+    
     const hash = window.location.hash;
     if (hash) {
+      console.log('Found hash, parsing token...');
       const token = hash.substring(1).split('&').find(elem => elem.startsWith('access_token'))?.split('=')[1];
+      console.log('Extracted token:', token ? 'Found' : 'Not found');
       if (token) {
         setAccessToken(token);
         window.location.hash = '';
         localStorage.setItem('spotify_access_token', token);
+        console.log('Token saved to localStorage');
       }
     } else {
       // Check if token exists in localStorage
       const savedToken = localStorage.getItem('spotify_access_token');
+      console.log('Checking localStorage for saved token:', savedToken ? 'Found' : 'Not found');
       if (savedToken) {
         setAccessToken(savedToken);
       }
@@ -54,6 +62,10 @@ export default function SpotifyLyrics() {
       : `https://xanderwalker.com/projects/spotify-lyrics`;
     const SCOPES = 'user-read-currently-playing user-read-playback-state';
     
+    console.log('Starting Spotify auth...');
+    console.log('Client ID:', CLIENT_ID);
+    console.log('Redirect URI:', REDIRECT_URI);
+    
     if (!CLIENT_ID) {
       setError('Spotify Client ID not configured. Please add VITE_SPOTIFY_CLIENT_ID to environment variables.');
       return;
@@ -65,6 +77,7 @@ export default function SpotifyLyrics() {
       `redirect_uri=${encodeURIComponent(REDIRECT_URI)}&` +
       `scope=${encodeURIComponent(SCOPES)}`;
 
+    console.log('Auth URL:', authUrl);
     window.location.href = authUrl;
   };
 
