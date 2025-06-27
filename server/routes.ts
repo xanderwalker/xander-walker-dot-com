@@ -103,7 +103,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: 'Spotify credentials not configured' });
       }
 
-      const redirectUri = `${req.protocol}://${req.get('host')}/projects/audio-visualizer`;
+      const redirectUri = `${req.protocol}://${req.get('host')}/projects/spotify-lyrics`;
       
       console.log('Server using redirect URI:', redirectUri);
       console.log('Request headers host:', req.get('host'));
