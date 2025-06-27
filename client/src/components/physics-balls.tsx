@@ -12,13 +12,6 @@ interface Ball {
   letter?: string;
   rotation?: number;
   rotationSpeed?: number;
-  isBeachBall?: boolean;
-  rotationX?: number;
-  rotationY?: number;
-  rotationZ?: number;
-  rotationSpeedX?: number;
-  rotationSpeedY?: number;
-  rotationSpeedZ?: number;
 }
 
 export default function PhysicsBalls() {
@@ -125,29 +118,7 @@ export default function PhysicsBalls() {
       });
     }
 
-    // Add two beach balls (replacing X and W letters)
-    const beachBallColors = ['#FF6B35', '#4ECDC4']; // Orange and teal beach balls
-    for (let i = 333; i < 335; i++) {
-      initialBalls.push({
-        id: i,
-        x: Math.random() * (window.innerWidth - 60),
-        y: Math.random() * (window.innerHeight - 60),
-        vx: (Math.random() - 0.5) * 2, // Moderate movement
-        vy: (Math.random() - 0.5) * 2,
-        size: 60, // Large beach balls
-        color: beachBallColors[i - 333],
-        isLetter: false, // No longer letters
-        isBeachBall: true, // Mark as beach balls
-        rotation: Math.random() * 360,
-        rotationSpeed: (Math.random() - 0.5) * 4, // Rotation speed for spinning
-        rotationX: Math.random() * 360,
-        rotationY: Math.random() * 360,
-        rotationZ: Math.random() * 360,
-        rotationSpeedX: (Math.random() - 0.5) * 3,
-        rotationSpeedY: (Math.random() - 0.5) * 3,
-        rotationSpeedZ: (Math.random() - 0.5) * 3
-      });
-    }
+
 
     setBalls(initialBalls);
   }, []);
@@ -207,25 +178,11 @@ export default function PhysicsBalls() {
             newRotation += ball.rotationSpeed || 0;
           }
 
-          // Update 3D rotations for beach balls
-          let newRotationX = ball.rotationX || 0;
-          let newRotationY = ball.rotationY || 0;
-          let newRotationZ = ball.rotationZ || 0;
-          
-          if (ball.isBeachBall) {
-            newRotationX += ball.rotationSpeedX || 0;
-            newRotationY += ball.rotationSpeedY || 0;
-            newRotationZ += ball.rotationSpeedZ || 0;
-          }
-
           return {
             ...ball,
             vx: newVx,
             vy: newVy,
-            rotation: newRotation,
-            rotationX: newRotationX,
-            rotationY: newRotationY,
-            rotationZ: newRotationZ
+            rotation: newRotation
           };
         });
 
@@ -324,58 +281,7 @@ export default function PhysicsBalls() {
   return (
     <div ref={containerRef} className="fixed inset-0 z-10">
       {balls.map(ball => (
-        ball.isBeachBall ? (
-          <div
-            key={ball.id}
-            className="absolute pointer-events-none"
-            style={{
-              left: ball.x,
-              top: ball.y,
-              width: ball.size,
-              height: ball.size,
-              perspective: '1000px',
-              transformStyle: 'preserve-3d'
-            }}
-          >
-            {/* Create sphere using multiple rotated divs */}
-            {Array.from({ length: 12 }, (_, i) => (
-              <div
-                key={i}
-                className="absolute rounded-full"
-                style={{
-                  width: '100%',
-                  height: '100%',
-                  background: ball.id === 333 
-                    ? `conic-gradient(from ${i * 30}deg, #FF6B35 0deg 60deg, #FFFFFF 60deg 120deg, #4ECDC4 120deg 180deg, #FFFFFF 180deg 240deg, #FF6B35 240deg 300deg, #FFFFFF 300deg 360deg)`
-                    : `conic-gradient(from ${i * 30}deg, #E74C3C 0deg 60deg, #FFFFFF 60deg 120deg, #3498DB 120deg 180deg, #FFFFFF 180deg 240deg, #F39C12 240deg 300deg, #FFFFFF 300deg 360deg)`,
-                  transform: `
-                    rotateX(${ball.rotationX || 0}deg) 
-                    rotateY(${(ball.rotationY || 0) + i * 30}deg) 
-                    rotateZ(${ball.rotationZ || 0}deg)
-                    rotateY(${i * 15}deg)
-                  `,
-                  opacity: 0.8,
-                  mixBlendMode: 'multiply',
-                  boxShadow: `
-                    inset -2px -2px 8px rgba(0,0,0,0.3),
-                    inset 2px 2px 8px rgba(255,255,255,0.2)
-                  `
-                }}
-              />
-            ))}
-            {/* Highlight overlay */}
-            <div
-              className="absolute rounded-full"
-              style={{
-                width: '100%',
-                height: '100%',
-                background: `radial-gradient(ellipse at 30% 30%, rgba(255,255,255,0.6) 0%, transparent 50%)`,
-                transform: `rotateX(${ball.rotationX || 0}deg) rotateY(${ball.rotationY || 0}deg) rotateZ(${ball.rotationZ || 0}deg)`,
-                pointerEvents: 'none'
-              }}
-            />
-          </div>
-        ) : ball.isLetter ? (
+        ball.isLetter ? (
           <div
             key={ball.id}
             className="absolute pointer-events-none font-xanman-wide font-bold flex items-center justify-center"
