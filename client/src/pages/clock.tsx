@@ -553,12 +553,18 @@ const PixelClockComponent = ({ currentTime }: { currentTime: Date }) => {
           
           let newY = ball.y + ball.vy;
           let newX = ball.x;
-          let newVy = ball.vy + 0.05; // Gravity
+          let newVy = ball.vy + 0.08; // Increased gravity for faster settling
           let newIsSettled = false;
           
           const cylinderBottom = 278;
           const cylinderLeft = 38;
           const cylinderRight = 42;
+          
+          // Add horizontal spreading force when ball is near settling
+          if (ball.vy > 1) {
+            // Add small random horizontal movement for better spreading
+            newX += (Math.random() - 0.5) * 0.3;
+          }
           
           // Constrain to cylinder walls
           if (newX < cylinderLeft) newX = cylinderLeft;
@@ -570,49 +576,49 @@ const PixelClockComponent = ({ currentTime }: { currentTime: Date }) => {
           
           // Check if position below is occupied or at bottom
           if (roundedY >= cylinderBottom || settledPositions.has(`${roundedX},${roundedY + 1}`)) {
-            // Try to find the highest available position at this x coordinate
+            // Find the lowest available position (bottom-up filling)
             let finalY = cylinderBottom;
-            for (let y = cylinderBottom; y >= 0; y--) {
+            let finalX = roundedX;
+            let found = false;
+            
+            // Start from bottom and work up, checking each row
+            for (let y = cylinderBottom; y >= 0 && !found; y--) {
+              // Check center position first
               if (!settledPositions.has(`${roundedX},${y}`)) {
                 finalY = y;
+                finalX = roundedX;
+                found = true;
                 break;
               }
-            }
-            
-            // If no space at this x, try adjacent x positions
-            if (settledPositions.has(`${roundedX},${finalY}`)) {
-              for (let offset = 1; offset <= 2; offset++) {
-                const leftX = roundedX - offset;
-                const rightX = roundedX + offset;
+              
+              // If center occupied, spread outward
+              for (let spread = 1; spread <= 2 && !found; spread++) {
+                const leftX = roundedX - spread;
+                const rightX = roundedX + spread;
                 
-                if (leftX >= cylinderLeft) {
-                  for (let y = cylinderBottom; y >= 0; y--) {
-                    if (!settledPositions.has(`${leftX},${y}`)) {
-                      newX = leftX;
-                      finalY = y;
-                      break;
-                    }
-                  }
-                  if (!settledPositions.has(`${leftX},${finalY}`)) break;
+                // Try left side
+                if (leftX >= cylinderLeft && !settledPositions.has(`${leftX},${y}`)) {
+                  finalY = y;
+                  finalX = leftX;
+                  found = true;
+                  break;
                 }
                 
-                if (rightX <= cylinderRight) {
-                  for (let y = cylinderBottom; y >= 0; y--) {
-                    if (!settledPositions.has(`${rightX},${y}`)) {
-                      newX = rightX;
-                      finalY = y;
-                      break;
-                    }
-                  }
-                  if (!settledPositions.has(`${rightX},${finalY}`)) break;
+                // Try right side
+                if (rightX <= cylinderRight && !settledPositions.has(`${rightX},${y}`)) {
+                  finalY = y;
+                  finalX = rightX;
+                  found = true;
+                  break;
                 }
               }
             }
             
             newY = finalY;
+            newX = finalX;
             newVy = 0;
             newIsSettled = true;
-            settledPositions.add(`${Math.round(newX)},${finalY}`);
+            settledPositions.add(`${finalX},${finalY}`);
           }
           
           return {
