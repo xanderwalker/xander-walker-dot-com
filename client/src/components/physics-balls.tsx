@@ -305,17 +305,10 @@ export default function PhysicsBalls() {
               top: ball.y,
               width: ball.size,
               height: ball.size,
-              background: `radial-gradient(circle at 30% 30%, 
-                rgba(255,255,255,0.8) 0%, 
-                ${ball.color} 20%, 
-                ${ball.color} 70%, 
-                rgba(0,0,0,0.3) 100%)`,
-              boxShadow: `
-                inset -3px -3px 8px rgba(0,0,0,0.4),
-                inset 3px 3px 8px rgba(255,255,255,0.7),
-                3px 3px 12px rgba(0,0,0,0.3)
-              `,
-              border: '2px solid rgba(255,255,255,0.4)'
+              background: ball.id === 333 
+                ? `conic-gradient(from 0deg, #FF6B35 0deg 60deg, #FFFFFF 60deg 120deg, #4ECDC4 120deg 180deg, #FFFFFF 180deg 240deg, #FF6B35 240deg 300deg, #FFFFFF 300deg 360deg)`
+                : `conic-gradient(from 0deg, #E74C3C 0deg 60deg, #FFFFFF 60deg 120deg, #3498DB 120deg 180deg, #FFFFFF 180deg 240deg, #F39C12 240deg 300deg, #FFFFFF 300deg 360deg)`,
+              border: '2px solid #333333'
             }}
           />
         ) : ball.isLetter ? (
