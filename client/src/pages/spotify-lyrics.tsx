@@ -44,13 +44,25 @@ export default function SpotifyLyrics() {
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const code = urlParams.get('code');
+    const returnTo = urlParams.get('return');
     
     if (code) {
-      handleAuthCallback(code);
+      handleAuthCallback(code).then(() => {
+        // If there's a return parameter, redirect after successful auth
+        if (returnTo === 'audio-visualizer') {
+          setTimeout(() => {
+            window.location.href = '/projects/audio-visualizer';
+          }, 1000);
+        }
+      });
     } else {
       const storedToken = localStorage.getItem('spotify_access_token');
       if (storedToken) {
         setAccessToken(storedToken);
+        // If user already has token and there's a return parameter, redirect immediately
+        if (returnTo === 'audio-visualizer') {
+          window.location.href = '/projects/audio-visualizer';
+        }
       }
     }
   }, []);

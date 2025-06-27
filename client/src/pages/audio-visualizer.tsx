@@ -99,31 +99,8 @@ export default function AudioVisualizer() {
   };
 
   const loginToSpotify = () => {
-    // Clear any existing token to force fresh auth
-    localStorage.removeItem('spotify_access_token');
-    setAccessToken(null);
-    setIsConnected(false);
-    setShowMinimized(false);
-    
-    const clientId = import.meta.env.VITE_SPOTIFY_CLIENT_ID;
-    const redirectUri = `${window.location.origin}/projects/audio-visualizer`;
-    const scope = 'user-read-currently-playing user-read-playback-state user-top-read';
-    
-    console.log('Client using redirect URI:', redirectUri);
-    console.log('Window location origin:', window.location.origin);
-    
-    const params = new URLSearchParams({
-      response_type: 'code',
-      client_id: clientId,
-      scope: scope,
-      redirect_uri: redirectUri,
-      code_challenge_method: 'S256',
-      code_challenge: 'dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk',
-      state: 'spotify-auth',
-      show_dialog: 'true' // Force consent screen to show new permissions
-    });
-
-    window.location.href = `https://accounts.spotify.com/authorize?${params}`;
+    // Use the lyrics page for authentication since it's already working
+    window.location.href = '/projects/spotify-lyrics?return=audio-visualizer';
   };
 
   // Paint swirling effects
