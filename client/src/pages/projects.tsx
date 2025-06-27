@@ -4,6 +4,12 @@ import Layout from '../components/layout';
 export default function Projects() {
   const projects = [
     {
+      title: "EYE TRACKING",
+      description: "Real-time eye movement detection using front camera. Animated eyes mirror your gaze direction and blink patterns with computer vision analysis.",
+      tags: "Computer Vision • Camera • Real-time",
+      link: "/projects/eye-tracking"
+    },
+    {
       title: "MONET PAINT SWIRLING",
       description: "Interactive paint mixing inspired by Claude Monet's water lily paintings. Mouse movement or device tilting creates beautiful color gradients that blend and morph in real-time like watercolors.",
       tags: "Interactive • Art • Sensors",
