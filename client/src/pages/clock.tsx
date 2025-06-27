@@ -13,6 +13,14 @@ interface Ball {
   color?: string;
 }
 
+interface PixelBall {
+  id: number;
+  x: number;
+  y: number;
+  vy: number;
+  isSettled: boolean;
+}
+
 // Function to generate random ball colors
 const getBallColor = (type: 'second' | 'minute' | 'hour') => {
   const colors = {
@@ -490,6 +498,189 @@ const AmoebaWithHandsClockComponent = ({ currentTime }: { currentTime: Date }) =
   );
 };
 
+const PixelClockComponent = ({ currentTime }: { currentTime: Date }) => {
+  const [pixelBalls, setPixelBalls] = useState<PixelBall[]>([]);
+  const ballIdRef = useRef(0);
+  const lastSecondRef = useRef(-1);
+  const animationFrameRef = useRef<number>();
+
+  // Drop 10 balls every second
+  useEffect(() => {
+    const currentSecond = currentTime.getSeconds();
+    
+    if (lastSecondRef.current !== currentSecond) {
+      lastSecondRef.current = currentSecond;
+      
+      // Clear all balls at the start of each minute
+      if (currentSecond === 0) {
+        setPixelBalls([]);
+        return;
+      }
+      
+      // Drop 10 new pixel balls
+      const newBalls: PixelBall[] = [];
+      for (let i = 0; i < 10; i++) {
+        newBalls.push({
+          id: ballIdRef.current++,
+          x: 38 + Math.random() * 4, // Random position across cylinder width
+          y: 0,
+          vy: 0.5 + Math.random() * 0.5,
+          isSettled: false
+        });
+      }
+      
+      setPixelBalls(prev => [...prev, ...newBalls]);
+    }
+  }, [currentTime]);
+
+  // Physics animation for sand-like stacking
+  useEffect(() => {
+    const animate = () => {
+      setPixelBalls(prev => {
+        const settledPositions = new Set<string>();
+        const newBalls = [...prev];
+        
+        // First pass: record all settled ball positions
+        newBalls.forEach(ball => {
+          if (ball.isSettled) {
+            settledPositions.add(`${Math.round(ball.x)},${Math.round(ball.y)}`);
+          }
+        });
+        
+        // Second pass: update moving balls
+        return newBalls.map(ball => {
+          if (ball.isSettled) return ball;
+          
+          let newY = ball.y + ball.vy;
+          let newX = ball.x;
+          let newVy = ball.vy + 0.05; // Gravity
+          let newIsSettled = false;
+          
+          const cylinderBottom = 278;
+          const cylinderLeft = 38;
+          const cylinderRight = 42;
+          
+          // Constrain to cylinder walls
+          if (newX < cylinderLeft) newX = cylinderLeft;
+          if (newX > cylinderRight) newX = cylinderRight;
+          
+          // Check collision with bottom or other balls
+          const roundedX = Math.round(newX);
+          const roundedY = Math.round(newY);
+          
+          // Check if position below is occupied or at bottom
+          if (roundedY >= cylinderBottom || settledPositions.has(`${roundedX},${roundedY + 1}`)) {
+            // Try to find the highest available position at this x coordinate
+            let finalY = cylinderBottom;
+            for (let y = cylinderBottom; y >= 0; y--) {
+              if (!settledPositions.has(`${roundedX},${y}`)) {
+                finalY = y;
+                break;
+              }
+            }
+            
+            // If no space at this x, try adjacent x positions
+            if (settledPositions.has(`${roundedX},${finalY}`)) {
+              for (let offset = 1; offset <= 2; offset++) {
+                const leftX = roundedX - offset;
+                const rightX = roundedX + offset;
+                
+                if (leftX >= cylinderLeft) {
+                  for (let y = cylinderBottom; y >= 0; y--) {
+                    if (!settledPositions.has(`${leftX},${y}`)) {
+                      newX = leftX;
+                      finalY = y;
+                      break;
+                    }
+                  }
+                  if (!settledPositions.has(`${leftX},${finalY}`)) break;
+                }
+                
+                if (rightX <= cylinderRight) {
+                  for (let y = cylinderBottom; y >= 0; y--) {
+                    if (!settledPositions.has(`${rightX},${y}`)) {
+                      newX = rightX;
+                      finalY = y;
+                      break;
+                    }
+                  }
+                  if (!settledPositions.has(`${rightX},${finalY}`)) break;
+                }
+              }
+            }
+            
+            newY = finalY;
+            newVy = 0;
+            newIsSettled = true;
+            settledPositions.add(`${Math.round(newX)},${finalY}`);
+          }
+          
+          return {
+            ...ball,
+            x: newX,
+            y: newY,
+            vy: newVy,
+            isSettled: newIsSettled
+          };
+        });
+      });
+      
+      animationFrameRef.current = requestAnimationFrame(animate);
+    };
+
+    animationFrameRef.current = requestAnimationFrame(animate);
+    
+    return () => {
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+      }
+    };
+  }, []);
+
+  return (
+    <div className="flex justify-center">
+      <div className="flex flex-col items-center">
+        <div className="font-serif text-lg mb-2 text-black" style={{fontFamily: 'Georgia, serif'}}>Seconds</div>
+        <div className="relative w-20 h-80 overflow-hidden" style={{
+          background: 'linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.7) 100%)',
+          borderRadius: '8px',
+          border: '2px solid rgba(0,0,0,0.1)',
+          boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.1)'
+        }}>
+          
+          {/* Second markers */}
+          {[...Array(12)].map((_, i) => (
+            <div key={i} className="absolute left-0 text-xs text-gray-600" style={{
+              fontFamily: 'Georgia, serif',
+              top: `${(i + 1) * (280 / 12) - 8}px`,
+              fontSize: '8px'
+            }}>
+              {60 - (i + 1) * 5}
+            </div>
+          ))}
+          
+          {/* Render pixel balls */}
+          {pixelBalls.map(ball => (
+            <div
+              key={ball.id}
+              className="absolute w-1 h-1 bg-blue-600"
+              style={{
+                left: `${ball.x}px`,
+                top: `${ball.y}px`
+              }}
+            />
+          ))}
+          
+        </div>
+        <div className="text-sm mt-2 text-center text-black font-serif" style={{fontFamily: 'Georgia, serif'}}>
+          <div>Balls: {pixelBalls.length}</div>
+          <div>Settled: {pixelBalls.filter(b => b.isSettled).length}</div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const YearClock = ({ currentDate }: { currentDate: Date }) => {
   const currentYear = currentDate.getFullYear();
   const currentDayOfYear = getDayOfYear(currentDate);
@@ -932,6 +1123,14 @@ export default function Clock() {
 
       {/* Clocks Display */}
       <div className="flex flex-col items-center justify-center min-h-[calc(100vh-200px)] space-y-12">
+        
+        {/* Pixel Ball Drop Clock */}
+        <div className="glassmorphism rounded-2xl p-8">
+          <h2 className="font-serif text-2xl mb-8 text-center text-black" style={{fontFamily: 'Georgia, serif'}}>
+            PIXEL BALL CLOCK
+          </h2>
+          <PixelClockComponent currentTime={time} />
+        </div>
         
         {/* Enhanced Amoeba Clock with Hands */}
         <div className="glassmorphism rounded-2xl p-8">
