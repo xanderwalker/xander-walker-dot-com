@@ -105,6 +105,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const redirectUri = `${req.protocol}://${req.get('host')}/projects/audio-visualizer`;
       
+      console.log('Server using redirect URI:', redirectUri);
+      console.log('Request headers host:', req.get('host'));
+      console.log('Request protocol:', req.protocol);
+      
       const tokenResponse = await fetch('https://accounts.spotify.com/api/token', {
         method: 'POST',
         headers: {

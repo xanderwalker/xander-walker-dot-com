@@ -109,7 +109,8 @@ export default function AudioVisualizer() {
     const redirectUri = `${window.location.origin}/projects/audio-visualizer`;
     const scope = 'user-read-currently-playing user-read-playback-state user-top-read';
     
-    console.log('Redirect URI being used:', redirectUri);
+    console.log('Client using redirect URI:', redirectUri);
+    console.log('Window location origin:', window.location.origin);
     
     const params = new URLSearchParams({
       response_type: 'code',
