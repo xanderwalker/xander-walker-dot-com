@@ -50,86 +50,75 @@ const YearClock = ({ currentDate }: { currentDate: Date }) => {
   const currentDayOfYear = getDayOfYear(currentDate);
   const totalDays = 365;
   
-  // Quarter boundaries (approximately)
-  const quarters = [
-    { name: 'Q1', end: 90 },   // ~March 31
-    { name: 'Q2', end: 181 },  // ~June 30
-    { name: 'Q3', end: 273 },  // ~September 30
-    { name: 'Q4', end: 365 }   // December 31
-  ];
-  
   return (
     <div className="w-full max-w-5xl">
       <div className="text-center mb-6">
-        <h3 className="font-serif text-lg text-black mb-1" style={{fontFamily: 'Georgia, serif'}}>
-          Year Progress {currentYear}
+        <h3 className="font-xanman-wide text-lg text-black mb-1">
+          YEAR PROGRESS {currentYear}
         </h3>
-        <div className="font-serif text-2xl font-bold text-black" style={{fontFamily: 'Georgia, serif'}}>
+        <div className="font-xanman-wide text-2xl font-bold text-black">
           {Math.round((currentDayOfYear / totalDays) * 100)}%
         </div>
-        <div className="text-sm text-gray-600">
-          Day {currentDayOfYear} of {totalDays}
+        <div className="font-xanman-wide text-sm text-gray-600">
+          DAY {currentDayOfYear} OF {totalDays}
         </div>
       </div>
       
-      {/* Quarter Labels */}
-      <div className="flex justify-between mb-2 px-1">
-        {quarters.map((quarter, index) => (
-          <div key={quarter.name} className="text-xs text-gray-600 font-serif" style={{fontFamily: 'Georgia, serif'}}>
-            {quarter.name}
-          </div>
-        ))}
-      </div>
-      
-      {/* Progress Bar with Hash Marks */}
+      {/* Glass Progress Bar */}
       <div className="relative">
-        {/* Background bar */}
-        <div className="w-full h-6 bg-gray-200 rounded-lg overflow-hidden">
-          {/* Progress fill */}
+        {/* Glass background bar */}
+        <div 
+          className="w-full h-8 rounded-lg overflow-hidden"
+          style={{
+            background: 'linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(230,230,230,0.6) 50%, rgba(255,255,255,0.9) 100%)',
+            border: '2px solid rgba(200,200,200,0.6)',
+            boxShadow: 'inset -4px 0 8px rgba(0,0,0,0.1), inset 4px 0 8px rgba(255,255,255,0.4), 0 4px 16px rgba(0,0,0,0.15)',
+            backdropFilter: 'blur(2px)'
+          }}
+        >
+          {/* Red progress fill */}
           <div 
-            className="h-full bg-gradient-to-r from-gray-700 to-gray-800 transition-all duration-1000"
-            style={{ width: `${(currentDayOfYear / totalDays) * 100}%` }}
+            className="h-full transition-all duration-1000"
+            style={{ 
+              width: `${(currentDayOfYear / totalDays) * 100}%`,
+              background: 'linear-gradient(135deg, #FF4444 0%, #CC0000 50%, #FF4444 100%)',
+              boxShadow: 'inset 0 2px 4px rgba(255,255,255,0.3), inset 0 -2px 4px rgba(0,0,0,0.2)'
+            }}
           />
+          
+          {/* Glass highlight effects */}
+          <div className="absolute top-1 left-1 right-1 h-1 bg-gradient-to-r from-white via-transparent to-transparent opacity-60 rounded-full"></div>
+          <div className="absolute bottom-1 left-1 right-1 h-1 bg-gradient-to-r from-transparent via-black to-transparent opacity-20 rounded-full"></div>
           
           {/* Current day indicator */}
           <div 
-            className="absolute top-0 w-1 h-6 bg-blue-500 shadow-lg"
-            style={{ left: `${(currentDayOfYear / totalDays) * 100}%` }}
+            className="absolute top-0 w-1 h-8 bg-white shadow-lg"
+            style={{ 
+              left: `${(currentDayOfYear / totalDays) * 100}%`,
+              boxShadow: '0 0 8px rgba(255,255,255,0.8), inset 0 0 4px rgba(0,0,0,0.3)'
+            }}
           />
         </div>
         
         {/* Hash marks for every 5 days */}
-        <div className="absolute top-0 w-full h-6 pointer-events-none">
+        <div className="absolute top-0 w-full h-8 pointer-events-none">
           {Array.from({ length: Math.floor(totalDays / 5) }, (_, i) => {
             const day = (i + 1) * 5;
-            const isQuarterEnd = quarters.some(q => Math.abs(q.end - day) < 3);
             return (
               <div
                 key={day}
-                className={`absolute top-0 ${isQuarterEnd ? 'w-0.5 h-6 bg-black' : 'w-px h-3 bg-gray-500'}`}
+                className="absolute top-1 w-px h-6 bg-black opacity-30"
                 style={{ left: `${(day / totalDays) * 100}%` }}
               />
             );
           })}
         </div>
-        
-        {/* Quarter dividers */}
-        {quarters.slice(0, 3).map((quarter) => (
-          <div
-            key={quarter.name}
-            className="absolute top-0 w-0.5 h-6 bg-black"
-            style={{ left: `${(quarter.end / totalDays) * 100}%` }}
-          />
-        ))}
       </div>
       
-      {/* Day scale */}
-      <div className="flex justify-between mt-2 text-xs text-gray-500">
-        <span>Jan 1</span>
-        <span>Apr 1</span>
-        <span>Jul 1</span>
-        <span>Oct 1</span>
-        <span>Dec 31</span>
+      {/* Simple day markers */}
+      <div className="flex justify-between mt-3 font-xanman-wide text-xs text-gray-500">
+        <span>JAN 1</span>
+        <span>DEC 31</span>
       </div>
     </div>
   );
