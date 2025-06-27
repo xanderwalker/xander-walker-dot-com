@@ -192,7 +192,7 @@ export default function SpotifyLyrics() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
-          song: songName, 
+          track: songName, 
           artist: artist,
           trackId: spotifyId
         })
