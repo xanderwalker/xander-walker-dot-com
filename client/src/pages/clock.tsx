@@ -196,7 +196,7 @@ export default function Clock() {
             let newX = ball.x + ball.vx;
             let newY = ball.y + ball.vy;
             let newVx = ball.vx;
-            let newVy = ball.vy + 0.6; // Stronger gravity for more bounce
+            let newVy = ball.vy + 1.2; // Much stronger gravity for heavier balls
             
             // Calculate depth-based stability (balls lower in cylinder are more stable)
             const cylinderHeight = 320;
@@ -218,11 +218,11 @@ export default function Clock() {
             
             if (newX <= leftWall) { // Left wall
               newX = leftWall;
-              newVx = -newVx * 0.8;
+              newVx = -newVx * 0.4; // Less bounce for heavier balls
             }
             if (newX >= rightWall) { // Right wall  
               newX = rightWall;
-              newVx = -newVx * 0.8;
+              newVx = -newVx * 0.4; // Less bounce for heavier balls
             }
 
             // Check collision with other balls and bottom
@@ -252,15 +252,15 @@ export default function Clock() {
                 const otherStabilityFactor = Math.pow(otherDepthRatio, 2);
                 const avgStability = (stabilityFactor + otherStabilityFactor) / 2;
                 
-                const bounceForce = 2.0 * (1 - avgStability * 0.6); // Reduce bounce for stable balls
+                const bounceForce = 1.0 * (1 - avgStability * 0.6); // Reduced bounce force for heavier balls
                 const relativeVelocity = Math.sqrt((ball.vx - otherBall.vx) ** 2 + (ball.vy - otherBall.vy) ** 2);
                 const velocityMultiplier = Math.max(0.3, Math.min(2.0, relativeVelocity * 0.3));
                 
                 newVx += Math.cos(angle) * bounceForce * velocityMultiplier;
                 newVy += Math.sin(angle) * bounceForce * velocityMultiplier;
                 
-                // More damping for deeper balls
-                const dampingFactor = 0.9 - (stabilityFactor * 0.3);
+                // More damping for heavier balls
+                const dampingFactor = 0.8 - (stabilityFactor * 0.4);
                 newVx *= dampingFactor;
                 newVy *= dampingFactor;
                 
@@ -272,8 +272,8 @@ export default function Clock() {
             const bottomBoundary = 320 - currentBallRadius - 8; // Ball center position at bottom
             if (newY >= bottomBoundary) {
               newY = bottomBoundary;
-              newVy = -newVy * 0.6; // More bounce, less damping
-              newVx *= 0.85; // Less friction for more natural movement
+              newVy = -newVy * 0.3; // Less bounce for heavier balls
+              newVx *= 0.7; // More friction for heavier feel
               hasCollision = true;
             }
             
