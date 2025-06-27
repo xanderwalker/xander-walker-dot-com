@@ -152,17 +152,24 @@ export default function AudioVisualizer() {
 
   // Get current track and audio features
   const getCurrentTrack = async () => {
-    if (!accessToken) return;
+    if (!accessToken) {
+      console.log('No access token available');
+      return;
+    }
     
     setLoading(true);
     try {
+      console.log('Making API call to get current track...');
       const response = await fetch('https://api.spotify.com/v1/me/player/currently-playing', {
         headers: {
           'Authorization': `Bearer ${accessToken}`
         }
       });
 
+      console.log('Current track API response status:', response.status);
+
       if (response.status === 204) {
+        console.log('No track currently playing (204 response)');
         setCurrentTrack(null);
         setAudioFeatures(null);
         return;
@@ -170,7 +177,10 @@ export default function AudioVisualizer() {
 
       if (response.ok) {
         const data = await response.json();
+        console.log('Current track data:', data);
+        
         if (data.item) {
+          console.log('Setting current track:', data.item.name, 'by', data.item.artists[0]?.name, 'playing:', data.is_playing);
           setCurrentTrack({
             id: data.item.id,
             name: data.item.name,
@@ -182,11 +192,19 @@ export default function AudioVisualizer() {
           });
           
           // Fetch audio features
+          console.log('Fetching audio features for track ID:', data.item.id);
           await getAudioFeatures(data.item.id);
+        } else {
+          console.log('No track item in response');
+        }
+      } else {
+        console.error('Failed to get current track:', response.status, response.statusText);
+        if (response.status === 401) {
+          console.log('Access token may be expired');
         }
       }
     } catch (err) {
-      console.error('Failed to get current track');
+      console.error('Failed to get current track:', err);
     } finally {
       setLoading(false);
     }
@@ -196,6 +214,7 @@ export default function AudioVisualizer() {
     if (!accessToken) return;
     
     try {
+      console.log('Fetching audio features for track:', trackId);
       const response = await fetch(`https://api.spotify.com/v1/audio-features/${trackId}`, {
         headers: {
           'Authorization': `Bearer ${accessToken}`
@@ -204,18 +223,27 @@ export default function AudioVisualizer() {
 
       if (response.ok) {
         const features = await response.json();
+        console.log('Audio features received:', features);
         setAudioFeatures(features);
+      } else {
+        console.error('Audio features API failed:', response.status, response.statusText);
+        const errorText = await response.text();
+        console.error('Error details:', errorText);
       }
     } catch (err) {
-      console.error('Failed to get audio features');
+      console.error('Failed to get audio features:', err);
     }
   };
 
   // Auto-refresh
   useEffect(() => {
     if (accessToken) {
+      console.log('Starting auto-refresh with access token');
       getCurrentTrack();
-      const interval = setInterval(getCurrentTrack, 10000); // Every 10 seconds
+      const interval = setInterval(() => {
+        console.log('Auto-refreshing current track...');
+        getCurrentTrack();
+      }, 5000); // Every 5 seconds
       return () => clearInterval(interval);
     }
   }, [accessToken]);
@@ -544,9 +572,32 @@ export default function AudioVisualizer() {
             <div className="text-white/60 font-xanman-wide truncate" style={{fontSize: '40px', lineHeight: '1.2'}}>
               {currentTrack.artists[0]?.name}
             </div>
+            {/* Debug info */}
+            <div className="text-white/40 font-xanman-wide text-xs mt-2">
+              Playing: {currentTrack.is_playing ? 'YES' : 'NO'} | 
+              Features: {audioFeatures ? 'YES' : 'NO'} |
+              Energy: {audioFeatures?.energy.toFixed(2) || 'N/A'}
+            </div>
           </div>
         </div>
       )}
+
+      {/* Debug panel for troubleshooting */}
+      <div className="absolute top-6 right-6 z-20 max-w-sm">
+        <div className="bg-black/20 backdrop-blur-sm rounded-lg px-4 py-2 border border-white/10 text-white/60 text-xs">
+          <div>Token: {accessToken ? 'YES' : 'NO'}</div>
+          <div>Connected: {isConnected ? 'YES' : 'NO'}</div>
+          <div>Track: {currentTrack ? currentTrack.name : 'NONE'}</div>
+          <div>Audio Features: {audioFeatures ? 'LOADED' : 'NONE'}</div>
+          {audioFeatures && (
+            <div className="mt-1">
+              <div>Energy: {audioFeatures.energy.toFixed(2)}</div>
+              <div>Dance: {audioFeatures.danceability.toFixed(2)}</div>
+              <div>Mood: {audioFeatures.valence.toFixed(2)}</div>
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 }
