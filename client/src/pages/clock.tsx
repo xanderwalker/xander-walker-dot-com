@@ -815,62 +815,6 @@ export default function Clock() {
   const ballIdRef = useRef(0);
   const lastSecondRef = useRef(-1);
   const animationFrameRef = useRef<number>();
-  
-  // Paint swirling state
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-  const [deviceMotion, setDeviceMotion] = useState({ x: 0, y: 0, z: 0 });
-  const backgroundRef = useRef<HTMLDivElement>(null);
-
-  // Mouse movement for paint swirling (desktop)
-  useEffect(() => {
-    const handleMouseMove = (event: MouseEvent) => {
-      const x = (event.clientX / window.innerWidth) * 100;
-      const y = (event.clientY / window.innerHeight) * 100;
-      setMousePosition({ x, y });
-      
-      // Update CSS custom properties for paint swirling
-      if (backgroundRef.current) {
-        backgroundRef.current.style.setProperty('--mouse-x', `${x}%`);
-        backgroundRef.current.style.setProperty('--mouse-y', `${y}%`);
-      }
-    };
-
-    window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
-  }, []);
-
-  // Device motion for paint swirling (mobile)
-  useEffect(() => {
-    const handleDeviceMotion = (event: DeviceMotionEvent) => {
-      if (event.accelerationIncludingGravity) {
-        const x = Math.max(-50, Math.min(50, (event.accelerationIncludingGravity.x || 0) * 5));
-        const y = Math.max(-50, Math.min(50, (event.accelerationIncludingGravity.y || 0) * 5));
-        const z = Math.max(-50, Math.min(50, (event.accelerationIncludingGravity.z || 0) * 5));
-        
-        setDeviceMotion({ x, y, z });
-        
-        // Update CSS custom properties for paint swirling
-        if (backgroundRef.current) {
-          backgroundRef.current.style.setProperty('--tilt-x', `${x + 50}%`);
-          backgroundRef.current.style.setProperty('--tilt-y', `${y + 50}%`);
-          backgroundRef.current.style.setProperty('--tilt-z', `${z + 50}%`);
-        }
-      }
-    };
-
-    // Request permission for device motion on iOS
-    if (typeof DeviceMotionEvent !== 'undefined' && typeof (DeviceMotionEvent as any).requestPermission === 'function') {
-      (DeviceMotionEvent as any).requestPermission().then((response: string) => {
-        if (response === 'granted') {
-          window.addEventListener('devicemotion', handleDeviceMotion);
-        }
-      });
-    } else {
-      window.addEventListener('devicemotion', handleDeviceMotion);
-    }
-
-    return () => window.removeEventListener('devicemotion', handleDeviceMotion);
-  }, []);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -1255,18 +1199,8 @@ export default function Clock() {
 
   return (
     <div className="min-h-screen relative overflow-hidden">
-      {/* Interactive paint swirling background */}
-      <div 
-        ref={backgroundRef}
-        className="fixed inset-0 paint-swirl-bg -z-10" 
-        style={{
-          '--mouse-x': '50%',
-          '--mouse-y': '50%',
-          '--tilt-x': '50%',
-          '--tilt-y': '50%',
-          '--tilt-z': '50%'
-        } as React.CSSProperties}
-      />
+      {/* Morphing sunset background */}
+      <div className="fixed inset-0 sunset-morphing-bg -z-10" />
       
       {/* Header with navigation back to projects */}
       <header className="p-8 flex justify-between items-center relative z-10">
@@ -1285,100 +1219,74 @@ export default function Clock() {
         <div className="w-48"></div> {/* Spacer for center alignment */}
       </header>
 
-      {/* Clock Cards Display */}
-      <div className="flex flex-col items-center justify-center min-h-[calc(100vh-200px)] space-y-8">
-        <div className="text-center mb-8">
-          <h2 className="font-serif text-3xl text-white mb-4" style={{fontFamily: 'Georgia, serif'}}>
-            INTERACTIVE CLOCKS
+      {/* Clocks Display */}
+      <div className="flex flex-col items-center justify-center min-h-[calc(100vh-200px)] space-y-12">
+        
+        {/* Pixel Ball Drop Clock */}
+        <div className="glassmorphism rounded-2xl p-8">
+          <h2 className="font-serif text-2xl mb-8 text-center text-black" style={{fontFamily: 'Georgia, serif'}}>
+            PIXEL BALL CLOCK
           </h2>
-          <p className="text-white/80 font-serif" style={{fontFamily: 'Georgia, serif'}}>
-            Choose a clock experience to explore
-          </p>
+          <PixelClockComponent currentTime={time} />
+        </div>
+        
+        {/* Enhanced Amoeba Clock with Hands */}
+        <div className="glassmorphism rounded-2xl p-8">
+          <h2 className="font-xanman-wide text-2xl mb-8 text-center text-black">
+            AMOEBA ANALOG CLOCK
+          </h2>
+          <AmoebaWithHandsClockComponent currentTime={time} />
+        </div>
+        
+        {/* Amoeba Clock */}
+        <div className="glassmorphism rounded-2xl p-8">
+          <h2 className="font-xanman-wide text-2xl mb-8 text-center text-black">
+            AMOEBA CLOCK
+          </h2>
+          <AmoebaClockComponent currentTime={time} />
+        </div>
+        
+        {/* Year Clock */}
+        <div className="glassmorphism rounded-2xl p-8 w-full max-w-6xl">
+          <h2 className="font-serif text-2xl mb-8 text-center text-black" style={{fontFamily: 'Georgia, serif'}}>
+            Year Progress Clock
+          </h2>
+          <YearClock currentDate={time} />
+        </div>
+        
+        {/* Graduated Cylinder Clock */}
+        <div className="glassmorphism rounded-2xl p-8">
+          <h2 className="font-serif text-2xl mb-8 text-center text-black" style={{fontFamily: 'Georgia, serif'}}>
+            Ball Drop Clock
+          </h2>
+          <div className="flex justify-center space-x-8">
+            <GraduatedCylinder 
+              balls={hourBalls} 
+              maxBalls={12} 
+              label="Hours" 
+              unit="hrs"
+            />
+            <GraduatedCylinder 
+              balls={minuteBalls} 
+              maxBalls={60} 
+              label="Minutes" 
+              unit="min"
+            />
+            <GraduatedCylinder 
+              balls={secondBalls} 
+              maxBalls={60} 
+              label="Seconds" 
+              unit="sec"
+            />
+          </div>
         </div>
 
-        {/* Clock Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-4xl px-4">
-          
-          {/* Hourglass Clock Card */}
-          <Link href="/projects/clock/hourglass">
-            <div className="glassmorphism rounded-2xl p-6 hover:scale-105 transition-transform duration-300 cursor-pointer group">
-              <h3 className="font-serif text-xl text-white mb-3" style={{fontFamily: 'Georgia, serif'}}>
-                Hourglass Clock
-              </h3>
-              <p className="text-white/70 text-sm mb-4 font-serif" style={{fontFamily: 'Georgia, serif'}}>
-                Watch sand grains fall and stack realistically in real-time
-              </p>
-              <div className="flex items-center justify-between">
-                <span className="text-white/60 text-xs font-serif" style={{fontFamily: 'Georgia, serif'}}>
-                  Physics Simulation
-                </span>
-                <span className="text-white group-hover:translate-x-1 transition-transform">→</span>
-              </div>
-            </div>
-          </Link>
-
-          {/* Sphere Clock Card */}
-          <Link href="/projects/clock/sphere">
-            <div className="glassmorphism rounded-2xl p-6 hover:scale-105 transition-transform duration-300 cursor-pointer group">
-              <h3 className="font-serif text-xl text-white mb-3" style={{fontFamily: 'Georgia, serif'}}>
-                Sphere Clock
-              </h3>
-              <p className="text-white/70 text-sm mb-4 font-serif" style={{fontFamily: 'Georgia, serif'}}>
-                Organic blob-like time display with fluid animations
-              </p>
-              <div className="flex items-center justify-between">
-                <span className="text-white/60 text-xs font-serif" style={{fontFamily: 'Georgia, serif'}}>
-                  Organic Animation
-                </span>
-                <span className="text-white group-hover:translate-x-1 transition-transform">→</span>
-              </div>
-            </div>
-          </Link>
-
-          {/* Hand Clock Card */}
-          <Link href="/projects/clock/hand">
-            <div className="glassmorphism rounded-2xl p-6 hover:scale-105 transition-transform duration-300 cursor-pointer group">
-              <h3 className="font-serif text-xl text-white mb-3" style={{fontFamily: 'Georgia, serif'}}>
-                Hand Clock
-              </h3>
-              <p className="text-white/70 text-sm mb-4 font-serif" style={{fontFamily: 'Georgia, serif'}}>
-                Traditional analog clock with fluid, organic hands
-              </p>
-              <div className="flex items-center justify-between">
-                <span className="text-white/60 text-xs font-serif" style={{fontFamily: 'Georgia, serif'}}>
-                  Analog Design
-                </span>
-                <span className="text-white group-hover:translate-x-1 transition-transform">→</span>
-              </div>
-            </div>
-          </Link>
-
-          {/* Year Clock Card */}
-          <Link href="/projects/clock/year">
-            <div className="glassmorphism rounded-2xl p-6 hover:scale-105 transition-transform duration-300 cursor-pointer group">
-              <h3 className="font-serif text-xl text-white mb-3" style={{fontFamily: 'Georgia, serif'}}>
-                Year Progress
-              </h3>
-              <p className="text-white/70 text-sm mb-4 font-serif" style={{fontFamily: 'Georgia, serif'}}>
-                Visual progress bar showing how much of the year has passed
-              </p>
-              <div className="flex items-center justify-between">
-                <span className="text-white/60 text-xs font-serif" style={{fontFamily: 'Georgia, serif'}}>
-                  Progress Visualization
-                </span>
-                <span className="text-white group-hover:translate-x-1 transition-transform">→</span>
-              </div>
-            </div>
-          </Link>
-
-        </div>
-
-        {/* Current Time Display */}
-        <div className="glassmorphism rounded-2xl p-8 text-center mt-12">
-          <div className="font-serif text-4xl md:text-5xl mb-2 text-white tracking-wider" style={{fontFamily: 'Georgia, serif'}}>
+        {/* Digital Clock */}
+        <div className="glassmorphism rounded-2xl p-12 text-center">
+          <div className="font-xanman-wide text-6xl md:text-7xl mb-4 text-black tracking-wider">
             {formatTime(time)}
           </div>
-          <div className="text-lg text-white/70 uppercase tracking-widest font-serif" style={{fontFamily: 'Georgia, serif'}}>
+          <div className="text-xl text-gray-600 uppercase tracking-widest">
             {formatDate(time)}
           </div>
         </div>
