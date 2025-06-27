@@ -15,6 +15,10 @@ interface Circle {
   dragStartX?: number;
   dragStartY?: number;
   dragStartTime?: number;
+  // Bubble deformation properties
+  scaleX: number;
+  scaleY: number;
+  deformDecay: number;
 }
 
 export default function BouncingCircles() {
@@ -47,7 +51,10 @@ export default function BouncingCircles() {
         size: 320,
         color: 'bg-electric-orange',
         text: 'RESUME',
-        action: () => navigateToPage('/about')
+        action: () => navigateToPage('/about'),
+        scaleX: 1,
+        scaleY: 1,
+        deformDecay: 0
       },
       {
         id: 'projects',
@@ -58,7 +65,10 @@ export default function BouncingCircles() {
         size: 240,
         color: 'bg-cyan-blue',
         text: 'PROJECTS',
-        action: () => navigateToPage('/projects')
+        action: () => navigateToPage('/projects'),
+        scaleX: 1,
+        scaleY: 1,
+        deformDecay: 0
       },
       {
         id: 'store',
@@ -69,7 +79,10 @@ export default function BouncingCircles() {
         size: 280,
         color: 'bg-electric-red',
         text: 'STORE',
-        action: () => navigateToPage('/portfolio')
+        action: () => navigateToPage('/portfolio'),
+        scaleX: 1,
+        scaleY: 1,
+        deformDecay: 0
       },
       {
         id: 'contact',
@@ -80,7 +93,10 @@ export default function BouncingCircles() {
         size: 200,
         color: 'bg-neon-green',
         text: 'CONTACT',
-        action: () => navigateToPage('/contact')
+        action: () => navigateToPage('/contact'),
+        scaleX: 1,
+        scaleY: 1,
+        deformDecay: 0
       }
     ];
 
@@ -93,15 +109,40 @@ export default function BouncingCircles() {
           let newY = circle.y + circle.vy;
           let newVx = circle.vx;
           let newVy = circle.vy;
+          let newScaleX = circle.scaleX;
+          let newScaleY = circle.scaleY;
+          let newDeformDecay = circle.deformDecay;
 
-          // Bounce off edges
+          // Bounce off edges with deformation
           if (newX <= 0 || newX >= window.innerWidth - circle.size) {
             newVx = -newVx;
             newX = Math.max(0, Math.min(window.innerWidth - circle.size, newX));
+            // Horizontal bounce deformation - squish horizontally, stretch vertically
+            newScaleX = 0.85;
+            newScaleY = 1.15;
+            newDeformDecay = 0.95;
           }
           if (newY <= 0 || newY >= window.innerHeight - circle.size) {
             newVy = -newVy;
             newY = Math.max(0, Math.min(window.innerHeight - circle.size, newY));
+            // Vertical bounce deformation - squish vertically, stretch horizontally
+            newScaleX = 1.15;
+            newScaleY = 0.85;
+            newDeformDecay = 0.95;
+          }
+
+          // Gradually return to normal shape (bubble-like recovery)
+          if (newDeformDecay > 0) {
+            newScaleX = newScaleX + (1 - newScaleX) * 0.08;
+            newScaleY = newScaleY + (1 - newScaleY) * 0.08;
+            newDeformDecay *= 0.98;
+            
+            // Stop deformation when close to normal
+            if (Math.abs(newScaleX - 1) < 0.01 && Math.abs(newScaleY - 1) < 0.01) {
+              newScaleX = 1;
+              newScaleY = 1;
+              newDeformDecay = 0;
+            }
           }
 
           return {
@@ -109,7 +150,10 @@ export default function BouncingCircles() {
             x: newX,
             y: newY,
             vx: newVx,
-            vy: newVy
+            vy: newVy,
+            scaleX: newScaleX,
+            scaleY: newScaleY,
+            deformDecay: newDeformDecay
           };
         })
       );
@@ -157,7 +201,10 @@ export default function BouncingCircles() {
               x: Math.max(0, Math.min(window.innerWidth - c.size, posX - dragOffset.x)),
               y: Math.max(0, Math.min(window.innerHeight - c.size, posY - dragOffset.y)),
               vx: 0,
-              vy: 0
+              vy: 0,
+              scaleX: 1,
+              scaleY: 1,
+              deformDecay: 0
             }
           : c
       ));
@@ -187,7 +234,10 @@ export default function BouncingCircles() {
                 ...c, 
                 vx: deltaX * throwMultiplier,
                 vy: deltaY * throwMultiplier,
-                isDragging: false 
+                isDragging: false,
+                scaleX: 1,
+                scaleY: 1,
+                deformDecay: 0
               }
             : c
         ));
@@ -244,7 +294,16 @@ export default function BouncingCircles() {
     // Mark drag start time and position for click detection
     setCircles(prev => prev.map(c => 
       c.id === circleId 
-        ? { ...c, isDragging: true, dragStartX: posX, dragStartY: posY, dragStartTime: Date.now() }
+        ? { 
+            ...c, 
+            isDragging: true, 
+            dragStartX: posX, 
+            dragStartY: posY, 
+            dragStartTime: Date.now(),
+            scaleX: 1,
+            scaleY: 1,
+            deformDecay: 0
+          }
         : c
     ));
   };
@@ -278,7 +337,9 @@ export default function BouncingCircles() {
             width: circle.size,
             height: circle.size,
             fontSize: window.innerWidth < 768 ? '100px' : '80px',
-            lineHeight: '1'
+            lineHeight: '1',
+            transform: `scaleX(${circle.scaleX}) scaleY(${circle.scaleY})`,
+            transformOrigin: 'center center'
           }}
           onMouseDown={(e) => handleStart(e, circle.id)}
           onTouchStart={(e) => handleStart(e, circle.id)}
