@@ -97,11 +97,11 @@ export default function PhysicsBalls() {
     for (let i = 333; i < 335; i++) {
       initialBalls.push({
         id: i,
-        x: Math.random() * (window.innerWidth - 80),
-        y: Math.random() * (window.innerHeight - 80),
+        x: Math.random() * (window.innerWidth - 60),
+        y: Math.random() * (window.innerHeight - 60),
         vx: (Math.random() - 0.5) * 3, // Faster movement for letters
         vy: (Math.random() - 0.5) * 3,
-        size: 80, // Larger size for letters
+        size: 60, // Large size for letters
         color: '#000000', // Black letters
         isLetter: true,
         letter: letters[i - 333],
@@ -274,13 +274,13 @@ export default function PhysicsBalls() {
         ball.isLetter ? (
           <div
             key={ball.id}
-            className="absolute pointer-events-none font-xanman-wide font-bold flex items-center justify-center border-2 border-black rounded-full"
+            className="absolute pointer-events-none font-xanman-wide font-bold flex items-center justify-center"
             style={{
               left: ball.x,
               top: ball.y,
               width: ball.size,
               height: ball.size,
-              fontSize: `${ball.size * 0.9}px`,
+              fontSize: `${ball.size * 0.8}px`,
               color: ball.color,
               transform: `rotate(${ball.rotation}deg)`,
               lineHeight: '1'
