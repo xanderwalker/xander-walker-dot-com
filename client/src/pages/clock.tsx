@@ -523,19 +523,19 @@ const PixelClockComponent = ({ currentTime }: { currentTime: Date }) => {
         let placed = false;
         
         // Simulate natural sand accumulation - balls prefer center and roll to edges
-        const preferredX = 30; // Center of 50-pixel tube (5 + 50/2 = 30)
+        const preferredX = 105; // Center of 200-pixel tube (5 + 200/2 = 105)
         
         // Try positions starting from center and spreading outward
-        for (let spread = 0; spread <= 25 && !placed; spread++) {
+        for (let spread = 0; spread <= 100 && !placed; spread++) {
           for (let side = 0; side <= 1 && !placed; side++) {
             const x = side === 0 ? preferredX - spread : preferredX + spread;
             
-            if (x >= 5 && x <= 55) {
+            if (x >= 5 && x <= 205) {
               // Find the surface level at this x position
-              for (let y = 278; y >= 0; y--) {
+              for (let y = 320; y >= 0; y--) {
                 if (!settledPositions.has(`${x},${y}`)) {
                   // Check if this position has proper support (sand behavior)
-                  if (y === 278 || settledPositions.has(`${x},${y + 1}`)) {
+                  if (y === 320 || settledPositions.has(`${x},${y + 1}`)) {
                     initialBalls.push({
                       id: ballIdRef.current++,
                       x: x,
@@ -555,8 +555,8 @@ const PixelClockComponent = ({ currentTime }: { currentTime: Date }) => {
         
         // If still not placed (tube getting full), place anywhere available
         if (!placed) {
-          for (let y = 278; y >= 0 && !placed; y--) {
-            for (let x = 5; x <= 55 && !placed; x++) {
+          for (let y = 320; y >= 0 && !placed; y--) {
+            for (let x = 5; x <= 205 && !placed; x++) {
               if (!settledPositions.has(`${x},${y}`)) {
                 initialBalls.push({
                   id: ballIdRef.current++,
@@ -597,7 +597,7 @@ const PixelClockComponent = ({ currentTime }: { currentTime: Date }) => {
       for (let i = 0; i < 10; i++) {
         newBalls.push({
           id: ballIdRef.current++,
-          x: 5 + Math.random() * 50, // Random position across 50-pixel width
+          x: 5 + Math.random() * 200, // Random position across 200-pixel width
           y: 0,
           vy: 0.5 + Math.random() * 0.5,
           isSettled: false
@@ -631,9 +631,9 @@ const PixelClockComponent = ({ currentTime }: { currentTime: Date }) => {
           let newVy = ball.vy + 0.08; // Increased gravity for faster settling
           let newIsSettled = false;
           
-          const cylinderBottom = 278;
+          const cylinderBottom = 320; // Moved to very bottom of container
           const cylinderLeft = 5;
-          const cylinderRight = 55;
+          const cylinderRight = 205;
           
           // Add horizontal spreading force when ball is near settling
           if (ball.vy > 1) {
@@ -680,8 +680,8 @@ const PixelClockComponent = ({ currentTime }: { currentTime: Date }) => {
               
               // If column full, try rolling to adjacent positions (sand behavior)
               if (!found) {
-                // Try immediate neighbors first - wider search for 50px tube
-                for (let offset = 1; offset <= 25 && !found; offset++) {
+                // Try immediate neighbors first - wider search for 200px tube
+                for (let offset = 1; offset <= 100 && !found; offset++) {
                   const leftX = roundedX - offset;
                   const rightX = roundedX + offset;
                   
@@ -752,8 +752,9 @@ const PixelClockComponent = ({ currentTime }: { currentTime: Date }) => {
     <div className="flex justify-center">
       <div className="flex flex-col items-center">
         <div className="font-serif text-lg mb-2 text-black" style={{fontFamily: 'Georgia, serif'}}>Hour Clock</div>
-        <div className="relative h-80 overflow-hidden" style={{
-          width: '70px', // 50 pixels for tube + padding
+        <div className="relative overflow-hidden" style={{
+          width: '220px', // 200 pixels for tube + padding
+          height: '340px', // Increased height to accommodate bottom placement
           background: 'linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.7) 100%)',
           borderRadius: '8px',
           border: '2px solid rgba(0,0,0,0.1)',
@@ -764,7 +765,7 @@ const PixelClockComponent = ({ currentTime }: { currentTime: Date }) => {
           {[...Array(12)].map((_, i) => (
             <div key={i} className="absolute left-0 text-xs text-gray-600" style={{
               fontFamily: 'Georgia, serif',
-              top: `${(i + 1) * (280 / 12) - 8}px`,
+              top: `${(i + 1) * (320 / 12) - 8}px`,
               fontSize: '8px'
             }}>
               {60 - (i + 1) * 5}m
