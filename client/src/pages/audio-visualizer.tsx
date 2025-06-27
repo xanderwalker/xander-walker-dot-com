@@ -106,7 +106,7 @@ export default function AudioVisualizer() {
     setShowMinimized(false);
     
     const clientId = import.meta.env.VITE_SPOTIFY_CLIENT_ID;
-    const redirectUri = `${window.location.origin}/projects/spotify-lyrics`;
+    const redirectUri = `${window.location.origin}/projects/audio-visualizer`;
     const scope = 'user-read-currently-playing user-read-playback-state user-top-read';
     
     const params = new URLSearchParams({
@@ -467,11 +467,8 @@ export default function AudioVisualizer() {
                 <div className="text-white font-xanman-wide font-bold mb-2" style={{fontSize: '100px', lineHeight: '1'}}>
                   CONNECT SPOTIFY
                 </div>
-                <div className="text-white/80 font-xanman-wide" style={{fontSize: '50px', lineHeight: '1.2'}}>
-                  WILL REDIRECT TO LYRICS PAGE FOR AUTH
-                </div>
-                <div className="text-white/60 font-xanman-wide mt-4" style={{fontSize: '40px', lineHeight: '1.2'}}>
-                  THEN RETURN HERE FOR VISUALIZATION
+                <div className="text-white/80 font-xanman-wide" style={{fontSize: '70px', lineHeight: '1'}}>
+                  EXPERIENCE MUSIC VISUALIZATION
                 </div>
               </div>
             </div>
