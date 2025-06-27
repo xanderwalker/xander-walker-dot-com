@@ -323,18 +323,8 @@ export default function PhysicsBalls() {
               top: ball.y,
               width: ball.size,
               height: ball.size,
-              background: `radial-gradient(circle at 30% 30%, 
-                rgba(255,255,255,0.8) 0%, 
-                ${ball.color} 20%, 
-                ${ball.color} 70%, 
-                rgba(0,0,0,0.3) 100%)`,
-              boxShadow: `
-                inset -2px -2px 6px rgba(0,0,0,0.3),
-                inset 2px 2px 6px rgba(255,255,255,0.6),
-                2px 2px 8px rgba(0,0,0,0.2)
-              `,
-              border: '1px solid rgba(255,255,255,0.3)',
-              transition: isMobile ? 'background 0.3s ease' : 'none'
+              backgroundColor: ball.color,
+              transition: isMobile ? 'background-color 0.3s ease' : 'none'
             }}
           />
         )
