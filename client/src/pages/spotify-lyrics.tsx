@@ -54,9 +54,6 @@ export default function SpotifyLyrics() {
       : `https://xanderwalker.com/projects/spotify-lyrics`;
     const SCOPES = 'user-read-currently-playing user-read-playback-state';
     
-    console.log('Redirect URI:', REDIRECT_URI);
-    console.log('Current origin:', window.location.origin);
-    
     if (!CLIENT_ID) {
       setError('Spotify Client ID not configured. Please add VITE_SPOTIFY_CLIENT_ID to environment variables.');
       return;
