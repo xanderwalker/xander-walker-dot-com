@@ -428,7 +428,12 @@ export default function AudioVisualizer() {
       />
       
       {/* Minimal top navigation */}
-      <div className="absolute top-6 left-6 z-20">
+      <div className="absolute top-6 left-6 z-20 flex gap-4">
+        <Link href="/">
+          <button className="text-white/80 hover:text-white transition-colors font-xanman-wide bg-white/10 backdrop-blur-sm px-6 py-4 rounded-lg border border-white/20" style={{fontSize: '25px', lineHeight: '1'}}>
+            HOME
+          </button>
+        </Link>
         <Link href="/projects">
           <button className="text-white/80 hover:text-white transition-colors font-xanman-wide bg-white/10 backdrop-blur-sm px-6 py-4 rounded-lg border border-white/20" style={{fontSize: '25px', lineHeight: '1'}}>
             ← BACK
