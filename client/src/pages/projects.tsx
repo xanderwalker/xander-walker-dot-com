@@ -4,6 +4,12 @@ import Layout from '../components/layout';
 export default function Projects() {
   const projects = [
     {
+      title: "SPOTIFY LYRICS",
+      description: "Real-time lyrics display for your currently playing Spotify track. Connect with your Spotify account to view synchronized lyrics for any song you're listening to.",
+      tags: "Music • API • Real-time",
+      link: "/projects/spotify-lyrics"
+    },
+    {
       title: "CAMERA SYSTEM",
       description: "Multi-camera detection and live video streaming system. Automatically detects all available cameras (front/rear) and displays simultaneous video feeds with device identification.",
       tags: "Camera • Video • Hardware",
