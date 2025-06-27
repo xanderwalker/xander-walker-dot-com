@@ -523,14 +523,14 @@ const PixelClockComponent = ({ currentTime }: { currentTime: Date }) => {
         let placed = false;
         
         // Simulate natural sand accumulation - balls prefer center and roll to edges
-        const preferredX = 10; // Center of tube
+        const preferredX = 30; // Center of 50-pixel tube (5 + 50/2 = 30)
         
         // Try positions starting from center and spreading outward
-        for (let spread = 0; spread <= 5 && !placed; spread++) {
+        for (let spread = 0; spread <= 25 && !placed; spread++) {
           for (let side = 0; side <= 1 && !placed; side++) {
             const x = side === 0 ? preferredX - spread : preferredX + spread;
             
-            if (x >= 5 && x <= 15) {
+            if (x >= 5 && x <= 55) {
               // Find the surface level at this x position
               for (let y = 278; y >= 0; y--) {
                 if (!settledPositions.has(`${x},${y}`)) {
@@ -556,7 +556,7 @@ const PixelClockComponent = ({ currentTime }: { currentTime: Date }) => {
         // If still not placed (tube getting full), place anywhere available
         if (!placed) {
           for (let y = 278; y >= 0 && !placed; y--) {
-            for (let x = 5; x <= 15 && !placed; x++) {
+            for (let x = 5; x <= 55 && !placed; x++) {
               if (!settledPositions.has(`${x},${y}`)) {
                 initialBalls.push({
                   id: ballIdRef.current++,
@@ -597,7 +597,7 @@ const PixelClockComponent = ({ currentTime }: { currentTime: Date }) => {
       for (let i = 0; i < 10; i++) {
         newBalls.push({
           id: ballIdRef.current++,
-          x: 5 + Math.random() * 10, // Random position across 10-pixel width (0-10 range)
+          x: 5 + Math.random() * 50, // Random position across 50-pixel width
           y: 0,
           vy: 0.5 + Math.random() * 0.5,
           isSettled: false
@@ -633,7 +633,7 @@ const PixelClockComponent = ({ currentTime }: { currentTime: Date }) => {
           
           const cylinderBottom = 278;
           const cylinderLeft = 5;
-          const cylinderRight = 15;
+          const cylinderRight = 55;
           
           // Add horizontal spreading force when ball is near settling
           if (ball.vy > 1) {
@@ -680,8 +680,8 @@ const PixelClockComponent = ({ currentTime }: { currentTime: Date }) => {
               
               // If column full, try rolling to adjacent positions (sand behavior)
               if (!found) {
-                // Try immediate neighbors first
-                for (let offset = 1; offset <= 5 && !found; offset++) {
+                // Try immediate neighbors first - wider search for 50px tube
+                for (let offset = 1; offset <= 25 && !found; offset++) {
                   const leftX = roundedX - offset;
                   const rightX = roundedX + offset;
                   
@@ -753,7 +753,7 @@ const PixelClockComponent = ({ currentTime }: { currentTime: Date }) => {
       <div className="flex flex-col items-center">
         <div className="font-serif text-lg mb-2 text-black" style={{fontFamily: 'Georgia, serif'}}>Hour Clock</div>
         <div className="relative h-80 overflow-hidden" style={{
-          width: '30px', // Exactly 10 pixels for tube + minimal padding
+          width: '70px', // 50 pixels for tube + padding
           background: 'linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.7) 100%)',
           borderRadius: '8px',
           border: '2px solid rgba(0,0,0,0.1)',
