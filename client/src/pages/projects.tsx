@@ -30,17 +30,17 @@ export default function Projects() {
               <Link key={index} href={project.link}>
                 <div className="glassmorphism rounded-2xl p-8 relative z-30 pointer-events-auto cursor-pointer hover:bg-opacity-90 transition-all duration-300 group">
                   {/* Project Title */}
-                  <div className="font-xanman-wide font-bold text-8xl mb-8 text-center text-black group-hover:text-gray-600 transition-colors">
+                  <div className="font-serif text-8xl mb-8 text-center text-black group-hover:text-gray-600 transition-colors" style={{fontFamily: 'Georgia, serif'}}>
                     {project.title}
                   </div>
                   
                   {/* Project Description */}
-                  <div className="text-gray-700 font-bold text-4xl mb-8 leading-relaxed text-center">
+                  <div className="text-gray-700 font-serif text-4xl mb-8 leading-relaxed text-center" style={{fontFamily: 'Georgia, serif'}}>
                     {project.description}
                   </div>
                   
                   {/* Project Tags */}
-                  <div className="text-2xl font-bold text-gray-500 uppercase tracking-wider text-center">
+                  <div className="text-2xl font-serif text-gray-500 uppercase tracking-wider text-center" style={{fontFamily: 'Georgia, serif'}}>
                     {project.tags}
                   </div>
                 </div>
