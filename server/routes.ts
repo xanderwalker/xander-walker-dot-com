@@ -88,6 +88,51 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Spotify callback endpoint
+  app.post('/api/spotify/callback', async (req, res) => {
+    try {
+      const { code } = req.body;
+      const clientId = process.env.VITE_SPOTIFY_CLIENT_ID;
+      const clientSecret = process.env.SPOTIFY_CLIENT_SECRET;
+      
+      if (!clientId || !clientSecret) {
+        return res.status(400).json({ error: 'Spotify credentials not configured' });
+      }
+
+      const redirectUri = `${req.protocol}://${req.get('host')}/projects/audio-visualizer`;
+      
+      const tokenResponse = await fetch('https://accounts.spotify.com/api/token', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'Authorization': `Basic ${Buffer.from(`${clientId}:${clientSecret}`).toString('base64')}`
+        },
+        body: new URLSearchParams({
+          grant_type: 'authorization_code',
+          code: code,
+          redirect_uri: redirectUri,
+          code_verifier: 'dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk'
+        })
+      });
+
+      if (tokenResponse.ok) {
+        const tokenData = await tokenResponse.json();
+        res.json({
+          access_token: tokenData.access_token,
+          refresh_token: tokenData.refresh_token,
+          expires_in: tokenData.expires_in
+        });
+      } else {
+        const errorData = await tokenResponse.json();
+        console.error('Spotify token exchange failed:', errorData);
+        res.status(400).json({ error: 'Failed to exchange code for token' });
+      }
+    } catch (error) {
+      console.error('Spotify callback error:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  });
+
   const httpServer = createServer(app);
 
   return httpServer;

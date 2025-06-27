@@ -43,11 +43,56 @@ export default function AudioVisualizer() {
 
   // Initialize auth
   useEffect(() => {
-    const storedToken = localStorage.getItem('spotify_access_token');
-    if (storedToken) {
-      setAccessToken(storedToken);
+    const urlParams = new URLSearchParams(window.location.search);
+    const code = urlParams.get('code');
+    
+    if (code) {
+      handleAuthCallback(code);
+    } else {
+      const storedToken = localStorage.getItem('spotify_access_token');
+      if (storedToken) {
+        setAccessToken(storedToken);
+      }
     }
   }, []);
+
+  // Spotify auth functions
+  const handleAuthCallback = async (code: string) => {
+    try {
+      const response = await fetch('/api/spotify/callback', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code })
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setAccessToken(data.access_token);
+        localStorage.setItem('spotify_access_token', data.access_token);
+        window.history.replaceState({}, document.title, window.location.pathname);
+      }
+    } catch (err) {
+      console.error('Failed to authenticate with Spotify');
+    }
+  };
+
+  const loginToSpotify = () => {
+    const clientId = import.meta.env.VITE_SPOTIFY_CLIENT_ID;
+    const redirectUri = `${window.location.origin}/projects/audio-visualizer`;
+    const scope = 'user-read-currently-playing user-read-playback-state';
+    
+    const params = new URLSearchParams({
+      response_type: 'code',
+      client_id: clientId,
+      scope: scope,
+      redirect_uri: redirectUri,
+      code_challenge_method: 'S256',
+      code_challenge: 'dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk',
+      state: 'spotify-auth'
+    });
+
+    window.location.href = `https://accounts.spotify.com/authorize?${params}`;
+  };
 
   // Paint swirling effects
   useEffect(() => {
@@ -292,7 +337,7 @@ export default function AudioVisualizer() {
       {!accessToken && (
         <div className="absolute top-6 right-6 z-20">
           <button
-            onClick={() => window.location.href = '/projects/spotify-lyrics'}
+            onClick={loginToSpotify}
             className="text-white/80 hover:text-white transition-colors text-sm font-serif bg-white/10 backdrop-blur-sm px-3 py-2 rounded-lg border border-white/20"
             style={{fontFamily: 'Georgia, serif'}}
           >
