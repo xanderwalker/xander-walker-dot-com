@@ -26,6 +26,12 @@ export default function Projects() {
       description: "A modern digital clock interface with custom styling and real-time updates. Clean design with precise time display.",
       tags: "Time • Design • Interface", 
       link: "/projects/clock"
+    },
+    {
+      title: "ROULETTE WHEEL",
+      description: "Interactive roulette wheel with realistic physics simulation. Drag to spin the wheel, drop the ball, and watch it bounce to a winning number.",
+      tags: "Physics • Interactive • Gaming",
+      link: "/projects/roulette"
     }
   ];
 
