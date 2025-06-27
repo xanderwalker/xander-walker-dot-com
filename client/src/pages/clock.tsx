@@ -24,6 +24,110 @@ const getBallColor = (type: 'second' | 'minute' | 'hour') => {
   return colorArray[Math.floor(Math.random() * colorArray.length)];
 };
 
+// Year clock helper functions
+const getDaysInMonth = (month: number, year: number) => {
+  return new Date(year, month, 0).getDate();
+};
+
+const getMonthName = (month: number) => {
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  return months[month];
+};
+
+const isDayPassed = (dayOfYear: number, currentDayOfYear: number) => {
+  return dayOfYear < currentDayOfYear;
+};
+
+const getDayOfYear = (date: Date) => {
+  const start = new Date(date.getFullYear(), 0, 0);
+  const diff = date.getTime() - start.getTime();
+  return Math.floor(diff / (1000 * 60 * 60 * 24));
+};
+
+// Year Clock Component
+const YearClock = ({ currentDate }: { currentDate: Date }) => {
+  const currentYear = currentDate.getFullYear();
+  const currentDayOfYear = getDayOfYear(currentDate);
+  
+  const months = [];
+  let dayCounter = 1;
+  
+  for (let month = 1; month <= 12; month++) {
+    const daysInMonth = getDaysInMonth(month, currentYear);
+    const monthDays = [];
+    
+    for (let day = 1; day <= daysInMonth; day++) {
+      const isPassed = isDayPassed(dayCounter, currentDayOfYear);
+      const isToday = dayCounter === currentDayOfYear;
+      
+      monthDays.push({
+        day,
+        dayOfYear: dayCounter,
+        isPassed,
+        isToday
+      });
+      dayCounter++;
+    }
+    
+    months.push({
+      name: getMonthName(month - 1),
+      days: monthDays,
+      number: month
+    });
+  }
+  
+  return (
+    <div className="w-full max-w-6xl">
+      <h3 className="font-serif text-xl mb-6 text-center text-black" style={{fontFamily: 'Georgia, serif'}}>
+        Year Progress {currentYear} - Day {currentDayOfYear} of 365
+      </h3>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        {months.map((month) => (
+          <div key={month.number} className="bg-white/40 rounded-lg p-4 border border-gray-200">
+            <h4 className="font-serif text-sm font-bold mb-3 text-center text-black">
+              {month.name}
+            </h4>
+            <div className="grid grid-cols-7 gap-1">
+              {month.days.map((dayData) => (
+                <div
+                  key={dayData.dayOfYear}
+                  className={`
+                    w-4 h-4 rounded-sm border border-gray-300 transition-all duration-200
+                    ${dayData.isToday 
+                      ? 'bg-blue-500 border-blue-600 shadow-md' 
+                      : dayData.isPassed 
+                        ? 'bg-gray-700 border-gray-800' 
+                        : 'bg-white border-gray-300 hover:bg-gray-100'
+                    }
+                  `}
+                  title={`${month.name} ${dayData.day}, ${currentYear} (Day ${dayData.dayOfYear})`}
+                />
+              ))}
+            </div>
+            <div className="text-xs text-gray-600 mt-2 text-center">
+              {month.days.filter(d => d.isPassed).length}/{month.days.length} days
+            </div>
+          </div>
+        ))}
+      </div>
+      <div className="mt-4 text-center text-sm text-gray-600">
+        <span className="inline-flex items-center mr-6">
+          <div className="w-3 h-3 bg-gray-700 border border-gray-800 rounded-sm mr-2"></div>
+          Past Days
+        </span>
+        <span className="inline-flex items-center mr-6">
+          <div className="w-3 h-3 bg-blue-500 border border-blue-600 rounded-sm mr-2"></div>
+          Today
+        </span>
+        <span className="inline-flex items-center">
+          <div className="w-3 h-3 bg-white border border-gray-300 rounded-sm mr-2"></div>
+          Future Days
+        </span>
+      </div>
+    </div>
+  );
+};
+
 export default function Clock() {
   const [time, setTime] = useState(new Date());
   const [secondBalls, setSecondBalls] = useState<Ball[]>([]);
@@ -435,6 +539,14 @@ export default function Clock() {
 
       {/* Clocks Display */}
       <div className="flex flex-col items-center justify-center min-h-[calc(100vh-200px)] space-y-12">
+        
+        {/* Year Clock */}
+        <div className="glassmorphism rounded-2xl p-8 w-full max-w-6xl">
+          <h2 className="font-serif text-2xl mb-8 text-center text-black" style={{fontFamily: 'Georgia, serif'}}>
+            Year Progress Clock
+          </h2>
+          <YearClock currentDate={time} />
+        </div>
         
         {/* Graduated Cylinder Clock */}
         <div className="glassmorphism rounded-2xl p-8">
