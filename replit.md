@@ -115,6 +115,7 @@ Changelog:
 - June 27, 2025. Successfully deployed complete interactive portfolio via ZIP download and force push - all physics projects (333 balls, hourglass clock with Monet paint swirling, sensor dashboard, roulette wheel, glass of water) now live at xanderwalker.com through streamlined download-and-push workflow.
 - June 27, 2025. Fixed SPA routing issue - added vercel.json configuration to handle direct URL navigation. All project URLs (like /projects/333-balls) now work when shared directly, resolving 404 errors for deep links.
 - June 27, 2025. Created dedicated camera system addressing iPhone hardware limitations - removed camera functionality from sensor dashboard, built single-camera switching interface at /projects/camera. System detects multiple cameras (wide, ultra-wide, telephoto, front) but properly handles one-camera-at-a-time restriction with clear hardware limitation notice and active camera indicators.
+- June 27, 2025. Successfully implemented Spotify Lyrics integration with PKCE authentication - configured Spotify Developer app (Client ID: 05e9ec0109e04f81bf9f3b19d491db05), resolved environment variable loading by moving .env to client directory, implemented modern PKCE authentication flow replacing deprecated implicit flow, added real-time lyrics fetching from Lyrics.ovh API. System now displays current song information and lyrics for authenticated users.
 ```
 
 ## User Preferences
