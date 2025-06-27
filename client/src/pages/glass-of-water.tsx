@@ -12,7 +12,8 @@ export default function GlassOfWater() {
   const [screenSize, setScreenSize] = useState({ width: 0, height: 0 });
   const [tilt, setTilt] = useState({ x: 0, y: 0 });
   const [waterPoints, setWaterPoints] = useState<WaterPoint[]>([]);
-  const [splashParticles, setSplashParticles] = useState<Array<{x: number, y: number, vx: number, vy: number, life: number}>>([]);
+  const [accelerometerEnabled, setAccelerometerEnabled] = useState(false);
+  const [permissionGranted, setPermissionGranted] = useState(false);
   const animationFrameRef = useRef<number>();
 
   // Update screen size
@@ -52,6 +53,8 @@ export default function GlassOfWater() {
 
   // Handle device motion (accelerometer)
   useEffect(() => {
+    if (!accelerometerEnabled) return;
+
     const handleDeviceMotion = (event: DeviceMotionEvent) => {
       const acceleration = event.accelerationIncludingGravity;
       if (acceleration && acceleration.x !== null && acceleration.y !== null) {
@@ -71,50 +74,71 @@ export default function GlassOfWater() {
       }
     };
 
-    // Request permission for iOS devices
-    const requestPermission = async () => {
-      if (typeof (DeviceMotionEvent as any).requestPermission === 'function') {
-        const permission = await (DeviceMotionEvent as any).requestPermission();
-        if (permission === 'granted') {
-          window.addEventListener('devicemotion', handleDeviceMotion);
-          window.addEventListener('deviceorientation', handleDeviceOrientation);
-        }
-      } else {
-        // For Android and other devices
-        window.addEventListener('devicemotion', handleDeviceMotion);
-        window.addEventListener('deviceorientation', handleDeviceOrientation);
-      }
-    };
-
-    requestPermission();
+    window.addEventListener('devicemotion', handleDeviceMotion);
+    window.addEventListener('deviceorientation', handleDeviceOrientation);
 
     return () => {
       window.removeEventListener('devicemotion', handleDeviceMotion);
       window.removeEventListener('deviceorientation', handleDeviceOrientation);
     };
-  }, []);
+  }, [accelerometerEnabled]);
 
-  // Water physics animation
+  // Permission handler
+  const requestAccelerometerPermission = async () => {
+    try {
+      if (typeof (DeviceMotionEvent as any).requestPermission === 'function') {
+        const permission = await (DeviceMotionEvent as any).requestPermission();
+        if (permission === 'granted') {
+          setPermissionGranted(true);
+          setAccelerometerEnabled(true);
+        } else {
+          setPermissionGranted(false);
+        }
+      } else {
+        // For Android and other devices
+        setPermissionGranted(true);
+        setAccelerometerEnabled(true);
+      }
+    } catch (error) {
+      console.error('Error requesting permission:', error);
+      setPermissionGranted(false);
+    }
+  };
+
+  // Water physics animation with enhanced curves
   useEffect(() => {
     const animate = () => {
       setWaterPoints(prevPoints => {
         return prevPoints.map((point, i) => {
-          // Calculate target Y based on tilt and base water level
-          const tiltOffset = (point.x - screenSize.width / 2) * (tilt.x * 0.002); // Horizontal tilt effect
-          const targetY = point.baseY + tiltOffset + (tilt.y * 2); // Vertical tilt effect
+          // Calculate target Y based on tilt and base water level with more dramatic curves
+          const distanceFromCenter = (point.x - screenSize.width / 2) / (screenSize.width / 2);
+          const tiltOffset = distanceFromCenter * (tilt.x * 0.004); // Doubled for more pronounced tilt
+          const targetY = point.baseY + tiltOffset + (tilt.y * 3); // Increased vertical response
           
-          // Spring physics for water surface
-          const force = (targetY - point.y) * 0.02; // Spring force
-          const damping = 0.98; // Damping
+          // Spring physics for water surface with stronger forces
+          const force = (targetY - point.y) * 0.03; // Increased spring force
+          const damping = 0.96; // Less damping for more fluid motion
           
           let newVelocity = (point.velocity + force) * damping;
           let newY = point.y + newVelocity;
           
-          // Add wave propagation from neighbors
-          if (i > 0 && i < prevPoints.length - 1) {
+          // Enhanced wave propagation with more neighbors for smoother curves
+          if (i > 1 && i < prevPoints.length - 2) {
             const leftNeighbor = prevPoints[i - 1];
             const rightNeighbor = prevPoints[i + 1];
-            const neighborForce = ((leftNeighbor.y + rightNeighbor.y) / 2 - point.y) * 0.015;
+            const leftLeft = prevPoints[i - 2];
+            const rightRight = prevPoints[i + 2];
+            
+            // Weighted average including second neighbors for smoother curves
+            const neighborAvg = (leftLeft.y * 0.1 + leftNeighbor.y * 0.4 + rightNeighbor.y * 0.4 + rightRight.y * 0.1);
+            const neighborForce = (neighborAvg - point.y) * 0.025; // Increased neighbor influence
+            newVelocity += neighborForce;
+            newY += neighborForce;
+          } else if (i > 0 && i < prevPoints.length - 1) {
+            // Standard neighbor calculation for edge points
+            const leftNeighbor = prevPoints[i - 1];
+            const rightNeighbor = prevPoints[i + 1];
+            const neighborForce = ((leftNeighbor.y + rightNeighbor.y) / 2 - point.y) * 0.02;
             newVelocity += neighborForce;
             newY += neighborForce;
           }
@@ -126,17 +150,6 @@ export default function GlassOfWater() {
           };
         });
       });
-      
-      // Update splash particles
-      setSplashParticles(prev => 
-        prev.map(particle => ({
-          ...particle,
-          x: particle.x + particle.vx,
-          y: particle.y + particle.vy,
-          vy: particle.vy + 0.3, // Gravity
-          life: particle.life - 0.02
-        })).filter(particle => particle.life > 0)
-      );
 
       animationFrameRef.current = requestAnimationFrame(animate);
     };
@@ -149,24 +162,6 @@ export default function GlassOfWater() {
       }
     };
   }, [screenSize, tilt]);
-
-  // Generate splash particles when tilt changes rapidly
-  useEffect(() => {
-    const tiltMagnitude = Math.sqrt(tilt.x * tilt.x + tilt.y * tilt.y);
-    if (tiltMagnitude > 8 && Math.random() < 0.3) {
-      const newSplashes: Array<{x: number, y: number, vx: number, vy: number, life: number}> = [];
-      for (let i = 0; i < 5; i++) {
-        newSplashes.push({
-          x: Math.random() * screenSize.width,
-          y: screenSize.height * (0.4 + Math.random() * 0.2),
-          vx: (Math.random() - 0.5) * 10,
-          vy: -Math.random() * 8,
-          life: 1
-        });
-      }
-      setSplashParticles(prev => [...prev, ...newSplashes]);
-    }
-  }, [tilt, screenSize]);
 
   // Generate water body path
   const generateWaterPath = () => {
@@ -256,36 +251,37 @@ export default function GlassOfWater() {
             style={{ transition: 'none' }}
           />
         </svg>
-        
-        {/* Splash particles */}
-        {splashParticles.map((particle, index) => (
-          <div
-            key={index}
-            className="absolute rounded-full pointer-events-none"
-            style={{
-              width: '6px',
-              height: '6px',
-              left: `${particle.x}px`,
-              top: `${particle.y}px`,
-              backgroundColor: `rgba(100, 200, 255, ${particle.life * 0.8})`,
-              transform: 'translate(-50%, -50%)',
-              zIndex: 2
-            }}
-          />
-        ))}
+      </div>
+
+      {/* Accelerometer Permission Toggle */}
+      <div className="absolute top-20 right-8 z-10">
+        <button
+          onClick={accelerometerEnabled ? () => setAccelerometerEnabled(false) : requestAccelerometerPermission}
+          className={`font-xanman-wide px-4 py-2 rounded-lg text-sm font-bold transition-colors ${
+            accelerometerEnabled 
+              ? 'bg-green-500 text-white hover:bg-green-600' 
+              : 'bg-gray-500 text-white hover:bg-gray-600'
+          }`}
+        >
+          {accelerometerEnabled ? 'ACCELEROMETER ON' : 'ENABLE ACCELEROMETER'}
+        </button>
       </div>
 
       {/* Tilt Indicator */}
       <div className="absolute bottom-8 left-8 z-10 bg-black bg-opacity-20 rounded-lg p-4 font-xanman-wide text-black">
         <div className="text-sm">TILT: {tilt.x.toFixed(1)}, {tilt.y.toFixed(1)}</div>
         <div className="text-xs mt-1">POINTS: {waterPoints.length}</div>
-        <div className="text-xs">SCREEN: {screenSize.width}×{screenSize.height}</div>
+        <div className="text-xs">ACCEL: {accelerometerEnabled ? 'ON' : 'OFF'}</div>
       </div>
 
       {/* Instructions */}
       <div className="absolute bottom-8 right-8 z-10 bg-black bg-opacity-20 rounded-lg p-4 font-xanman-wide text-black text-right">
-        <div className="text-sm">TILT YOUR DEVICE</div>
-        <div className="text-xs mt-1">TO SLOSH THE WATER</div>
+        <div className="text-sm">
+          {accelerometerEnabled ? 'TILT YOUR DEVICE' : 'ENABLE ACCELEROMETER'}
+        </div>
+        <div className="text-xs mt-1">
+          {accelerometerEnabled ? 'TO SLOSH THE WATER' : 'TO START SLOSHING'}
+        </div>
       </div>
     </div>
   );
