@@ -398,9 +398,8 @@ export default function Clock() {
                   height: `${currentBallSize}px`,
                   left: `${ball.x - currentBallSize/2}px`, // Center the ball
                   bottom: `${320 - ball.y - currentBallSize}px`, // Position from bottom
-                  background: `radial-gradient(circle at 30% 30%, ${ballColor}ff, ${ballColor}cc, ${ballColor}99)`,
-                  border: `2px solid ${ballColor}88`,
-                  boxShadow: `inset -2px -2px 4px rgba(0,0,0,0.2), inset 2px 2px 4px rgba(255,255,255,0.3), 0 2px 8px rgba(0,0,0,0.15)`,
+                  backgroundColor: ballColor,
+                  border: `1px solid ${ballColor}dd`,
                   transition: 'none', // Let physics handle movement
                   zIndex: 5 // All balls have same z-index since they're all dynamic
                 }}
