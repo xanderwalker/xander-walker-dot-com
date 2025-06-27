@@ -1,21 +1,19 @@
 import { Link } from 'wouter';
 import { useState, useEffect, useRef } from 'react';
 
-interface WaterParticle {
-  id: number;
+interface WaterPoint {
   x: number;
   y: number;
-  vx: number;
-  vy: number;
-  size: number;
+  baseY: number;
+  velocity: number;
 }
 
 export default function GlassOfWater() {
-  const [waterParticles, setWaterParticles] = useState<WaterParticle[]>([]);
   const [screenSize, setScreenSize] = useState({ width: 0, height: 0 });
   const [tilt, setTilt] = useState({ x: 0, y: 0 });
+  const [waterPoints, setWaterPoints] = useState<WaterPoint[]>([]);
+  const [splashParticles, setSplashParticles] = useState<Array<{x: number, y: number, vx: number, vy: number, life: number}>>([]);
   const animationFrameRef = useRef<number>();
-  const particleIdRef = useRef(0);
 
   // Update screen size
   useEffect(() => {
@@ -31,34 +29,25 @@ export default function GlassOfWater() {
     return () => window.removeEventListener('resize', updateScreenSize);
   }, []);
 
-  // Initialize water particles to fill 60% of screen volume
+  // Initialize water surface points
   useEffect(() => {
     if (screenSize.width === 0 || screenSize.height === 0) return;
 
-    const targetVolume = screenSize.width * screenSize.height * 0.6;
-    const particleSize = Math.max(8, Math.min(16, Math.sqrt(targetVolume / 1000))); // Adaptive particle size
-    const particleArea = Math.PI * Math.pow(particleSize / 2, 2);
-    const numParticles = Math.floor(targetVolume / particleArea);
-
-    const particles: WaterParticle[] = [];
+    const waterLevel = screenSize.height * 0.4; // Water takes up bottom 60% of screen
+    const numPoints = Math.max(20, Math.floor(screenSize.width / 15)); // Adaptive resolution
     
-    // Create particles in a water-like distribution (bottom 60% of screen)
-    for (let i = 0; i < numParticles; i++) {
-      const waterHeight = screenSize.height * 0.6;
-      const x = Math.random() * screenSize.width;
-      const y = screenSize.height - (Math.random() * waterHeight);
-      
-      particles.push({
-        id: particleIdRef.current++,
+    const points: WaterPoint[] = [];
+    for (let i = 0; i <= numPoints; i++) {
+      const x = (i / numPoints) * screenSize.width;
+      points.push({
         x,
-        y,
-        vx: (Math.random() - 0.5) * 0.5,
-        vy: (Math.random() - 0.5) * 0.5,
-        size: particleSize * (0.8 + Math.random() * 0.4)
+        y: waterLevel,
+        baseY: waterLevel,
+        velocity: 0
       });
     }
-
-    setWaterParticles(particles);
+    
+    setWaterPoints(points);
   }, [screenSize]);
 
   // Handle device motion (accelerometer)
@@ -67,8 +56,8 @@ export default function GlassOfWater() {
       const acceleration = event.accelerationIncludingGravity;
       if (acceleration && acceleration.x !== null && acceleration.y !== null) {
         setTilt({
-          x: Math.max(-10, Math.min(10, acceleration.x || 0)),
-          y: Math.max(-10, Math.min(10, acceleration.y || 0))
+          x: Math.max(-15, Math.min(15, acceleration.x || 0)),
+          y: Math.max(-15, Math.min(15, acceleration.y || 0))
         });
       }
     };
@@ -76,8 +65,8 @@ export default function GlassOfWater() {
     const handleDeviceOrientation = (event: DeviceOrientationEvent) => {
       if (event.gamma !== null && event.beta !== null) {
         setTilt({
-          x: Math.max(-45, Math.min(45, event.gamma)) / 4.5, // Scale to -10 to 10
-          y: Math.max(-45, Math.min(45, event.beta)) / 4.5
+          x: Math.max(-45, Math.min(45, event.gamma)) / 3, // Scale to -15 to 15
+          y: Math.max(-45, Math.min(45, event.beta)) / 3
         });
       }
     };
@@ -105,77 +94,48 @@ export default function GlassOfWater() {
     };
   }, []);
 
-  // Physics animation loop
+  // Water physics animation
   useEffect(() => {
     const animate = () => {
-      setWaterParticles(prevParticles => 
-        prevParticles.map(particle => {
-          let newX = particle.x + particle.vx;
-          let newY = particle.y + particle.vy;
-          let newVx = particle.vx;
-          let newVy = particle.vy;
-
-          // Apply gravity and tilt forces
-          const gravity = 0.3;
-          const tiltForceX = tilt.x * 0.1;
-          const tiltForceY = -tilt.y * 0.1; // Negative because screen Y is inverted
-
-          newVx += tiltForceX;
-          newVy += gravity + tiltForceY;
-
-          // Damping
-          newVx *= 0.98;
-          newVy *= 0.98;
-
-          // Boundary collisions
-          const radius = particle.size / 2;
+      setWaterPoints(prevPoints => {
+        return prevPoints.map((point, i) => {
+          // Calculate target Y based on tilt and base water level
+          const tiltOffset = (point.x - screenSize.width / 2) * (tilt.x * 0.002); // Horizontal tilt effect
+          const targetY = point.baseY + tiltOffset + (tilt.y * 2); // Vertical tilt effect
           
-          if (newX <= radius) {
-            newX = radius;
-            newVx = -newVx * 0.6;
+          // Spring physics for water surface
+          const force = (targetY - point.y) * 0.02; // Spring force
+          const damping = 0.98; // Damping
+          
+          let newVelocity = (point.velocity + force) * damping;
+          let newY = point.y + newVelocity;
+          
+          // Add wave propagation from neighbors
+          if (i > 0 && i < prevPoints.length - 1) {
+            const leftNeighbor = prevPoints[i - 1];
+            const rightNeighbor = prevPoints[i + 1];
+            const neighborForce = ((leftNeighbor.y + rightNeighbor.y) / 2 - point.y) * 0.015;
+            newVelocity += neighborForce;
+            newY += neighborForce;
           }
-          if (newX >= screenSize.width - radius) {
-            newX = screenSize.width - radius;
-            newVx = -newVx * 0.6;
-          }
-          if (newY <= radius) {
-            newY = radius;
-            newVy = -newVy * 0.6;
-          }
-          if (newY >= screenSize.height - radius) {
-            newY = screenSize.height - radius;
-            newVy = -newVy * 0.6;
-          }
-
-          // Simple particle-to-particle collision (proximity-based)
-          const otherParticles = prevParticles.filter(p => p.id !== particle.id);
-          for (const other of otherParticles) {
-            const dx = newX - other.x;
-            const dy = newY - other.y;
-            const distance = Math.sqrt(dx * dx + dy * dy);
-            const minDistance = (particle.size + other.size) / 2;
-
-            if (distance < minDistance && distance > 0) {
-              const overlap = minDistance - distance;
-              const angle = Math.atan2(dy, dx);
-              
-              newX += Math.cos(angle) * overlap * 0.5;
-              newY += Math.sin(angle) * overlap * 0.5;
-              
-              const force = 0.5;
-              newVx += Math.cos(angle) * force;
-              newVy += Math.sin(angle) * force;
-            }
-          }
-
+          
           return {
-            ...particle,
-            x: newX,
+            ...point,
             y: newY,
-            vx: newVx,
-            vy: newVy
+            velocity: newVelocity
           };
-        })
+        });
+      });
+      
+      // Update splash particles
+      setSplashParticles(prev => 
+        prev.map(particle => ({
+          ...particle,
+          x: particle.x + particle.vx,
+          y: particle.y + particle.vy,
+          vy: particle.vy + 0.3, // Gravity
+          life: particle.life - 0.02
+        })).filter(particle => particle.life > 0)
       );
 
       animationFrameRef.current = requestAnimationFrame(animate);
@@ -189,6 +149,53 @@ export default function GlassOfWater() {
       }
     };
   }, [screenSize, tilt]);
+
+  // Generate splash particles when tilt changes rapidly
+  useEffect(() => {
+    const tiltMagnitude = Math.sqrt(tilt.x * tilt.x + tilt.y * tilt.y);
+    if (tiltMagnitude > 8 && Math.random() < 0.3) {
+      const newSplashes: Array<{x: number, y: number, vx: number, vy: number, life: number}> = [];
+      for (let i = 0; i < 5; i++) {
+        newSplashes.push({
+          x: Math.random() * screenSize.width,
+          y: screenSize.height * (0.4 + Math.random() * 0.2),
+          vx: (Math.random() - 0.5) * 10,
+          vy: -Math.random() * 8,
+          life: 1
+        });
+      }
+      setSplashParticles(prev => [...prev, ...newSplashes]);
+    }
+  }, [tilt, screenSize]);
+
+  // Generate water body path
+  const generateWaterPath = () => {
+    if (waterPoints.length === 0) return '';
+    
+    let path = `M 0 ${screenSize.height} `; // Start from bottom left
+    path += `L 0 ${waterPoints[0].y} `; // Go to first water point
+    
+    // Create smooth curve through all water points
+    for (let i = 0; i < waterPoints.length - 1; i++) {
+      const current = waterPoints[i];
+      const next = waterPoints[i + 1];
+      const midX = (current.x + next.x) / 2;
+      const midY = (current.y + next.y) / 2;
+      
+      if (i === 0) {
+        path += `L ${current.x} ${current.y} `;
+      }
+      path += `Q ${current.x} ${current.y} ${midX} ${midY} `;
+    }
+    
+    // Complete the water body
+    const lastPoint = waterPoints[waterPoints.length - 1];
+    path += `L ${lastPoint.x} ${lastPoint.y} `;
+    path += `L ${screenSize.width} ${screenSize.height} `; // Bottom right
+    path += `Z`; // Close path
+    
+    return path;
+  };
 
   return (
     <div className="min-h-screen bg-white text-black overflow-hidden relative">
@@ -209,23 +216,60 @@ export default function GlassOfWater() {
         <div className="w-48"></div> {/* Spacer for center alignment */}
       </header>
 
-      {/* Water Particles */}
+      {/* Water Body */}
       <div className="absolute inset-0 w-full h-full">
-        {waterParticles.map((particle) => (
+        <svg width="100%" height="100%" className="absolute inset-0">
+          <defs>
+            <linearGradient id="waterGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stopColor="rgba(100, 200, 255, 0.9)" />
+              <stop offset="30%" stopColor="rgba(80, 180, 255, 0.8)" />
+              <stop offset="70%" stopColor="rgba(60, 160, 255, 0.7)" />
+              <stop offset="100%" stopColor="rgba(40, 140, 255, 0.6)" />
+            </linearGradient>
+            
+            <filter id="waterFilter">
+              <feGaussianBlur in="SourceGraphic" stdDeviation="2" />
+              <feOffset dx="0" dy="2" result="offset" />
+              <feFlood floodColor="rgba(0, 100, 200, 0.3)" />
+              <feComposite in2="offset" operator="in" />
+              <feMerge>
+                <feMergeNode />
+                <feMergeNode in="SourceGraphic" />
+              </feMerge>
+            </filter>
+          </defs>
+          
+          {/* Main water body */}
+          <path
+            d={generateWaterPath()}
+            fill="url(#waterGradient)"
+            filter="url(#waterFilter)"
+            style={{ transition: 'none' }}
+          />
+          
+          {/* Water surface reflection */}
+          <path
+            d={waterPoints.length > 0 ? `M 0 ${waterPoints[0].y} ${waterPoints.map(p => `L ${p.x} ${p.y}`).join(' ')} L ${screenSize.width} ${waterPoints[waterPoints.length - 1]?.y || 0}` : ''}
+            fill="none"
+            stroke="rgba(255, 255, 255, 0.4)"
+            strokeWidth="2"
+            style={{ transition: 'none' }}
+          />
+        </svg>
+        
+        {/* Splash particles */}
+        {splashParticles.map((particle, index) => (
           <div
-            key={particle.id}
-            className="absolute rounded-full transition-none"
+            key={index}
+            className="absolute rounded-full pointer-events-none"
             style={{
-              width: `${particle.size}px`,
-              height: `${particle.size}px`,
-              left: `${particle.x - particle.size/2}px`,
-              top: `${particle.y - particle.size/2}px`,
-              background: `radial-gradient(circle at 30% 30%, 
-                rgba(100, 200, 255, 0.8), 
-                rgba(50, 150, 255, 0.6), 
-                rgba(0, 100, 200, 0.4))`,
-              boxShadow: '0 2px 8px rgba(0, 100, 200, 0.3)',
-              zIndex: 1
+              width: '6px',
+              height: '6px',
+              left: `${particle.x}px`,
+              top: `${particle.y}px`,
+              backgroundColor: `rgba(100, 200, 255, ${particle.life * 0.8})`,
+              transform: 'translate(-50%, -50%)',
+              zIndex: 2
             }}
           />
         ))}
@@ -234,7 +278,7 @@ export default function GlassOfWater() {
       {/* Tilt Indicator */}
       <div className="absolute bottom-8 left-8 z-10 bg-black bg-opacity-20 rounded-lg p-4 font-xanman-wide text-black">
         <div className="text-sm">TILT: {tilt.x.toFixed(1)}, {tilt.y.toFixed(1)}</div>
-        <div className="text-xs mt-1">PARTICLES: {waterParticles.length}</div>
+        <div className="text-xs mt-1">POINTS: {waterPoints.length}</div>
         <div className="text-xs">SCREEN: {screenSize.width}×{screenSize.height}</div>
       </div>
 
