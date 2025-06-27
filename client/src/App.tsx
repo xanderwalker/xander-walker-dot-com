@@ -11,6 +11,7 @@ import SensorDashboard from "@/pages/sensor-dashboard";
 import GlassOfWater from "@/pages/glass-of-water";
 import Balls333 from "@/pages/333-balls";
 import Clock from "@/pages/clock";
+import PixelClock from "@/pages/pixel-clock";
 import Roulette from "@/pages/roulette";
 import Contact from "@/pages/contact";
 import NotFound from "@/pages/not-found";
@@ -26,6 +27,7 @@ function Router() {
       <Route path="/projects/glass-of-water" component={GlassOfWater} />
       <Route path="/projects/333-balls" component={Balls333} />
       <Route path="/projects/clock" component={Clock} />
+      <Route path="/projects/pixel-clock" component={PixelClock} />
       <Route path="/projects/roulette" component={Roulette} />
       <Route path="/contact" component={Contact} />
       <Route component={NotFound} />

@@ -32,6 +32,12 @@ export default function Projects() {
       description: "Interactive roulette wheel with realistic physics simulation. Drag to spin the wheel, drop the ball, and watch it bounce to a winning number.",
       tags: "Physics • Interactive • Gaming",
       link: "/projects/roulette"
+    },
+    {
+      title: "PIXEL CLOCK",
+      description: "Minimalist clock with 1-pixel balls dropping continuously. 10 balls fall every second, cylinder clears every minute for precise time visualization.",
+      tags: "Minimalist • Physics • Time",
+      link: "/projects/pixel-clock"
     }
   ];
 
