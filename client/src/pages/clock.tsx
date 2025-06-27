@@ -9,6 +9,7 @@ interface Ball {
   vy: number;
   isSettled: boolean;
   settledIndex?: number;
+  ballSize?: number;
 }
 
 export default function Clock() {
@@ -43,7 +44,8 @@ export default function Clock() {
               y: -20, // Start above cylinder
               vx: (Math.random() - 0.5) * 2, // Random horizontal velocity
               vy: 0, // Start with no vertical velocity
-              isSettled: false 
+              isSettled: false,
+              ballSize: 16 // Regular size for minutes
             };
             const newBalls = [...prev, newBall];
             return newBalls.slice(-currentMinute || -60);
@@ -56,10 +58,11 @@ export default function Clock() {
               const newBall: Ball = { 
                 id: ballIdRef.current++, 
                 x: 40, 
-                y: -20, 
-                vx: (Math.random() - 0.5) * 2, 
+                y: -30, // Start higher for larger balls
+                vx: (Math.random() - 0.5) * 1.5, // Slower for larger balls
                 vy: 0, 
-                isSettled: false 
+                isSettled: false,
+                ballSize: 24 // Larger size for hours
               };
               const newBalls = [...prev, newBall];
               return newBalls.slice(-currentHour || -12);
@@ -73,7 +76,8 @@ export default function Clock() {
             y: -20, 
             vx: (Math.random() - 0.5) * 2, 
             vy: 0, 
-            isSettled: false 
+            isSettled: false,
+            ballSize: 16 // Regular size for seconds
           };
           setSecondBalls(prev => [...prev, newBall]);
         }
@@ -91,12 +95,13 @@ export default function Clock() {
     const hours = now.getHours() % 12;
     
     // Helper function to create naturally settled balls with proper spacing
-    const createSettledBalls = (count: number) => {
+    const createSettledBalls = (count: number, ballSize: number = 16) => {
       const balls: Ball[] = [];
-      const ballRadius = 8;
+      const ballRadius = ballSize / 2;
       const minDistance = ballRadius * 2.2;
       const cylinderWidth = 64; // 80px total - 16px margins
       const cylinderLeft = 16;
+      const bottomY = 320 - ballSize - 8; // Bottom position for this ball size
       
       for (let i = 0; i < count; i++) {
         let attempts = 0;
@@ -112,7 +117,7 @@ export default function Clock() {
           
           // Position within the layer with some randomness
           x = cylinderLeft + (positionInLayer * minDistance) + (Math.random() * 8 - 4);
-          y = 304 - (layer * minDistance) - (Math.random() * 4);
+          y = bottomY - (layer * minDistance) - (Math.random() * 4);
           
           // Ensure within cylinder bounds
           x = Math.max(cylinderLeft + ballRadius, Math.min(cylinderLeft + cylinderWidth - ballRadius, x));
@@ -121,11 +126,14 @@ export default function Clock() {
           // Check if this position overlaps with existing balls
           validPosition = true;
           for (const existingBall of balls) {
+            const existingBallSize = existingBall.ballSize || 16;
+            const existingBallRadius = existingBallSize / 2;
             const dx = x - existingBall.x;
             const dy = y - existingBall.y;
             const distance = Math.sqrt(dx * dx + dy * dy);
+            const requiredDistance = (ballRadius + existingBallRadius) * 1.1;
             
-            if (distance < minDistance) {
+            if (distance < requiredDistance) {
               validPosition = false;
               break;
             }
@@ -136,7 +144,7 @@ export default function Clock() {
         // If we couldn't find a good position, place it anyway (stacked higher)
         if (!validPosition) {
           x = cylinderLeft + ballRadius + (Math.random() * (cylinderWidth - ballRadius * 2));
-          y = 304 - i * 8; // Stack higher if needed
+          y = bottomY - i * ballRadius; // Stack higher if needed
         }
         
         balls.push({
@@ -145,15 +153,16 @@ export default function Clock() {
           y: y!,
           vx: 0,
           vy: 0,
-          isSettled: true
+          isSettled: true,
+          ballSize: ballSize
         });
       }
       return balls;
     };
     
-    setSecondBalls(createSettledBalls(seconds));
-    setMinuteBalls(createSettledBalls(minutes));
-    setHourBalls(createSettledBalls(hours));
+    setSecondBalls(createSettledBalls(seconds, 16));
+    setMinuteBalls(createSettledBalls(minutes, 16));
+    setHourBalls(createSettledBalls(hours, 24));
   }, []);
 
   // Physics animation loop
@@ -182,14 +191,17 @@ export default function Clock() {
             // Check collision with other balls and bottom
             const otherBalls = prevBalls.filter(b => b.id !== ball.id);
             let hasCollision = false;
+            const currentBallSize = ball.ballSize || 16;
+            const currentBallRadius = currentBallSize / 2;
             
             // Check collision with other balls (both settled and moving)
             for (const otherBall of otherBalls) {
               const dx = newX - otherBall.x;
               const dy = newY - otherBall.y;
               const distance = Math.sqrt(dx * dx + dy * dy);
-              const ballRadius = 8; // Half of 16px ball width
-              const minDistance = ballRadius * 2.2; // Slight spacing between balls
+              const otherBallSize = otherBall.ballSize || 16;
+              const otherBallRadius = otherBallSize / 2;
+              const minDistance = (currentBallRadius + otherBallRadius) * 1.1; // Slight spacing between balls
               
               if (distance < minDistance && distance > 0) {
                 // Separate balls to prevent overlap
@@ -212,8 +224,9 @@ export default function Clock() {
             }
             
             // Bottom collision (cylinder bottom)
-            if (newY >= 304) { // 320px cylinder height - 16px ball height
-              newY = 304;
+            const bottomY = 320 - currentBallSize - 8; // Cylinder height minus ball size and margin
+            if (newY >= bottomY) {
+              newY = bottomY;
               newVy = -newVy * 0.3; // Bounce with heavy damping
               newVx *= 0.7; // Friction
               hasCollision = true;
@@ -282,6 +295,9 @@ export default function Clock() {
     label: string,
     unit: string 
   }) => {
+    // Determine ball size based on cylinder type
+    const isHourCylinder = label === "Hours";
+    const ballSize = isHourCylinder ? 24 : 16; // Hours: 24px, others: 16px
     return (
       <div className="flex flex-col items-center">
         <div className="font-serif text-lg mb-2" style={{fontFamily: 'Georgia, serif'}}>{label}</div>
@@ -297,18 +313,23 @@ export default function Clock() {
           ))}
           
           {/* Balls */}
-          {balls.map((ball) => (
-            <div
-              key={ball.id}
-              className="absolute w-4 h-4 bg-blue-500 rounded-full border border-blue-700"
-              style={{
-                left: `${ball.x - 8}px`, // Center the ball (16px width / 2)
-                bottom: `${320 - ball.y - 16}px`, // Position from bottom
-                transition: 'none', // Let physics handle movement
-                zIndex: ball.isSettled ? 1 : 10 // Falling balls appear above settled ones
-              }}
-            />
-          ))}
+          {balls.map((ball) => {
+            const currentBallSize = ball.ballSize || ballSize;
+            return (
+              <div
+                key={ball.id}
+                className="absolute bg-blue-500 rounded-full border border-blue-700"
+                style={{
+                  width: `${currentBallSize}px`,
+                  height: `${currentBallSize}px`,
+                  left: `${ball.x - currentBallSize/2}px`, // Center the ball
+                  bottom: `${320 - ball.y - currentBallSize}px`, // Position from bottom
+                  transition: 'none', // Let physics handle movement
+                  zIndex: ball.isSettled ? 1 : 10 // Falling balls appear above settled ones
+                }}
+              />
+            );
+          })}
         </div>
         <div className="font-serif text-sm mt-1 text-gray-600" style={{fontFamily: 'Georgia, serif'}}>
           {balls.length} {unit}
