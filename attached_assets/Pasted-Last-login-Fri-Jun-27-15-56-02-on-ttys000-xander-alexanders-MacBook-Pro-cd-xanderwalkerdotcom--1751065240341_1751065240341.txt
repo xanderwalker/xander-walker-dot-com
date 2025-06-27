@@ -1,0 +1,49 @@
+Last login: Fri Jun 27 15:56:02 on ttys000
+xander@alexanders-MacBook-Pro ~ % cd xanderwalkerdotcom
+
+cd: no such file or directory: xanderwalkerdotcom
+xander@alexanders-MacBook-Pro ~ % ls -la
+total 78352
+drwxr-xr-x+   42 xander  staff      1344 Jun 27 15:59 .
+drwxr-xr-x     5 root    admin       160 Jan 21  2024 ..
+-r--------     1 xander  staff         7 Aug 17  2020 .CFUserTextEncoding
+-rw-r--r--@    1 xander  staff     30724 Jun 27 15:20 .DS_Store
+drwx------+    2 xander  staff        64 Jun 25 11:49 .Trash
+drwxr-x--x     3 xander  staff        96 Oct  4  2022 .adobe
+drwxr-xr-x     4 xander  staff       128 Oct 18  2024 .aws
+drwxr-xr-x     3 xander  staff        96 Jan 26  2021 .config
+drwx------     3 xander  staff        96 Aug 21  2020 .cups
+-rw-------     1 xander  staff        20 Oct 18  2024 .lesshst
+drwxr-xr-x     3 xander  staff        96 Jan 26  2021 .local
+drwxr-xr-x     3 root    staff        96 Jan 26  2021 .mono
+-rw-------     1 xander  staff      2147 Jun 26 11:54 .viminfo
+-rw-------     1 xander  staff      5585 Jun 27 15:21 .zsh_history
+drwx------    25 xander  staff       800 Jun 27 15:59 .zsh_sessions
+drwxr-xr-x    10 xander  staff       320 Mar 12  2023 2022 tax
+-rw-r--r--     1 xander  staff  40058107 Oct 18  2024 AWSCLIV2.pkg
+drwx------@    6 xander  staff       192 Jan 19  2024 Applications
+drwx------     7 xander  staff       224 Apr 28  2024 Creative Cloud Files Personal Account xanderfwalker@gmail.com 25042B9F4AD8850B992015C3@AdobeID
+drwx------@  393 xander  staff     12576 Jun 27 15:55 Desktop
+drwx------@   11 xander  staff       352 Dec 10  2024 Documents
+drwx------@ 2835 xander  staff     90720 Jun 27 15:59 Downloads
+drwxr-xr-x    16 xander  staff       512 Sep 21  2023 EVSERVICEPROS
+lrwx------     1 xander  staff        70 Jun 27 15:37 Google Drive -> /Users/xander/Library/CloudStorage/GoogleDrive-xanderfwalker@gmail.com
+drwx------@  100 xander  staff      3200 Dec 19  2024 Library
+drwx------+   21 xander  staff       672 Jun  5  2024 Movies
+drwx------+    5 xander  staff       160 Jan 31  2023 Music
+drwx------+   22 xander  staff       704 Aug  4  2023 Pictures
+drwxr-xr-x     2 xander  staff        64 Jul 14  2023 Pitch samples
+drwxr-xr-x+    5 xander  staff       160 Oct 26  2024 Public
+drwxr-xr-x  1062 xander  staff     33984 Apr  9  2024 Sony Movie File Dump august 2023
+drwxr-xr-x   143 xander  staff      4576 Jul 16  2024 art
+drwxr-xr-x    19 xander  staff       608 Sep  3  2024 coupe
+drwxr-xr-x     4 xander  staff       128 Jun  9  2024 insta360
+drwxr-xr-x     5 xander  staff       160 Jun 14  2024 job descriptions
+drwxr-xr-x    24 xander  staff       768 May  8 11:15 lightroom exports for flickr
+drwxr-xr-x    27 xander  staff       864 Sep 13  2023 monroneys
+drwxrwxrwx    37 xander  staff      1184 Apr  9  2024 pat shots
+drwxr-xr-x     4 xander  staff       128 Jun 12  2024 premier exports
+drwxr-xr-x    48 xander  staff      1536 Oct 20  2023 speckr
+drwxr-xr-x    13 xander  staff       416 Sep 27  2022 stock
+-rw-r--r--@    1 xander  staff      1052 Oct 18  2024 updateSpeckrEBEnvVar.py
+xander@alexanders-MacBook-Pro ~ % 
