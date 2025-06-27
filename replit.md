@@ -113,6 +113,7 @@ Changelog:
 - June 27, 2025. Created interactive paint-swirling background using Monet water lily colors - responds to mouse movement on desktop and device accelerometer on mobile. Multiple radial gradients create realistic paint mixing effects with smooth transitions. Replaces static gradient with dynamic user-controlled color morphing.
 - June 27, 2025. Deployed comprehensive updates via clean GitHub repository import - resolved git connection issues for streamlined future deployments while maintaining custom domain xanderwalker.com integration with Vercel.
 - June 27, 2025. Successfully deployed complete interactive portfolio via ZIP download and force push - all physics projects (333 balls, hourglass clock with Monet paint swirling, sensor dashboard, roulette wheel, glass of water) now live at xanderwalker.com through streamlined download-and-push workflow.
+- June 27, 2025. Fixed SPA routing issue - added vercel.json configuration to handle direct URL navigation. All project URLs (like /projects/333-balls) now work when shared directly, resolving 404 errors for deep links.
 ```
 
 ## User Preferences
