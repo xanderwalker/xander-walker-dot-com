@@ -842,7 +842,7 @@ export default function Clock() {
   // Device motion for paint swirling (mobile)
   useEffect(() => {
     const handleDeviceMotion = (event: DeviceMotionEvent) => {
-      if (event.accelerationIncludingGravity) {
+      if (window.innerWidth <= 768 && event.accelerationIncludingGravity) {
         const x = Math.max(-50, Math.min(50, (event.accelerationIncludingGravity.x || 0) * 5));
         const y = Math.max(-50, Math.min(50, (event.accelerationIncludingGravity.y || 0) * 5));
         const z = Math.max(-50, Math.min(50, (event.accelerationIncludingGravity.z || 0) * 5));
@@ -858,15 +858,18 @@ export default function Clock() {
       }
     };
 
-    // Request permission for device motion on iOS
-    if (typeof DeviceMotionEvent !== 'undefined' && typeof (DeviceMotionEvent as any).requestPermission === 'function') {
-      (DeviceMotionEvent as any).requestPermission().then((response: string) => {
-        if (response === 'granted') {
-          window.addEventListener('devicemotion', handleDeviceMotion);
-        }
-      });
-    } else {
-      window.addEventListener('devicemotion', handleDeviceMotion);
+    // Always set up event listener for mobile devices
+    if (window.innerWidth <= 768) {
+      // Request permission for device motion on iOS
+      if (typeof DeviceMotionEvent !== 'undefined' && typeof (DeviceMotionEvent as any).requestPermission === 'function') {
+        (DeviceMotionEvent as any).requestPermission().then((response: string) => {
+          if (response === 'granted') {
+            window.addEventListener('devicemotion', handleDeviceMotion);
+          }
+        });
+      } else {
+        window.addEventListener('devicemotion', handleDeviceMotion);
+      }
     }
 
     return () => window.removeEventListener('devicemotion', handleDeviceMotion);

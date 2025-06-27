@@ -1,6 +1,5 @@
+import { useState, useEffect, useRef } from 'react';
 import { Link } from 'wouter';
-import { useState, useEffect } from 'react';
-import Layout from '../components/layout';
 
 interface SpotifyTrack {
   id: string;
@@ -33,221 +32,62 @@ export default function SpotifyLyrics() {
   const [lyrics, setLyrics] = useState<LyricsData | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [currentPosition, setCurrentPosition] = useState<number>(0);
+  const [lyricsLoading, setLyricsLoading] = useState(false);
+  const [currentPosition, setCurrentPosition] = useState(0);
 
-  // Exchange authorization code for access token
-  const exchangeCodeForToken = async (code: string) => {
-    const CLIENT_ID = import.meta.env.VITE_SPOTIFY_CLIENT_ID;
-    const REDIRECT_URI = import.meta.env.DEV 
-      ? `${window.location.origin}/projects/spotify-lyrics`
-      : `https://xanderwalker.com/projects/spotify-lyrics`;
-    const codeVerifier = localStorage.getItem('code_verifier');
+  // Paint swirling background state
+  const [mousePos, setMousePos] = useState({ x: 0.5, y: 0.5 });
+  const [accelData, setAccelData] = useState({ x: 0, y: 0 });
+  const backgroundRef = useRef<HTMLDivElement>(null);
 
-    if (!codeVerifier) {
-      setError('Code verifier not found. Please try logging in again.');
-      return;
-    }
-
-    try {
-      const response = await fetch('https://accounts.spotify.com/api/token', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: new URLSearchParams({
-          client_id: CLIENT_ID,
-          grant_type: 'authorization_code',
-          code: code,
-          redirect_uri: REDIRECT_URI,
-          code_verifier: codeVerifier,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to exchange code for token');
-      }
-
-      const data = await response.json();
-      setAccessToken(data.access_token);
-      localStorage.setItem('spotify_access_token', data.access_token);
-      localStorage.removeItem('code_verifier');
-      
-      // Clean up URL
-      window.history.replaceState({}, document.title, window.location.pathname);
-    } catch (error) {
-      setError('Failed to authenticate with Spotify');
-      console.error('Token exchange error:', error);
-    }
-  };
-
-  // Check for authorization code in URL after Spotify redirect
+  // Initialize Spotify auth on mount
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const code = urlParams.get('code');
-    const error = urlParams.get('error');
-
-    if (error) {
-      setError(`Spotify authentication error: ${error}`);
-      return;
-    }
-
+    
     if (code) {
-      exchangeCodeForToken(code);
+      handleAuthCallback(code);
     } else {
-      // Check if token exists in localStorage
-      const savedToken = localStorage.getItem('spotify_access_token');
-      if (savedToken) {
-        setAccessToken(savedToken);
+      const storedToken = localStorage.getItem('spotify_access_token');
+      if (storedToken) {
+        setAccessToken(storedToken);
       }
     }
   }, []);
 
-  // Generate code verifier and challenge for PKCE
-  const generateCodeChallenge = async () => {
-    const codeVerifier = generateRandomString(128);
-    const data = new TextEncoder().encode(codeVerifier);
-    const digest = await window.crypto.subtle.digest('SHA-256', data);
-    const hashArray = new Uint8Array(digest);
-    const bytes: number[] = [];
-    for (let i = 0; i < hashArray.length; i++) {
-      bytes.push(hashArray[i]);
-    }
-    const codeChallenge = btoa(String.fromCharCode(...bytes))
-      .replace(/\+/g, '-')
-      .replace(/\//g, '_')
-      .replace(/=+$/, '');
-    
-    return { codeVerifier, codeChallenge };
-  };
-
-  const generateRandomString = (length: number) => {
-    let text = '';
-    const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    for (let i = 0; i < length; i++) {
-      text += possible.charAt(Math.floor(Math.random() * possible.length));
-    }
-    return text;
-  };
-
-  // Spotify login with PKCE
-  const loginToSpotify = async () => {
-    const CLIENT_ID = import.meta.env.VITE_SPOTIFY_CLIENT_ID;
-    // Use current origin for development, force HTTPS for production
-    const REDIRECT_URI = import.meta.env.DEV 
-      ? `${window.location.origin}/projects/spotify-lyrics`
-      : `https://xanderwalker.com/projects/spotify-lyrics`;
-    const SCOPES = 'user-read-currently-playing user-read-playback-state';
-    
-    if (!CLIENT_ID) {
-      setError('Spotify Client ID not configured. Please add VITE_SPOTIFY_CLIENT_ID to environment variables.');
-      return;
-    }
-
-    try {
-      const { codeVerifier, codeChallenge } = await generateCodeChallenge();
-      
-      // Store code verifier for later use
-      localStorage.setItem('code_verifier', codeVerifier);
-
-      const authUrl = `https://accounts.spotify.com/authorize?` +
-        `client_id=${CLIENT_ID}&` +
-        `response_type=code&` +
-        `redirect_uri=${encodeURIComponent(REDIRECT_URI)}&` +
-        `scope=${encodeURIComponent(SCOPES)}&` +
-        `code_challenge_method=S256&` +
-        `code_challenge=${codeChallenge}`;
-
-      window.location.href = authUrl;
-    } catch (error) {
-      setError('Failed to generate authentication challenge');
-    }
-  };
-
-  // Get currently playing track
-  const getCurrentTrack = async () => {
-    if (!accessToken) return;
-
-    try {
-      setLoading(true);
-      const response = await fetch('https://api.spotify.com/v1/me/player/currently-playing', {
-        headers: {
-          'Authorization': `Bearer ${accessToken}`
-        }
-      });
-
-      if (response.status === 204) {
-        setCurrentTrack(null);
-        setError('No track currently playing');
-        return;
-      }
-
-      if (response.status === 401) {
-        // Token expired
-        localStorage.removeItem('spotify_access_token');
-        setAccessToken(null);
-        setError('Spotify session expired. Please log in again.');
-        return;
-      }
-
-      if (!response.ok) {
-        throw new Error(`Spotify API error: ${response.status}`);
-      }
-
-      const data = await response.json();
-      if (data.item) {
-        setCurrentTrack(data.item);
-        setCurrentPosition(data.progress_ms || 0);
-        setError(null);
-        // Fetch lyrics for this track
-        await fetchLyrics(data.item.name, data.item.artists[0].name, data.item.id);
-      } else {
-        setCurrentTrack(null);
-        setError('No track currently playing');
-      }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error fetching current track');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Fetch lyrics from backend
-  const fetchLyrics = async (trackName: string, artistName: string, trackId?: string) => {
-    try {
-      const response = await fetch('/api/lyrics', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          track: trackName,
-          artist: artistName,
-          trackId: trackId
-        })
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch lyrics');
-      }
-
-      const lyricsData = await response.json();
-      setLyrics(lyricsData);
-    } catch (err) {
-      console.error('Error fetching lyrics:', err);
-      setLyrics({ lyrics: 'Lyrics not available for this track', source: 'system' });
-    }
-  };
-
-  // Auto-refresh current track every 30 seconds
+  // Paint swirling effects
   useEffect(() => {
-    if (accessToken) {
-      getCurrentTrack();
-      const interval = setInterval(getCurrentTrack, 30000);
-      return () => clearInterval(interval);
-    }
-  }, [accessToken]);
+    const handleMouseMove = (e: MouseEvent) => {
+      if (window.innerWidth > 768) {
+        setMousePos({
+          x: e.clientX / window.innerWidth,
+          y: e.clientY / window.innerHeight
+        });
+      }
+    };
 
-  // Update position in real-time when music is playing
+    const handleDeviceMotion = (event: DeviceMotionEvent) => {
+      if (window.innerWidth <= 768) {
+        const acceleration = event.accelerationIncludingGravity;
+        if (acceleration) {
+          setAccelData({
+            x: Math.max(-1, Math.min(1, (acceleration.x || 0) / 10)),
+            y: Math.max(-1, Math.min(1, (acceleration.y || 0) / 10))
+          });
+        }
+      }
+    };
+
+    document.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('devicemotion', handleDeviceMotion);
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('devicemotion', handleDeviceMotion);
+    };
+  }, []);
+
+  // Real-time position tracking
   useEffect(() => {
     if (currentTrack?.is_playing) {
       const timer = setInterval(() => {
@@ -256,6 +96,126 @@ export default function SpotifyLyrics() {
       return () => clearInterval(timer);
     }
   }, [currentTrack?.is_playing]);
+
+  // Spotify auth functions
+  const handleAuthCallback = async (code: string) => {
+    try {
+      const response = await fetch('/api/spotify/callback', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code })
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setAccessToken(data.access_token);
+        localStorage.setItem('spotify_access_token', data.access_token);
+        window.history.replaceState({}, document.title, window.location.pathname);
+      }
+    } catch (err) {
+      setError('Failed to authenticate with Spotify');
+    }
+  };
+
+  const loginToSpotify = () => {
+    const clientId = import.meta.env.VITE_SPOTIFY_CLIENT_ID;
+    const redirectUri = `${window.location.origin}/projects/spotify-lyrics`;
+    const scope = 'user-read-currently-playing user-read-playback-state';
+    
+    const params = new URLSearchParams({
+      response_type: 'code',
+      client_id: clientId,
+      scope: scope,
+      redirect_uri: redirectUri,
+      code_challenge_method: 'S256',
+      code_challenge: 'dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk',
+      state: 'spotify-auth'
+    });
+
+    window.location.href = `https://accounts.spotify.com/authorize?${params}`;
+  };
+
+  const getCurrentTrack = async () => {
+    if (!accessToken) return;
+    
+    setLoading(true);
+    try {
+      const response = await fetch('https://api.spotify.com/v1/me/player/currently-playing', {
+        headers: {
+          'Authorization': `Bearer ${accessToken}`
+        }
+      });
+
+      if (response.status === 204) {
+        setCurrentTrack(null);
+        setLyrics(null);
+        return;
+      }
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data.item) {
+          setCurrentTrack({
+            id: data.item.id,
+            name: data.item.name,
+            artists: data.item.artists,
+            album: data.item.album,
+            duration_ms: data.item.duration_ms,
+            progress_ms: data.progress_ms || 0,
+            is_playing: data.is_playing
+          });
+          setCurrentPosition(data.progress_ms || 0);
+          
+          // Auto-fetch lyrics for new track
+          if (!lyrics || lyrics.source !== data.item.id) {
+            fetchLyrics(data.item.name, data.item.artists[0].name, data.item.id);
+          }
+        }
+      }
+    } catch (err) {
+      setError('Failed to get current track');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchLyrics = async (trackName?: string, artistName?: string, trackId?: string) => {
+    const songName = trackName || currentTrack?.name;
+    const artist = artistName || currentTrack?.artists[0]?.name;
+    const spotifyId = trackId || currentTrack?.id;
+    
+    if (!songName || !artist) return;
+    
+    setLyricsLoading(true);
+    try {
+      const response = await fetch('/api/lyrics', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          song: songName, 
+          artist: artist,
+          trackId: spotifyId
+        })
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setLyrics(data);
+      }
+    } catch (err) {
+      setError('Failed to fetch lyrics');
+    } finally {
+      setLyricsLoading(false);
+    }
+  };
+
+  const logout = () => {
+    localStorage.removeItem('spotify_access_token');
+    setAccessToken(null);
+    setCurrentTrack(null);
+    setLyrics(null);
+    setError(null);
+  };
 
   // Create basic synchronized lyrics from static lyrics
   const createBasicSync = (lyricsText: string, duration: number) => {
@@ -306,139 +266,188 @@ export default function SpotifyLyrics() {
     return -1;
   };
 
-  // Logout
-  const logout = () => {
-    localStorage.removeItem('spotify_access_token');
-    setAccessToken(null);
-    setCurrentTrack(null);
-    setLyrics(null);
-    setError(null);
-  };
+  // Auto-refresh current track
+  useEffect(() => {
+    if (accessToken) {
+      getCurrentTrack();
+      const interval = setInterval(getCurrentTrack, 30000);
+      return () => clearInterval(interval);
+    }
+  }, [accessToken]);
 
-  // Format duration
-  const formatDuration = (ms: number) => {
-    const minutes = Math.floor(ms / 60000);
-    const seconds = Math.floor((ms % 60000) / 1000);
-    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+  const dynamicStyle = window.innerWidth > 768 ? {
+    // Desktop: mouse-based
+    background: `
+      radial-gradient(circle at ${mousePos.x * 100}% ${mousePos.y * 100}%, 
+        rgba(91, 134, 229, 0.3) 0%, 
+        rgba(147, 112, 219, 0.2) 25%,
+        rgba(72, 61, 139, 0.15) 50%,
+        rgba(25, 25, 112, 0.1) 75%,
+        rgba(0, 0, 0, 0.05) 100%),
+      radial-gradient(circle at ${(1 - mousePos.x) * 100}% ${(1 - mousePos.y) * 100}%, 
+        rgba(255, 248, 220, 0.2) 0%,
+        rgba(245, 245, 220, 0.15) 30%,
+        rgba(230, 230, 250, 0.1) 60%,
+        rgba(240, 248, 255, 0.05) 100%),
+      linear-gradient(135deg, 
+        rgba(123, 104, 238, 0.1) 0%,
+        rgba(147, 112, 219, 0.08) 25%,
+        rgba(72, 61, 139, 0.06) 50%,
+        rgba(25, 25, 112, 0.04) 100%)
+    `
+  } : {
+    // Mobile: accelerometer-based
+    background: `
+      radial-gradient(circle at ${50 + accelData.x * 30}% ${50 + accelData.y * 30}%, 
+        rgba(91, 134, 229, 0.3) 0%, 
+        rgba(147, 112, 219, 0.2) 25%,
+        rgba(72, 61, 139, 0.15) 50%,
+        rgba(25, 25, 112, 0.1) 75%,
+        rgba(0, 0, 0, 0.05) 100%),
+      radial-gradient(circle at ${50 - accelData.x * 25}% ${50 - accelData.y * 25}%, 
+        rgba(255, 248, 220, 0.2) 0%,
+        rgba(245, 245, 220, 0.15) 30%,
+        rgba(230, 230, 250, 0.1) 60%,
+        rgba(240, 248, 255, 0.05) 100%),
+      linear-gradient(135deg, 
+        rgba(123, 104, 238, 0.1) 0%,
+        rgba(147, 112, 219, 0.08) 25%,
+        rgba(72, 61, 139, 0.06) 50%,
+        rgba(25, 25, 112, 0.04) 100%)
+    `
   };
 
   return (
-    <Layout title="SPOTIFY LYRICS" subtitle="Real-time lyrics for your currently playing Spotify track">
-      <div className="min-h-screen p-6">
-        {/* Navigation */}
-        <div className="mb-8 text-center">
-          <Link 
-            to="/projects" 
-            className="inline-block px-6 py-3 bg-white/10 hover:bg-white/20 backdrop-blur-sm rounded-2xl transition-all duration-300 font-serif text-lg"
-            style={{fontFamily: 'Georgia, serif'}}
-          >
-            ← Back to Projects
-          </Link>
-        </div>
-
-        {/* Main Container */}
-        <div className="max-w-4xl mx-auto">
-          <div className="glassmorphism rounded-2xl p-8">
-            <h1 className="font-serif text-3xl mb-6 text-center" style={{fontFamily: 'Georgia, serif'}}>
+    <div className="min-h-screen relative">
+      {/* Dynamic Monet Background */}
+      <div 
+        ref={backgroundRef}
+        className="fixed inset-0 transition-all duration-300 ease-out"
+        style={dynamicStyle}
+      />
+      
+      {/* Connection Status - Top of screen when not connected */}
+      {!accessToken && (
+        <div className="flex items-center justify-center min-h-screen px-8 relative z-10">
+          <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-12 text-center border border-white/20 max-w-2xl">
+            <h2 className="font-serif text-6xl font-bold text-white mb-8" style={{fontFamily: 'Georgia, serif'}}>
               SPOTIFY LYRICS
-            </h1>
+            </h2>
+            <p className="font-serif text-2xl text-gray-300 mb-12" style={{fontFamily: 'Georgia, serif'}}>
+              Connect to see real-time lyrics for distance reading
+            </p>
+            <button
+              onClick={loginToSpotify}
+              className="font-serif bg-green-600 hover:bg-green-700 text-white px-12 py-6 rounded-lg text-3xl transition-colors duration-200 font-bold"
+              style={{fontFamily: 'Georgia, serif'}}
+            >
+              Connect to Spotify
+            </button>
+            
+            <div className="mt-8">
+              <Link href="/projects">
+                <button className="text-white hover:text-gray-200 transition-colors text-lg font-serif bg-black/30 px-6 py-3 rounded-lg border border-white/20" style={{fontFamily: 'Georgia, serif'}}>
+                  ← Back to Projects
+                </button>
+              </Link>
+            </div>
+          </div>
+        </div>
+      )}
 
-            {!accessToken ? (
-              /* Login Section */
-              <div className="text-center">
-                <div className="mb-6">
-                  <div className="font-serif text-lg mb-4" style={{fontFamily: 'Georgia, serif'}}>
-                    Connect to Spotify to view lyrics for your currently playing track
-                  </div>
-                  <button
-                    onClick={loginToSpotify}
-                    className="px-8 py-4 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-serif text-lg"
-                    style={{fontFamily: 'Georgia, serif'}}
-                  >
-                    Connect to Spotify
-                  </button>
-                </div>
-                
-                {error && (
-                  <div className="text-red-500 font-serif text-sm" style={{fontFamily: 'Georgia, serif'}}>
-                    {error}
-                  </div>
-                )}
+      {/* Connected State - Full screen lyrics layout */}
+      {accessToken && (
+        <div className="min-h-screen flex flex-col relative z-10">
+          
+          {/* Top Controls Bar */}
+          <div className="flex justify-between items-center p-6 bg-black/20 backdrop-blur-sm">
+            <Link href="/projects">
+              <button className="text-white hover:text-gray-200 transition-colors text-lg font-serif bg-black/30 px-4 py-2 rounded-lg border border-white/20" style={{fontFamily: 'Georgia, serif'}}>
+                ← BACK
+              </button>
+            </Link>
+            
+            <div className="flex items-center space-x-4">
+              <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+              <button
+                onClick={getCurrentTrack}
+                disabled={loading}
+                className="font-serif bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 text-white px-4 py-2 rounded-lg transition-colors duration-200"
+                style={{fontFamily: 'Georgia, serif'}}
+              >
+                {loading ? 'Refreshing...' : 'Refresh'}
+              </button>
+              <button
+                onClick={logout}
+                className="font-serif bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition-colors duration-200"
+                style={{fontFamily: 'Georgia, serif'}}
+              >
+                Disconnect
+              </button>
+            </div>
+          </div>
+
+          {/* Main Lyrics Area */}
+          <div className="flex-1 flex flex-col px-8 py-4">
+            
+            {/* Error Messages */}
+            {error && (
+              <div className="bg-red-500/20 border border-red-500/30 rounded-lg p-4 mb-4">
+                <p className="font-serif text-red-200 text-xl" style={{fontFamily: 'Georgia, serif'}}>
+                  {error}
+                </p>
               </div>
-            ) : (
-              /* Connected Section */
-              <div>
-                {/* Connection Status */}
-                <div className="text-center mb-6">
-                  <div className="inline-block px-4 py-2 bg-green-600 text-white rounded-lg font-serif text-sm" style={{fontFamily: 'Georgia, serif'}}>
-                    Connected to Spotify
-                  </div>
-                  <button
-                    onClick={logout}
-                    className="ml-4 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-serif text-sm"
-                    style={{fontFamily: 'Georgia, serif'}}
-                  >
-                    Disconnect
-                  </button>
-                </div>
+            )}
 
-                {/* Refresh Button */}
-                <div className="text-center mb-6">
-                  <button
-                    onClick={getCurrentTrack}
-                    disabled={loading}
-                    className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 transition-colors font-serif"
-                    style={{fontFamily: 'Georgia, serif'}}
-                  >
-                    {loading ? 'Loading...' : 'Refresh Now Playing'}
-                  </button>
+            {/* Loading State */}
+            {loading && (
+              <div className="flex-1 flex items-center justify-center">
+                <div className="text-center">
+                  <div className="animate-spin w-16 h-16 border-4 border-white border-t-transparent rounded-full mx-auto mb-8"></div>
+                  <p className="font-serif text-white text-3xl" style={{fontFamily: 'Georgia, serif'}}>Loading...</p>
                 </div>
+              </div>
+            )}
 
-                {/* Current Track Display */}
-                {currentTrack && (
-                  <div className="mb-8">
-                    <div className="bg-white/10 rounded-2xl p-6">
-                      <div className="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-6">
-                        {/* Album Art */}
-                        {currentTrack.album.images[0] && (
-                          <img
-                            src={currentTrack.album.images[0].url}
-                            alt={currentTrack.album.name}
-                            className="w-32 h-32 rounded-lg shadow-lg"
-                          />
-                        )}
-                        
-                        {/* Track Info */}
-                        <div className="flex-1 text-center md:text-left">
-                          <h2 className="font-serif text-2xl mb-2" style={{fontFamily: 'Georgia, serif'}}>
-                            {currentTrack.name}
-                          </h2>
-                          <p className="font-serif text-lg text-gray-600 mb-2" style={{fontFamily: 'Georgia, serif'}}>
-                            {currentTrack.artists.map(artist => artist.name).join(', ')}
-                          </p>
-                          <p className="font-serif text-sm text-gray-500 mb-2" style={{fontFamily: 'Georgia, serif'}}>
-                            {currentTrack.album.name}
-                          </p>
-                          <div className="font-serif text-sm" style={{fontFamily: 'Georgia, serif'}}>
-                            {formatDuration(currentTrack.progress_ms)} / {formatDuration(currentTrack.duration_ms)}
-                            {currentTrack.is_playing ? ' • Playing' : ' • Paused'}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
+            {/* No Track Playing */}
+            {!currentTrack && !loading && (
+              <div className="flex-1 flex items-center justify-center">
+                <div className="text-center">
+                  <h3 className="font-serif text-6xl mb-8 text-white" style={{fontFamily: 'Georgia, serif'}}>
+                    No Track Playing
+                  </h3>
+                  <p className="font-serif text-3xl text-gray-300" style={{fontFamily: 'Georgia, serif'}}>
+                    Start playing a song on Spotify
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* Lyrics Display - Full Screen */}
+            {currentTrack && (
+              <div className="flex-1 flex flex-col">
+                
+                {/* Fetch Lyrics Button (if no lyrics) */}
+                {!lyrics && (
+                  <div className="text-center mb-8">
+                    <button
+                      onClick={() => fetchLyrics()}
+                      disabled={lyricsLoading}
+                      className="font-serif bg-purple-600 hover:bg-purple-700 disabled:bg-gray-600 text-white px-12 py-6 rounded-lg text-3xl transition-colors duration-200 font-bold"
+                      style={{fontFamily: 'Georgia, serif'}}
+                    >
+                      {lyricsLoading ? 'Fetching Lyrics...' : 'Get Lyrics'}
+                    </button>
                   </div>
                 )}
 
-                {/* Lyrics Display */}
+                {/* Full Width Lyrics */}
                 {lyrics && (
-                  <div className="bg-white/10 rounded-2xl p-6">
-                    <h3 className="font-serif text-xl mb-4 text-center" style={{fontFamily: 'Georgia, serif'}}>
-                      LYRICS {lyrics.syncedLyrics ? '(SYNCHRONIZED)' : currentTrack?.is_playing ? '(AUTO-SYNC)' : ''}
-                    </h3>
-                    <div className="bg-white/5 rounded-lg p-4 max-h-96 overflow-y-auto">
+                  <div className="flex-1 bg-black/20 backdrop-blur-sm rounded-2xl p-8 mb-4">
+                    <div className="h-full overflow-y-auto">
                       {(lyrics.syncedLyrics || (currentTrack?.is_playing && lyrics.lyrics)) ? (
-                        // Synchronized or auto-synchronized lyrics display
-                        <div className="font-serif text-sm leading-relaxed space-y-2" style={{fontFamily: 'Georgia, serif'}}>
+                        // Large synchronized lyrics for distance reading
+                        <div className="font-serif leading-relaxed space-y-6 text-center" style={{fontFamily: 'Georgia, serif'}}>
                           {(lyrics.syncedLyrics || createBasicSync(lyrics.lyrics, currentTrack?.duration_ms || 0)).map((line, index) => {
                             const isCurrentLine = getCurrentLyricIndex() === index;
                             return (
@@ -446,11 +455,11 @@ export default function SpotifyLyrics() {
                                 key={index}
                                 className={`transition-all duration-500 ${
                                   isCurrentLine 
-                                    ? 'text-white font-bold text-lg scale-105' 
-                                    : 'text-gray-300 text-sm'
+                                    ? 'text-white font-bold text-4xl md:text-6xl scale-105' 
+                                    : 'text-gray-400 text-2xl md:text-4xl'
                                 }`}
                                 style={{
-                                  transform: isCurrentLine ? 'translateX(10px)' : 'translateX(0)',
+                                  transform: isCurrentLine ? 'translateY(-10px)' : 'translateY(0)',
                                 }}
                               >
                                 {line.words}
@@ -459,41 +468,56 @@ export default function SpotifyLyrics() {
                           })}
                         </div>
                       ) : (
-                        // Static lyrics display
-                        <pre className="font-serif text-sm whitespace-pre-wrap leading-relaxed" style={{fontFamily: 'Georgia, serif'}}>
+                        // Large static lyrics
+                        <div className="font-serif text-2xl md:text-4xl whitespace-pre-wrap leading-relaxed text-center text-white" style={{fontFamily: 'Georgia, serif'}}>
                           {lyrics.lyrics}
-                        </pre>
+                        </div>
                       )}
                     </div>
-                    <div className="text-center mt-4 text-xs text-gray-500 font-serif" style={{fontFamily: 'Georgia, serif'}}>
-                      Lyrics provided by {lyrics.source}
-                      {currentTrack?.is_playing && (
-                        <span className="ml-2">
-                          • Position: {Math.floor(currentPosition / 1000)}s / {Math.floor((currentTrack?.duration_ms || 0) / 1000)}s
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                )}
-
-                {/* Error Display */}
-                {error && (
-                  <div className="text-center text-red-500 font-serif" style={{fontFamily: 'Georgia, serif'}}>
-                    {error}
-                  </div>
-                )}
-
-                {/* No Track Playing */}
-                {!currentTrack && !loading && !error && (
-                  <div className="text-center text-gray-500 font-serif" style={{fontFamily: 'Georgia, serif'}}>
-                    No track currently playing. Start playing music on Spotify and refresh.
                   </div>
                 )}
               </div>
             )}
           </div>
+
+          {/* Bottom Album Info Bar */}
+          {currentTrack && (
+            <div className="bg-black/30 backdrop-blur-sm p-6 border-t border-white/20">
+              <div className="flex items-center justify-between max-w-6xl mx-auto">
+                <div className="flex items-center space-x-6">
+                  <img 
+                    src={currentTrack.album.images[0]?.url} 
+                    alt={currentTrack.album.name}
+                    className="w-16 h-16 rounded-lg object-cover"
+                  />
+                  <div>
+                    <h3 className="font-serif text-2xl font-bold text-white" style={{fontFamily: 'Georgia, serif'}}>
+                      {currentTrack.name}
+                    </h3>
+                    <p className="font-serif text-xl text-gray-300" style={{fontFamily: 'Georgia, serif'}}>
+                      {currentTrack.artists.map(artist => artist.name).join(', ')}
+                    </p>
+                  </div>
+                </div>
+                
+                <div className="text-right">
+                  <div className="flex items-center space-x-2 mb-2">
+                    <div className={`w-3 h-3 rounded-full ${currentTrack.is_playing ? 'bg-green-500 animate-pulse' : 'bg-gray-500'}`}></div>
+                    <p className="font-serif text-lg text-gray-300" style={{fontFamily: 'Georgia, serif'}}>
+                      {currentTrack.is_playing ? 'Playing' : 'Paused'}
+                    </p>
+                  </div>
+                  {currentTrack.is_playing && (
+                    <p className="font-serif text-sm text-gray-400" style={{fontFamily: 'Georgia, serif'}}>
+                      {Math.floor(currentPosition / 1000)}s / {Math.floor((currentTrack?.duration_ms || 0) / 1000)}s
+                    </p>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
         </div>
-      </div>
-    </Layout>
+      )}
+    </div>
   );
 }
