@@ -257,21 +257,52 @@ export default function SpotifyLyrics() {
     }
   }, [currentTrack?.is_playing]);
 
+  // Create basic synchronized lyrics from static lyrics
+  const createBasicSync = (lyricsText: string, duration: number) => {
+    const lines = lyricsText.split('\n').filter(line => line.trim());
+    const timePerLine = duration / lines.length;
+    
+    return lines.map((line, index) => ({
+      startTimeMs: (index * timePerLine).toString(),
+      words: line.trim(),
+      endTimeMs: ((index + 1) * timePerLine).toString()
+    }));
+  };
+
   // Find current lyric line based on position
   const getCurrentLyricIndex = () => {
-    if (!lyrics?.syncedLyrics) return -1;
+    if (!lyrics) return -1;
     
-    for (let i = 0; i < lyrics.syncedLyrics.length; i++) {
-      const currentLine = lyrics.syncedLyrics[i];
-      const nextLine = lyrics.syncedLyrics[i + 1];
+    // Use synchronized lyrics if available
+    if (lyrics.syncedLyrics) {
+      for (let i = 0; i < lyrics.syncedLyrics.length; i++) {
+        const currentLine = lyrics.syncedLyrics[i];
+        const nextLine = lyrics.syncedLyrics[i + 1];
+        
+        const currentTime = parseInt(currentLine.startTimeMs);
+        const nextTime = nextLine ? parseInt(nextLine.startTimeMs) : Infinity;
+        
+        if (currentPosition >= currentTime && currentPosition < nextTime) {
+          return i;
+        }
+      }
+    } else if (currentTrack) {
+      // Create basic sync from static lyrics
+      const basicSync = createBasicSync(lyrics.lyrics, currentTrack.duration_ms);
       
-      const currentTime = parseInt(currentLine.startTimeMs);
-      const nextTime = nextLine ? parseInt(nextLine.startTimeMs) : Infinity;
-      
-      if (currentPosition >= currentTime && currentPosition < nextTime) {
-        return i;
+      for (let i = 0; i < basicSync.length; i++) {
+        const currentLine = basicSync[i];
+        const nextLine = basicSync[i + 1];
+        
+        const currentTime = parseInt(currentLine.startTimeMs);
+        const nextTime = nextLine ? parseInt(nextLine.startTimeMs) : Infinity;
+        
+        if (currentPosition >= currentTime && currentPosition < nextTime) {
+          return i;
+        }
       }
     }
+    
     return -1;
   };
 
@@ -402,18 +433,18 @@ export default function SpotifyLyrics() {
                 {lyrics && (
                   <div className="bg-white/10 rounded-2xl p-6">
                     <h3 className="font-serif text-xl mb-4 text-center" style={{fontFamily: 'Georgia, serif'}}>
-                      LYRICS {lyrics.syncedLyrics && '(SYNCHRONIZED)'}
+                      LYRICS {lyrics.syncedLyrics ? '(SYNCHRONIZED)' : currentTrack?.is_playing ? '(AUTO-SYNC)' : ''}
                     </h3>
                     <div className="bg-white/5 rounded-lg p-4 max-h-96 overflow-y-auto">
-                      {lyrics.syncedLyrics ? (
-                        // Synchronized lyrics display
+                      {(lyrics.syncedLyrics || (currentTrack?.is_playing && lyrics.lyrics)) ? (
+                        // Synchronized or auto-synchronized lyrics display
                         <div className="font-serif text-sm leading-relaxed space-y-2" style={{fontFamily: 'Georgia, serif'}}>
-                          {lyrics.syncedLyrics.map((line, index) => {
+                          {(lyrics.syncedLyrics || createBasicSync(lyrics.lyrics, currentTrack?.duration_ms || 0)).map((line, index) => {
                             const isCurrentLine = getCurrentLyricIndex() === index;
                             return (
                               <div
                                 key={index}
-                                className={`transition-all duration-300 ${
+                                className={`transition-all duration-500 ${
                                   isCurrentLine 
                                     ? 'text-white font-bold text-lg scale-105' 
                                     : 'text-gray-300 text-sm'
@@ -436,9 +467,9 @@ export default function SpotifyLyrics() {
                     </div>
                     <div className="text-center mt-4 text-xs text-gray-500 font-serif" style={{fontFamily: 'Georgia, serif'}}>
                       Lyrics provided by {lyrics.source}
-                      {currentTrack?.is_playing && lyrics.syncedLyrics && (
+                      {currentTrack?.is_playing && (
                         <span className="ml-2">
-                          • Position: {Math.floor(currentPosition / 1000)}s
+                          • Position: {Math.floor(currentPosition / 1000)}s / {Math.floor((currentTrack?.duration_ms || 0) / 1000)}s
                         </span>
                       )}
                     </div>

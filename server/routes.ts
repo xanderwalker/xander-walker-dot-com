@@ -18,7 +18,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (trackId) {
         try {
           console.log(`Attempting to fetch synced lyrics for track ID: ${trackId}`);
-          const syncResponse = await fetch(`https://spotify-lyric-api.herokuapp.com/?trackid=${trackId}`);
+          
+          // Try the akashrchandran API first
+          const syncResponse = await fetch(`https://spotify-lyrics-api-akashrchandran.vercel.app/?trackid=${trackId}`);
           console.log(`Sync API response status: ${syncResponse.status}`);
           
           if (syncResponse.ok) {
@@ -28,11 +30,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
             if (syncData.error === false && syncData.lines) {
               syncedLyrics = syncData.lines;
               console.log(`Found ${syncedLyrics.length} synchronized lyric lines`);
+            } else if (syncData.syncType === 'LINE_SYNCED' && syncData.lines) {
+              syncedLyrics = syncData.lines;
+              console.log(`Found ${syncedLyrics.length} synchronized lyric lines`);
             } else {
               console.log('No synchronized lyrics found or API returned error');
             }
           } else {
-            console.log(`Sync API failed with status: ${syncResponse.status}`);
+            console.log(`Primary sync API failed with status: ${syncResponse.status}, trying backup`);
+            
+            // Fallback to alternative API
+            try {
+              const backupResponse = await fetch(`https://lyricstify.vercel.app/api/lyrics?track=${trackId}`);
+              if (backupResponse.ok) {
+                const backupData = await backupResponse.json();
+                console.log('Backup API response:', JSON.stringify(backupData, null, 2));
+                
+                if (backupData.lines) {
+                  syncedLyrics = backupData.lines;
+                  console.log(`Found ${syncedLyrics.length} synchronized lyric lines from backup API`);
+                }
+              }
+            } catch (backupError) {
+              console.log('Backup API also failed:', backupError);
+            }
           }
         } catch (syncError) {
           console.warn('Failed to fetch synchronized lyrics:', syncError);
