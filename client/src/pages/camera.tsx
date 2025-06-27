@@ -7,16 +7,17 @@ interface CameraDevice {
   label: string;
   kind: MediaDeviceKind;
   facing: 'user' | 'environment' | 'unknown';
-  stream?: MediaStream;
 }
 
 export default function Camera() {
   const [cameras, setCameras] = useState<CameraDevice[]>([]);
-  const [camerasActive, setCamerasActive] = useState(false);
+  const [activeCamera, setActiveCamera] = useState<CameraDevice | null>(null);
   const [permissions, setPermissions] = useState({ camera: false });
+  const [currentStream, setCurrentStream] = useState<MediaStream | null>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
 
-  // Detect and initialize all cameras
-  const detectAndInitializeCameras = async () => {
+  // Detect available cameras
+  const detectCameras = async () => {
     try {
       // Request camera permission first
       const stream = await navigator.mediaDevices.getUserMedia({ video: true });
@@ -64,62 +65,65 @@ export default function Camera() {
     }
   };
 
-  // Start all camera streams
-  const startAllCameras = async () => {
-    if (cameras.length === 0) return;
-
-    const updatedCameras = [...cameras];
-    
-    for (let i = 0; i < updatedCameras.length; i++) {
-      try {
-        const constraints = {
-          video: {
-            deviceId: { exact: updatedCameras[i].deviceId },
-            width: { ideal: 480 },
-            height: { ideal: 360 }
-          }
-        };
-
-        const stream = await navigator.mediaDevices.getUserMedia(constraints);
-        updatedCameras[i].stream = stream;
-
-        // Start video stream
-        setTimeout(() => {
-          const videoElement = document.getElementById(`camera-${i}`) as HTMLVideoElement;
-          if (videoElement && stream) {
-            videoElement.srcObject = stream;
-            videoElement.play();
-          }
-        }, 100);
-
-      } catch (error) {
-        console.error(`Failed to start camera ${updatedCameras[i].label}:`, error);
+  // Switch to a specific camera
+  const switchToCamera = async (targetCamera: CameraDevice) => {
+    try {
+      // Stop current camera if active
+      if (currentStream) {
+        currentStream.getTracks().forEach((track: MediaStreamTrack) => track.stop());
       }
-    }
 
-    setCameras(updatedCameras);
-    setCamerasActive(true);
+      const constraints = {
+        video: {
+          deviceId: { exact: targetCamera.deviceId },
+          width: { ideal: 640 },
+          height: { ideal: 480 }
+        }
+      };
+
+      const stream = await navigator.mediaDevices.getUserMedia(constraints);
+      setCurrentStream(stream);
+      setActiveCamera(targetCamera);
+
+      // Start video stream
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+        videoRef.current.play();
+      }
+
+    } catch (error) {
+      console.error(`Failed to switch to camera ${targetCamera.label}:`, error);
+    }
   };
 
-  // Stop all camera streams
-  const stopAllCameras = () => {
-    cameras.forEach(camera => {
-      if (camera.stream) {
-        camera.stream.getTracks().forEach((track: MediaStreamTrack) => track.stop());
-      }
-    });
-    
-    setCameras(cameras.map(camera => ({ ...camera, stream: undefined })));
-    setCamerasActive(false);
+  // Stop current camera
+  const stopCamera = () => {
+    if (currentStream) {
+      currentStream.getTracks().forEach((track: MediaStreamTrack) => track.stop());
+    }
+    setCurrentStream(null);
+    setActiveCamera(null);
+    if (videoRef.current) {
+      videoRef.current.srcObject = null;
+    }
   };
 
   // Initialize cameras on component mount
   useEffect(() => {
-    detectAndInitializeCameras();
+    detectCameras();
   }, []);
 
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (currentStream) {
+        currentStream.getTracks().forEach(track => track.stop());
+      }
+    };
+  }, [currentStream]);
+
   return (
-    <Layout title="CAMERA SYSTEM" subtitle="Multi-camera detection and live video streams">
+    <Layout title="CAMERA SYSTEM" subtitle="Single camera switching due to hardware limitations">
       <div className="min-h-screen p-6">
         {/* Navigation */}
         <div className="mb-8 text-center">
@@ -133,11 +137,21 @@ export default function Camera() {
         </div>
 
         {/* Camera System Container */}
-        <div className="max-w-6xl mx-auto">
+        <div className="max-w-4xl mx-auto">
           <div className="glassmorphism rounded-2xl p-8">
             <h1 className="font-serif text-3xl mb-6 text-center" style={{fontFamily: 'Georgia, serif'}}>
               CAMERA SYSTEM
             </h1>
+            
+            {/* Hardware Limitation Notice */}
+            <div className="mb-6 p-4 bg-blue-100/20 rounded-lg text-center">
+              <div className="font-serif text-lg mb-2" style={{fontFamily: 'Georgia, serif'}}>
+                Hardware Limitation Notice
+              </div>
+              <div className="font-serif text-sm" style={{fontFamily: 'Georgia, serif'}}>
+                Mobile devices can only access one camera at a time. Switch between available cameras using the buttons below.
+              </div>
+            </div>
             
             {/* Permission Status */}
             <div className="text-center mb-6">
@@ -153,15 +167,29 @@ export default function Camera() {
               {cameras.length > 0 ? (
                 <>
                   <div className="text-lg mb-4">Detected {cameras.length} camera(s)</div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                    {cameras.map((camera, index) => (
-                      <div key={camera.deviceId} className="bg-white/10 rounded-lg p-3">
+                  
+                  {/* Camera Switcher Buttons */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+                    {cameras.map((camera) => (
+                      <button
+                        key={camera.deviceId}
+                        onClick={() => switchToCamera(camera)}
+                        className={`p-4 rounded-lg transition-all duration-300 font-serif ${
+                          activeCamera?.deviceId === camera.deviceId
+                            ? 'bg-green-600 text-white'
+                            : 'bg-white/10 hover:bg-white/20'
+                        }`}
+                        style={{fontFamily: 'Georgia, serif'}}
+                      >
                         <div className="font-semibold">{camera.label}</div>
                         <div className="text-sm opacity-75">
                           {camera.facing === 'user' ? 'Front Camera' : 
                            camera.facing === 'environment' ? 'Rear Camera' : 'Unknown Position'}
                         </div>
-                      </div>
+                        {activeCamera?.deviceId === camera.deviceId && (
+                          <div className="text-xs mt-1">● ACTIVE</div>
+                        )}
+                      </button>
                     ))}
                   </div>
                 </>
@@ -174,50 +202,40 @@ export default function Camera() {
             {cameras.length > 0 && (
               <div className="flex justify-center space-x-4 mb-8">
                 <button
-                  onClick={startAllCameras}
-                  disabled={camerasActive}
-                  className="px-6 py-3 bg-green-600 text-white rounded-lg disabled:bg-gray-400 hover:bg-green-700 transition-colors font-serif"
-                  style={{fontFamily: 'Georgia, serif'}}
-                >
-                  Start All Cameras
-                </button>
-                <button
-                  onClick={stopAllCameras}
-                  disabled={!camerasActive}
+                  onClick={stopCamera}
+                  disabled={!activeCamera}
                   className="px-6 py-3 bg-red-600 text-white rounded-lg disabled:bg-gray-400 hover:bg-red-700 transition-colors font-serif"
                   style={{fontFamily: 'Georgia, serif'}}
                 >
-                  Stop All Cameras
+                  Stop Camera
                 </button>
               </div>
             )}
             
-            {/* Camera Video Feeds */}
-            {cameras.length > 0 && (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {cameras.map((camera, index) => (
-                  <div key={camera.deviceId} className="bg-black rounded-lg overflow-hidden shadow-2xl">
-                    <div className="p-3 bg-gray-800 text-white text-center font-serif" style={{fontFamily: 'Georgia, serif'}}>
-                      <div className="font-semibold">{camera.label}</div>
-                      <div className="text-xs opacity-75">
-                        {camera.facing === 'user' ? 'Front Camera' : 
-                         camera.facing === 'environment' ? 'Rear Camera' : 'Unknown Position'}
-                      </div>
-                    </div>
-                    <video
-                      id={`camera-${index}`}
-                      className="w-full h-64 object-cover bg-gray-900"
-                      autoPlay
-                      playsInline
-                      muted
-                    />
-                    <div className="p-2 bg-gray-800 text-white text-xs text-center font-serif" style={{fontFamily: 'Georgia, serif'}}>
-                      {camerasActive && camera.stream ? 'Live' : 'Stopped'}
+            {/* Video Feed */}
+            <div className="flex justify-center">
+              <div className="bg-black rounded-lg overflow-hidden shadow-2xl max-w-2xl w-full">
+                {activeCamera && (
+                  <div className="p-3 bg-gray-800 text-white text-center font-serif" style={{fontFamily: 'Georgia, serif'}}>
+                    <div className="font-semibold">{activeCamera.label}</div>
+                    <div className="text-xs opacity-75">
+                      {activeCamera.facing === 'user' ? 'Front Camera' : 
+                       activeCamera.facing === 'environment' ? 'Rear Camera' : 'Unknown Position'}
                     </div>
                   </div>
-                ))}
+                )}
+                <video
+                  ref={videoRef}
+                  className="w-full h-80 object-cover bg-gray-900"
+                  autoPlay
+                  playsInline
+                  muted
+                />
+                <div className="p-2 bg-gray-800 text-white text-xs text-center font-serif" style={{fontFamily: 'Georgia, serif'}}>
+                  {activeCamera ? 'Live Stream' : 'No Camera Selected'}
+                </div>
               </div>
-            )}
+            </div>
 
             {/* No Cameras Message */}
             {cameras.length === 0 && permissions.camera && (
@@ -233,7 +251,7 @@ export default function Camera() {
                 <div className="text-xl mb-2">Camera access denied</div>
                 <div className="text-sm">Please allow camera access to use this feature</div>
                 <button
-                  onClick={detectAndInitializeCameras}
+                  onClick={detectCameras}
                   className="mt-4 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
                 >
                   Request Camera Permission
