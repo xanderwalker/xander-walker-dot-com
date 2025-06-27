@@ -10,6 +10,12 @@ export default function Projects() {
       link: "/projects/spotify-lyrics"
     },
     {
+      title: "AUDIO VISUALIZER",
+      description: "Three organic amoeba-shaped visualizers that respond to your Spotify music's energy, danceability, and mood using authentic Monet water lily colors. Minimal interface focused purely on the visual experience.",
+      tags: "Music • Visualization • Audio",
+      link: "/projects/audio-visualizer"
+    },
+    {
       title: "CAMERA SYSTEM",
       description: "Multi-camera detection and live video streaming system. Automatically detects all available cameras (front/rear) and displays simultaneous video feeds with device identification.",
       tags: "Camera • Video • Hardware",
