@@ -1198,17 +1198,20 @@ export default function Clock() {
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen relative overflow-hidden">
+      {/* Morphing sunset background */}
+      <div className="fixed inset-0 sunset-morphing-bg -z-10" />
+      
       {/* Header with navigation back to projects */}
-      <header className="p-8 flex justify-between items-center">
+      <header className="p-8 flex justify-between items-center relative z-10">
         <Link href="/projects">
-          <button className="text-black hover:text-gray-600 transition-colors text-lg">
+          <button className="text-white hover:text-gray-200 transition-colors text-lg backdrop-blur-sm bg-black/20 px-4 py-2 rounded-lg border border-white/20">
             ← BACK TO PROJECTS
           </button>
         </Link>
         
         <Link href="/">
-          <h1 className="text-black font-xanman-wide font-bold text-4xl md:text-6xl hover:opacity-70 transition-opacity duration-200 cursor-pointer">
+          <h1 className="text-white font-xanman-wide font-bold text-4xl md:text-6xl hover:opacity-70 transition-opacity duration-200 cursor-pointer drop-shadow-lg">
             XANDER WALKER
           </h1>
         </Link>
