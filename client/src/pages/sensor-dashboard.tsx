@@ -14,6 +14,41 @@ interface SensorData {
   battery: { level: number; charging: boolean };
 }
 
+interface LocationData {
+  latitude: number | null;
+  longitude: number | null;
+  accuracy: number | null;
+  altitude: number | null;
+  speed: number | null;
+  heading: number | null;
+}
+
+interface DeviceData {
+  userAgent: string;
+  platform: string;
+  language: string;
+  cookieEnabled: boolean;
+  onLine: boolean;
+  deviceMemory: number | null;
+  hardwareConcurrency: number;
+  maxTouchPoints: number;
+  screenWidth: number;
+  screenHeight: number;
+  colorDepth: number;
+  pixelRatio: number;
+}
+
+interface BrowserData {
+  vendor: string;
+  product: string;
+  appName: string;
+  appVersion: string;
+  appCodeName: string;
+  doNotTrack: string | null;
+  javaEnabled: boolean;
+  pdfViewerEnabled: boolean;
+}
+
 export default function SensorDashboard() {
   const [sensorData, setSensorData] = useState<SensorData>({
     accelerometer: { x: 0, y: 0, z: 0 },
@@ -28,10 +63,46 @@ export default function SensorDashboard() {
     battery: { level: 0, charging: false }
   });
   
+  const [locationData, setLocationData] = useState<LocationData>({
+    latitude: null,
+    longitude: null,
+    accuracy: null,
+    altitude: null,
+    speed: null,
+    heading: null
+  });
+
+  const [deviceData, setDeviceData] = useState<DeviceData>({
+    userAgent: '',
+    platform: '',
+    language: '',
+    cookieEnabled: false,
+    onLine: false,
+    deviceMemory: null,
+    hardwareConcurrency: 0,
+    maxTouchPoints: 0,
+    screenWidth: 0,
+    screenHeight: 0,
+    colorDepth: 0,
+    pixelRatio: 0
+  });
+
+  const [browserData, setBrowserData] = useState<BrowserData>({
+    vendor: '',
+    product: '',
+    appName: '',
+    appVersion: '',
+    appCodeName: '',
+    doNotTrack: null,
+    javaEnabled: false,
+    pdfViewerEnabled: false
+  });
+
   const [permissions, setPermissions] = useState({
     motion: false,
     audio: false,
-    camera: false
+    camera: false,
+    location: false
   });
   
   const audioContextRef = useRef<AudioContext | null>(null);
@@ -68,9 +139,71 @@ export default function SensorDashboard() {
         console.error('Camera permission denied:', error);
       }
 
+      // Location permission
+      try {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            setPermissions(prev => ({ ...prev, location: true }));
+            updateLocationData(position);
+          },
+          (error) => {
+            console.error('Location permission denied:', error);
+          },
+          { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
+        );
+      } catch (error) {
+        console.error('Location request failed:', error);
+      }
+
     } catch (error) {
       console.error('Permission request failed:', error);
     }
+  };
+
+  // Update location data
+  const updateLocationData = (position: GeolocationPosition) => {
+    setLocationData({
+      latitude: position.coords.latitude,
+      longitude: position.coords.longitude,
+      accuracy: position.coords.accuracy,
+      altitude: position.coords.altitude,
+      speed: position.coords.speed,
+      heading: position.coords.heading
+    });
+  };
+
+  // Collect device information
+  const collectDeviceInfo = () => {
+    const nav = navigator as any;
+    setDeviceData({
+      userAgent: navigator.userAgent,
+      platform: navigator.platform,
+      language: navigator.language,
+      cookieEnabled: navigator.cookieEnabled,
+      onLine: navigator.onLine,
+      deviceMemory: nav.deviceMemory || null,
+      hardwareConcurrency: navigator.hardwareConcurrency,
+      maxTouchPoints: navigator.maxTouchPoints || 0,
+      screenWidth: screen.width,
+      screenHeight: screen.height,
+      colorDepth: screen.colorDepth,
+      pixelRatio: window.devicePixelRatio
+    });
+  };
+
+  // Collect browser information
+  const collectBrowserInfo = () => {
+    const nav = navigator as any;
+    setBrowserData({
+      vendor: navigator.vendor,
+      product: navigator.product,
+      appName: navigator.appName,
+      appVersion: navigator.appVersion,
+      appCodeName: navigator.appCodeName,
+      doNotTrack: navigator.doNotTrack,
+      javaEnabled: navigator.javaEnabled ? navigator.javaEnabled() : false,
+      pdfViewerEnabled: nav.pdfViewerEnabled || false
+    });
   };
 
   // Setup audio analysis for sound level detection
@@ -147,6 +280,12 @@ export default function SensorDashboard() {
       window.removeEventListener('deviceorientation', handleDeviceOrientation);
     };
   }, [permissions.motion]);
+
+  // Initialize device and browser information on component mount
+  useEffect(() => {
+    collectDeviceInfo();
+    collectBrowserInfo();
+  }, []);
 
   // Monitor battery status
   useEffect(() => {
@@ -475,9 +614,131 @@ export default function SensorDashboard() {
 
       </div>
 
+      {/* Information Sections */}
+      <div className="mt-12 space-y-8 max-w-6xl mx-auto">
+        
+        {/* Location Section */}
+        <div className="glassmorphism rounded-2xl p-6">
+          <h3 className="font-serif text-2xl mb-6 text-center" style={{fontFamily: 'Georgia, serif'}}>LOCATION</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-sm font-serif" style={{fontFamily: 'Georgia, serif'}}>
+            <div>
+              <div className="font-semibold">Latitude:</div>
+              <div>{locationData.latitude ? locationData.latitude.toFixed(6) : 'Not available'}</div>
+            </div>
+            <div>
+              <div className="font-semibold">Longitude:</div>
+              <div>{locationData.longitude ? locationData.longitude.toFixed(6) : 'Not available'}</div>
+            </div>
+            <div>
+              <div className="font-semibold">Accuracy:</div>
+              <div>{locationData.accuracy ? `${Math.round(locationData.accuracy)}m` : 'Not available'}</div>
+            </div>
+            <div>
+              <div className="font-semibold">Altitude:</div>
+              <div>{locationData.altitude ? `${Math.round(locationData.altitude)}m` : 'Not available'}</div>
+            </div>
+            <div>
+              <div className="font-semibold">Speed:</div>
+              <div>{locationData.speed ? `${(locationData.speed * 3.6).toFixed(1)} km/h` : 'Not available'}</div>
+            </div>
+            <div>
+              <div className="font-semibold">Heading:</div>
+              <div>{locationData.heading ? `${Math.round(locationData.heading)}°` : 'Not available'}</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Device Section */}
+        <div className="glassmorphism rounded-2xl p-6">
+          <h3 className="font-serif text-2xl mb-6 text-center" style={{fontFamily: 'Georgia, serif'}}>DEVICE</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-sm font-serif" style={{fontFamily: 'Georgia, serif'}}>
+            <div>
+              <div className="font-semibold">Platform:</div>
+              <div>{deviceData.platform || 'Unknown'}</div>
+            </div>
+            <div>
+              <div className="font-semibold">Language:</div>
+              <div>{deviceData.language || 'Unknown'}</div>
+            </div>
+            <div>
+              <div className="font-semibold">Online Status:</div>
+              <div>{deviceData.onLine ? 'Online' : 'Offline'}</div>
+            </div>
+            <div>
+              <div className="font-semibold">CPU Cores:</div>
+              <div>{deviceData.hardwareConcurrency}</div>
+            </div>
+            <div>
+              <div className="font-semibold">Device Memory:</div>
+              <div>{deviceData.deviceMemory ? `${deviceData.deviceMemory} GB` : 'Not available'}</div>
+            </div>
+            <div>
+              <div className="font-semibold">Touch Points:</div>
+              <div>{deviceData.maxTouchPoints}</div>
+            </div>
+            <div>
+              <div className="font-semibold">Screen Size:</div>
+              <div>{deviceData.screenWidth} × {deviceData.screenHeight}</div>
+            </div>
+            <div>
+              <div className="font-semibold">Color Depth:</div>
+              <div>{deviceData.colorDepth} bits</div>
+            </div>
+            <div>
+              <div className="font-semibold">Pixel Ratio:</div>
+              <div>{deviceData.pixelRatio}x</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Browser Section */}
+        <div className="glassmorphism rounded-2xl p-6">
+          <h3 className="font-serif text-2xl mb-6 text-center" style={{fontFamily: 'Georgia, serif'}}>BROWSER</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-sm font-serif" style={{fontFamily: 'Georgia, serif'}}>
+            <div>
+              <div className="font-semibold">Vendor:</div>
+              <div>{browserData.vendor || 'Unknown'}</div>
+            </div>
+            <div>
+              <div className="font-semibold">App Name:</div>
+              <div>{browserData.appName || 'Unknown'}</div>
+            </div>
+            <div>
+              <div className="font-semibold">Product:</div>
+              <div>{browserData.product || 'Unknown'}</div>
+            </div>
+            <div>
+              <div className="font-semibold">Code Name:</div>
+              <div>{browserData.appCodeName || 'Unknown'}</div>
+            </div>
+            <div>
+              <div className="font-semibold">Do Not Track:</div>
+              <div>{browserData.doNotTrack || 'Not set'}</div>
+            </div>
+            <div>
+              <div className="font-semibold">Java Enabled:</div>
+              <div>{browserData.javaEnabled ? 'Yes' : 'No'}</div>
+            </div>
+            <div>
+              <div className="font-semibold">PDF Viewer:</div>
+              <div>{browserData.pdfViewerEnabled ? 'Yes' : 'No'}</div>
+            </div>
+            <div>
+              <div className="font-semibold">Cookies Enabled:</div>
+              <div>{deviceData.cookieEnabled ? 'Yes' : 'No'}</div>
+            </div>
+            <div className="md:col-span-2 lg:col-span-3">
+              <div className="font-semibold">User Agent:</div>
+              <div className="text-xs break-all">{deviceData.userAgent}</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
       {/* Permission Status */}
       <div className="mt-8 text-center text-sm text-gray-600 font-serif" style={{fontFamily: 'Georgia, serif'}}>
-        <div>Permissions: Motion: {permissions.motion ? '✓' : '✗'} | Audio: {permissions.audio ? '✓' : '✗'} | Camera: {permissions.camera ? '✓' : '✗'}</div>
+        <div>Permissions: Motion: {permissions.motion ? '✓' : '✗'} | Audio: {permissions.audio ? '✓' : '✗'} | Camera: {permissions.camera ? '✓' : '✗'} | Location: {permissions.location ? '✓' : '✗'}</div>
       </div>
     </div>
   );
