@@ -151,9 +151,9 @@ export default function Clock() {
           id: ballIdRef.current++,
           x: x!,
           y: y!,
-          vx: 0,
-          vy: 0,
-          isSettled: true,
+          vx: (Math.random() - 0.5) * 0.5, // Small random velocity for subtle movement
+          vy: (Math.random() - 0.5) * 0.3,
+          isSettled: false, // Start as dynamic, not settled
           ballSize: ballSize
         });
       }
@@ -171,12 +171,17 @@ export default function Clock() {
       const updateBalls = (balls: Ball[], setBalls: React.Dispatch<React.SetStateAction<Ball[]>>) => {
         setBalls(prevBalls => 
           prevBalls.map(ball => {
-            if (ball.isSettled) return ball;
+            // Remove the settled check - all balls should always be affected by physics
+            // if (ball.isSettled) return ball;
 
             let newX = ball.x + ball.vx;
             let newY = ball.y + ball.vy;
             let newVx = ball.vx;
             let newVy = ball.vy + 0.6; // Stronger gravity for more bounce
+            
+            // Add small random forces to keep balls moving subtly
+            newVx += (Math.random() - 0.5) * 0.02;
+            newVy += (Math.random() - 0.5) * 0.02;
 
             // Get ball size and radius for calculations
             const currentBallSize = ball.ballSize || 16;
@@ -209,20 +214,22 @@ export default function Clock() {
               if (distance < minDistance && distance > 0) {
                 // Separate balls to prevent overlap
                 const overlap = minDistance - distance;
-                const separationForce = overlap * 0.5;
+                const separationForce = overlap * 0.6;
                 
                 const angle = Math.atan2(dy, dx);
                 newX += Math.cos(angle) * separationForce;
                 newY += Math.sin(angle) * separationForce;
                 
-                // Add bounce velocity if ball was moving
-                if (!ball.isSettled) {
-                  const bounceForce = 1.5; // Increased bounce force
-                  newVx += Math.cos(angle) * bounceForce;
-                  newVy += Math.sin(angle) * bounceForce;
-                  newVx *= 0.8; // Less damping for more bounce
-                  newVy *= 0.8;
-                }
+                // Enhanced bouncing - all balls bounce off each other regardless of settled state
+                const bounceForce = 2.0; // Stronger bounce force
+                const relativeVelocity = Math.sqrt((ball.vx - otherBall.vx) ** 2 + (ball.vy - otherBall.vy) ** 2);
+                const velocityMultiplier = Math.max(0.5, Math.min(2.0, relativeVelocity * 0.3));
+                
+                newVx += Math.cos(angle) * bounceForce * velocityMultiplier;
+                newVy += Math.sin(angle) * bounceForce * velocityMultiplier;
+                newVx *= 0.9; // Minimal damping for sustained bouncing
+                newVy *= 0.9;
+                
                 hasCollision = true;
               }
             }
@@ -236,18 +243,13 @@ export default function Clock() {
               hasCollision = true;
             }
             
-            // Check if ball should settle (very low energy and touching something)
-            const settleThreshold = currentBallSize > 24 ? 0.3 : 0.4; // Larger balls settle easier
-            if (hasCollision && Math.abs(newVy) < settleThreshold && Math.abs(newVx) < settleThreshold) {
-              return {
-                ...ball,
-                x: newX,
-                y: newY,
-                vx: 0,
-                vy: 0,
-                isSettled: true
-              };
-            }
+            // Apply minimal velocity damping to prevent excessive energy buildup
+            if (Math.abs(newVx) > 10) newVx *= 0.95; // Cap horizontal velocity
+            if (Math.abs(newVy) > 15) newVy *= 0.95; // Cap vertical velocity
+            
+            // Very minimal energy damping for overall stability
+            newVx *= 0.999;
+            newVy *= 0.999;
 
             return {
               ...ball,
@@ -330,7 +332,7 @@ export default function Clock() {
                   left: `${ball.x - currentBallSize/2}px`, // Center the ball
                   bottom: `${320 - ball.y - currentBallSize}px`, // Position from bottom
                   transition: 'none', // Let physics handle movement
-                  zIndex: ball.isSettled ? 1 : 10 // Falling balls appear above settled ones
+                  zIndex: 5 // All balls have same z-index since they're all dynamic
                 }}
               />
             );
