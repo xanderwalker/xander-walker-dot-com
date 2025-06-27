@@ -99,8 +99,8 @@ export default function Clock() {
       const balls: Ball[] = [];
       const ballRadius = ballSize / 2;
       const minDistance = ballRadius * 2.2;
-      const cylinderWidth = 64; // 80px total - 16px margins
-      const cylinderLeft = 16;
+      const cylinderWidth = 76; // 80px total - 4px margins (2px each side)
+      const cylinderLeft = 18; // Adjusted left margin
       const bottomY = 320 - ballSize - 8; // Bottom position for this ball size
       
       for (let i = 0; i < count; i++) {
@@ -193,14 +193,14 @@ export default function Clock() {
             const currentBallSize = ball.ballSize || 16;
             const currentBallRadius = currentBallSize / 2;
 
-            // Wall collisions (cylinder walls) - adjust for ball size
-            const wallMargin = currentBallRadius;
-            if (newX <= 16 + wallMargin) { // Left wall
-              newX = 16 + wallMargin;
+            // Wall collisions (cylinder walls) - allow balls to get closer to walls
+            const wallMargin = currentBallRadius * 0.1; // Much smaller margin, balls can almost touch walls
+            if (newX <= 18 + wallMargin) { // Left wall
+              newX = 18 + wallMargin;
               newVx = -newVx * 0.8; // More bounce, less damping
             }
-            if (newX >= 64 - wallMargin) { // Right wall
-              newX = 64 - wallMargin;
+            if (newX >= 76 - wallMargin) { // Right wall  
+              newX = 76 - wallMargin;
               newVx = -newVx * 0.8; // More bounce, less damping
             }
 
@@ -324,12 +324,12 @@ export default function Clock() {
       <div className="flex flex-col items-center">
         <div className="font-serif text-lg mb-2" style={{fontFamily: 'Georgia, serif'}}>{label}</div>
         <div className="relative w-20 h-80 border-2 border-black rounded-b-lg bg-white overflow-hidden">
-          {/* Graduated markings */}
-          {Array.from({ length: Math.min(maxBalls + 1, 13) }, (_, i) => (
+          {/* Graduated markings - quarter intervals */}
+          {Array.from({ length: 5 }, (_, i) => (
             <div key={i} className="absolute right-0 w-full border-t border-gray-300" 
-                 style={{ bottom: `${(i / maxBalls) * 100}%` }}>
+                 style={{ bottom: `${(i / 4) * 100}%` }}>
               <span className="absolute -right-8 text-xs text-gray-600 transform -translate-y-1/2">
-                {maxBalls - i}
+                {Math.round((4 - i) / 4 * maxBalls)}
               </span>
             </div>
           ))}
