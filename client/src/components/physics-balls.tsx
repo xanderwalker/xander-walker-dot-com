@@ -38,11 +38,49 @@ export default function PhysicsBalls() {
   useEffect(() => {
     if (!isMobile) return;
 
+    let cleanup: (() => void) | undefined;
+
+    const setupAccelerometer = () => {
+      const handleDeviceMotion = (event: DeviceMotionEvent) => {
+        if (event.accelerationIncludingGravity) {
+          const x = event.accelerationIncludingGravity.x || 0;
+          const y = event.accelerationIncludingGravity.y || 0;
+          const z = event.accelerationIncludingGravity.z || 0;
+          
+          setAcceleration({ x, y, z });
+        }
+      };
+
+      const handleDeviceOrientation = (event: DeviceOrientationEvent) => {
+        // Fallback to orientation if motion isn't available
+        const gamma = event.gamma || 0; // left/right tilt
+        const beta = event.beta || 0;   // front/back tilt
+        
+        setAcceleration({ 
+          x: gamma / 30, // normalize to reasonable range
+          y: beta / 30, 
+          z: 0 
+        });
+      };
+
+      // Try devicemotion first, then orientation as fallback
+      window.addEventListener('devicemotion', handleDeviceMotion, { passive: true });
+      window.addEventListener('deviceorientation', handleDeviceOrientation, { passive: true });
+      
+      cleanup = () => {
+        window.removeEventListener('devicemotion', handleDeviceMotion);
+        window.removeEventListener('deviceorientation', handleDeviceOrientation);
+      };
+    };
+
     const requestPermission = async () => {
-      if (typeof DeviceOrientationEvent !== 'undefined' && 'requestPermission' in DeviceOrientationEvent) {
+      // For iOS 13+ devices
+      if (typeof DeviceMotionEvent !== 'undefined' && 'requestPermission' in DeviceMotionEvent) {
         try {
-          const permission = await (DeviceOrientationEvent as any).requestPermission();
-          if (permission === 'granted') {
+          const motionPermission = await (DeviceMotionEvent as any).requestPermission();
+          const orientationPermission = await (DeviceOrientationEvent as any).requestPermission();
+          
+          if (motionPermission === 'granted' || orientationPermission === 'granted') {
             setupAccelerometer();
           }
         } catch (error) {
@@ -50,28 +88,28 @@ export default function PhysicsBalls() {
           setupAccelerometer();
         }
       } else {
+        // For Android and older iOS
         setupAccelerometer();
       }
     };
 
-    const setupAccelerometer = () => {
-      const handleDeviceMotion = (event: DeviceMotionEvent) => {
-        if (event.accelerationIncludingGravity) {
-          setAcceleration({
-            x: event.accelerationIncludingGravity.x || 0,
-            y: event.accelerationIncludingGravity.y || 0,
-            z: event.accelerationIncludingGravity.z || 0
-          });
-        }
-      };
-
-      window.addEventListener('devicemotion', handleDeviceMotion);
-      return () => window.removeEventListener('devicemotion', handleDeviceMotion);
+    // Add user interaction requirement for iOS
+    const handleUserInteraction = () => {
+      requestPermission();
+      document.removeEventListener('touchstart', handleUserInteraction);
+      document.removeEventListener('click', handleUserInteraction);
     };
 
-    // Add a small delay to ensure the page is loaded
-    const timeout = setTimeout(requestPermission, 1000);
-    return () => clearTimeout(timeout);
+    // Try immediate setup, then add interaction listeners
+    requestPermission();
+    document.addEventListener('touchstart', handleUserInteraction, { once: true });
+    document.addEventListener('click', handleUserInteraction, { once: true });
+
+    return () => {
+      if (cleanup) cleanup();
+      document.removeEventListener('touchstart', handleUserInteraction);
+      document.removeEventListener('click', handleUserInteraction);
+    };
   }, [isMobile]);
 
   // Initialize balls
