@@ -327,31 +327,54 @@ export default function PhysicsBalls() {
         ball.isBeachBall ? (
           <div
             key={ball.id}
-            className="absolute rounded-full pointer-events-none"
+            className="absolute pointer-events-none"
             style={{
               left: ball.x,
               top: ball.y,
               width: ball.size,
               height: ball.size,
-              background: ball.id === 333 
-                ? `radial-gradient(ellipse at 30% 30%, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.4) 15%, transparent 40%), 
-                   conic-gradient(from 0deg, #FF6B35 0deg 60deg, #FFFFFF 60deg 120deg, #4ECDC4 120deg 180deg, #FFFFFF 180deg 240deg, #FF6B35 240deg 300deg, #FFFFFF 300deg 360deg),
-                   radial-gradient(ellipse at 70% 70%, rgba(0,0,0,0.3) 0%, transparent 50%)`
-                : `radial-gradient(ellipse at 30% 30%, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.4) 15%, transparent 40%), 
-                   conic-gradient(from 0deg, #E74C3C 0deg 60deg, #FFFFFF 60deg 120deg, #3498DB 120deg 180deg, #FFFFFF 180deg 240deg, #F39C12 240deg 300deg, #FFFFFF 300deg 360deg),
-                   radial-gradient(ellipse at 70% 70%, rgba(0,0,0,0.3) 0%, transparent 50%)`,
-              boxShadow: `
-                inset -4px -4px 12px rgba(0,0,0,0.4),
-                inset 4px 4px 12px rgba(255,255,255,0.3),
-                0 8px 16px rgba(0,0,0,0.3),
-                0 0 20px rgba(255,255,255,0.1)
-              `,
-              border: '1px solid rgba(255,255,255,0.2)',
-              transform: `rotateX(${ball.rotationX || 0}deg) rotateY(${ball.rotationY || 0}deg) rotateZ(${ball.rotationZ || 0}deg)`,
-              transformStyle: 'preserve-3d',
-              filter: 'brightness(1.1) contrast(1.05)'
+              perspective: '1000px',
+              transformStyle: 'preserve-3d'
             }}
-          />
+          >
+            {/* Create sphere using multiple rotated divs */}
+            {Array.from({ length: 12 }, (_, i) => (
+              <div
+                key={i}
+                className="absolute rounded-full"
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  background: ball.id === 333 
+                    ? `conic-gradient(from ${i * 30}deg, #FF6B35 0deg 60deg, #FFFFFF 60deg 120deg, #4ECDC4 120deg 180deg, #FFFFFF 180deg 240deg, #FF6B35 240deg 300deg, #FFFFFF 300deg 360deg)`
+                    : `conic-gradient(from ${i * 30}deg, #E74C3C 0deg 60deg, #FFFFFF 60deg 120deg, #3498DB 120deg 180deg, #FFFFFF 180deg 240deg, #F39C12 240deg 300deg, #FFFFFF 300deg 360deg)`,
+                  transform: `
+                    rotateX(${ball.rotationX || 0}deg) 
+                    rotateY(${(ball.rotationY || 0) + i * 30}deg) 
+                    rotateZ(${ball.rotationZ || 0}deg)
+                    rotateY(${i * 15}deg)
+                  `,
+                  opacity: 0.8,
+                  mixBlendMode: 'multiply',
+                  boxShadow: `
+                    inset -2px -2px 8px rgba(0,0,0,0.3),
+                    inset 2px 2px 8px rgba(255,255,255,0.2)
+                  `
+                }}
+              />
+            ))}
+            {/* Highlight overlay */}
+            <div
+              className="absolute rounded-full"
+              style={{
+                width: '100%',
+                height: '100%',
+                background: `radial-gradient(ellipse at 30% 30%, rgba(255,255,255,0.6) 0%, transparent 50%)`,
+                transform: `rotateX(${ball.rotationX || 0}deg) rotateY(${ball.rotationY || 0}deg) rotateZ(${ball.rotationZ || 0}deg)`,
+                pointerEvents: 'none'
+              }}
+            />
+          </div>
         ) : ball.isLetter ? (
           <div
             key={ball.id}
