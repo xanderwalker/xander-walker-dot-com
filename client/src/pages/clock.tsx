@@ -809,12 +809,6 @@ const YearClock = ({ currentDate }: { currentDate: Date }) => {
 
 export default function Clock() {
   const [time, setTime] = useState(new Date());
-  const [secondBalls, setSecondBalls] = useState<Ball[]>([]);
-  const [minuteBalls, setMinuteBalls] = useState<Ball[]>([]);
-  const [hourBalls, setHourBalls] = useState<Ball[]>([]);
-  const ballIdRef = useRef(0);
-  const lastSecondRef = useRef(-1);
-  const animationFrameRef = useRef<number>();
   
   // Paint swirling state
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
@@ -874,68 +868,7 @@ export default function Clock() {
 
   useEffect(() => {
     const timer = setInterval(() => {
-      const now = new Date();
-      setTime(now);
-      
-      const currentSecond = now.getSeconds();
-      const currentMinute = now.getMinutes();
-      const currentHour = now.getHours(); // 24-hour time
-      
-      // Add new ball every second
-      if (currentSecond !== lastSecondRef.current) {
-        lastSecondRef.current = currentSecond;
-        
-        if (currentSecond === 0) {
-          // Reset seconds, add to minutes
-          setSecondBalls([]);
-          setMinuteBalls(prev => {
-            const newBall: Ball = { 
-              id: ballIdRef.current++, 
-              x: 40, // Center of cylinder (80px width / 2)
-              y: -20, // Start above cylinder
-              vx: (Math.random() - 0.5) * 3, // More horizontal velocity for bounce
-              vy: 0.5, // Small initial downward velocity
-              isSettled: false,
-              ballSize: 20, // Calculated size for minutes (60 ball capacity)
-              color: getBallColor('minute')
-            };
-            const newBalls = [...prev, newBall];
-            return newBalls.slice(-currentMinute || -60);
-          });
-          
-          // If minute is 0, add to hours
-          if (currentMinute === 0) {
-            setMinuteBalls([]);
-            setHourBalls(prev => {
-              const newBall: Ball = { 
-                id: ballIdRef.current++, 
-                x: 40, 
-                y: -30, // Start higher for larger balls
-                vx: (Math.random() - 0.5) * 2.5, // More velocity for bigger bounces
-                vy: 0, 
-                isSettled: false,
-                ballSize: 41, // Calculated size for hours (24 ball capacity)
-                color: getBallColor('hour')
-              };
-              const newBalls = [...prev, newBall];
-              return newBalls.slice(-currentHour || -24);
-            });
-          }
-        } else {
-          // Add ball to seconds
-          const newBall: Ball = { 
-            id: ballIdRef.current++, 
-            x: 40, 
-            y: -20, 
-            vx: (Math.random() - 0.5) * 3, 
-            vy: 0.5, 
-            isSettled: false,
-            ballSize: 20, // Calculated size for seconds (60 ball capacity)
-            color: getBallColor('second')
-          };
-          setSecondBalls(prev => [...prev, newBall]);
-        }
-      }
+      setTime(new Date());
     }, 1000);
 
     return () => clearInterval(timer);
@@ -1288,71 +1221,72 @@ export default function Clock() {
       {/* Clocks Display */}
       <div className="flex flex-col items-center justify-center min-h-[calc(100vh-200px)] space-y-12">
         
-        {/* Pixel Ball Drop Clock */}
-        <div className="glassmorphism rounded-2xl p-8">
-          <h2 className="font-serif text-2xl mb-8 text-center text-black" style={{fontFamily: 'Georgia, serif'}}>
-            PIXEL BALL CLOCK
-          </h2>
-          <PixelClockComponent currentTime={time} />
-        </div>
-        
-        {/* Enhanced Amoeba Clock with Hands */}
-        <div className="glassmorphism rounded-2xl p-8">
-          <h2 className="font-xanman-wide text-2xl mb-8 text-center text-black">
-            AMOEBA ANALOG CLOCK
-          </h2>
-          <AmoebaWithHandsClockComponent currentTime={time} />
-        </div>
-        
-        {/* Amoeba Clock */}
-        <div className="glassmorphism rounded-2xl p-8">
-          <h2 className="font-xanman-wide text-2xl mb-8 text-center text-black">
-            AMOEBA CLOCK
-          </h2>
-          <AmoebaClockComponent currentTime={time} />
-        </div>
-        
-        {/* Year Clock */}
-        <div className="glassmorphism rounded-2xl p-8 w-full max-w-6xl">
-          <h2 className="font-serif text-2xl mb-8 text-center text-black" style={{fontFamily: 'Georgia, serif'}}>
-            Year Progress Clock
-          </h2>
-          <YearClock currentDate={time} />
-        </div>
-        
-        {/* Graduated Cylinder Clock */}
-        <div className="glassmorphism rounded-2xl p-8">
-          <h2 className="font-serif text-2xl mb-8 text-center text-black" style={{fontFamily: 'Georgia, serif'}}>
-            Ball Drop Clock
-          </h2>
-          <div className="flex justify-center space-x-8">
-            <GraduatedCylinder 
-              balls={hourBalls} 
-              maxBalls={12} 
-              label="Hours" 
-              unit="hrs"
-            />
-            <GraduatedCylinder 
-              balls={minuteBalls} 
-              maxBalls={60} 
-              label="Minutes" 
-              unit="min"
-            />
-            <GraduatedCylinder 
-              balls={secondBalls} 
-              maxBalls={60} 
-              label="Seconds" 
-              unit="sec"
-            />
+        {/* Hourglass Clock Card */}
+        <Link href="/projects/clock/hourglass">
+          <div className="glassmorphism rounded-2xl p-8 cursor-pointer hover:bg-white/30 transition-all duration-300 transform hover:scale-105">
+            <h2 className="font-serif text-2xl mb-8 text-center text-white drop-shadow-lg" style={{fontFamily: 'Georgia, serif'}}>
+              🔃 HOURGLASS CLOCK
+            </h2>
+            <div className="h-48 flex items-center justify-center">
+              <div className="text-center text-white/80">
+                <div className="text-6xl mb-4">⏳</div>
+                <p className="text-lg">Watch sand grains drop and accumulate in real-time</p>
+              </div>
+            </div>
           </div>
-        </div>
-
-        {/* Digital Clock */}
-        <div className="glassmorphism rounded-2xl p-12 text-center">
-          <div className="font-xanman-wide text-6xl md:text-7xl mb-4 text-black tracking-wider">
+        </Link>
+        
+        {/* Sphere Clock Card */}
+        <Link href="/projects/clock/sphere">
+          <div className="glassmorphism rounded-2xl p-8 cursor-pointer hover:bg-white/30 transition-all duration-300 transform hover:scale-105">
+            <h2 className="font-serif text-2xl mb-8 text-center text-white drop-shadow-lg" style={{fontFamily: 'Georgia, serif'}}>
+              🔮 SPHERE CLOCK
+            </h2>
+            <div className="h-48 flex items-center justify-center">
+              <div className="text-center text-white/80">
+                <div className="text-6xl mb-4">🌊</div>
+                <p className="text-lg">Organic flowing time visualization</p>
+              </div>
+            </div>
+          </div>
+        </Link>
+        
+        {/* Analog Clock Card */}
+        <Link href="/projects/clock/analog">
+          <div className="glassmorphism rounded-2xl p-8 cursor-pointer hover:bg-white/30 transition-all duration-300 transform hover:scale-105">
+            <h2 className="font-serif text-2xl mb-8 text-center text-white drop-shadow-lg" style={{fontFamily: 'Georgia, serif'}}>
+              🕐 ANALOG CLOCK
+            </h2>
+            <div className="h-48 flex items-center justify-center">
+              <div className="text-center text-white/80">
+                <div className="text-6xl mb-4">⏰</div>
+                <p className="text-lg">Traditional clock with flowing hands</p>
+              </div>
+            </div>
+          </div>
+        </Link>
+        
+        {/* Year Progress Clock Card */}
+        <Link href="/projects/clock/year">
+          <div className="glassmorphism rounded-2xl p-8 cursor-pointer hover:bg-white/30 transition-all duration-300 transform hover:scale-105">
+            <h2 className="font-serif text-2xl mb-8 text-center text-white drop-shadow-lg" style={{fontFamily: 'Georgia, serif'}}>
+              📅 YEAR PROGRESS CLOCK
+            </h2>
+            <div className="h-48 flex items-center justify-center">
+              <div className="text-center text-white/80">
+                <div className="text-6xl mb-4">📊</div>
+                <p className="text-lg">Track your progress through the year</p>
+              </div>
+            </div>
+          </div>
+        </Link>
+        
+        {/* Digital Time Display */}
+        <div className="glassmorphism rounded-2xl p-8 text-center backdrop-blur-md bg-white/10">
+          <div className="font-serif text-4xl md:text-6xl mb-4 text-white drop-shadow-lg tracking-wider" style={{fontFamily: 'Georgia, serif'}}>
             {formatTime(time)}
           </div>
-          <div className="text-xl text-gray-600 uppercase tracking-widest">
+          <div className="text-lg text-white/80 uppercase tracking-widest drop-shadow-lg" style={{fontFamily: 'Georgia, serif'}}>
             {formatDate(time)}
           </div>
         </div>
