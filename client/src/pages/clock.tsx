@@ -230,6 +230,266 @@ const AmoebaClockComponent = ({ currentTime }: { currentTime: Date }) => {
   );
 };
 
+// Enhanced Amoeba Clock with Hands Component
+const AmoebaWithHandsClockComponent = ({ currentTime }: { currentTime: Date }) => {
+  const [morphPoints, setMorphPoints] = useState<number[]>([]);
+  const [waterOffset, setWaterOffset] = useState(0);
+  const [pulseScale, setPulseScale] = useState(1);
+  const [handMorph, setHandMorph] = useState({ hour: 1, minute: 1 });
+  
+  const seconds = currentTime.getSeconds();
+  const minutes = currentTime.getMinutes();
+  const hours = currentTime.getHours() % 12;
+  
+  // Generate color based on time
+  const getTimeColor = () => {
+    const hue = (seconds * 6) % 360;
+    return `hsl(${hue}, 70%, 60%)`;
+  };
+  
+  // Generate hand colors
+  const getHourHandColor = () => {
+    const hue = (hours * 30 + minutes * 0.5) % 360; // 30 degrees per hour
+    return `hsl(${hue}, 80%, 55%)`;
+  };
+  
+  const getMinuteHandColor = () => {
+    const hue = (minutes * 6) % 360; // 6 degrees per minute
+    return `hsl(${hue}, 75%, 50%)`;
+  };
+  
+  // Calculate hand angles
+  const hourAngle = (hours * 30) + (minutes * 0.5) - 90; // -90 to start at 12 o'clock
+  const minuteAngle = (minutes * 6) - 90;
+  
+  // Generate amoeba blob path
+  const generateBlobPath = (points: number[]) => {
+    if (points.length === 0) return '';
+    
+    const centerX = 150;
+    const centerY = 150;
+    const baseRadius = 80;
+    
+    let path = `M `;
+    for (let i = 0; i < 12; i++) {
+      const angle = (i / 12) * Math.PI * 2;
+      const radiusVariation = points[i] || 0.8;
+      const radius = baseRadius * (0.6 + radiusVariation * 0.4);
+      const x = centerX + Math.cos(angle) * radius;
+      const y = centerY + Math.sin(angle) * radius;
+      
+      if (i === 0) {
+        path += `${x} ${y}`;
+      } else {
+        const prevAngle = ((i - 1) / 12) * Math.PI * 2;
+        const prevRadius = baseRadius * (0.6 + (points[i - 1] || 0.8) * 0.4);
+        const prevX = centerX + Math.cos(prevAngle) * prevRadius;
+        const prevY = centerY + Math.sin(prevAngle) * prevRadius;
+        
+        const cpX = (prevX + x) / 2 + Math.sin(angle) * 20;
+        const cpY = (prevY + y) / 2 + Math.cos(angle) * 20;
+        
+        path += ` Q ${cpX} ${cpY} ${x} ${y}`;
+      }
+    }
+    path += ' Z';
+    return path;
+  };
+  
+  // Generate morphing oval hand path
+  const generateHandPath = (length: number, width: number, morphFactor: number) => {
+    const morphedWidth = width * morphFactor;
+    const morphedLength = length * (0.8 + morphFactor * 0.4);
+    
+    return `M 0,-${morphedWidth/2} 
+            Q ${morphedLength*0.3},-${morphedWidth/2} ${morphedLength},-${morphedWidth/4}
+            Q ${morphedLength*1.1},0 ${morphedLength},${morphedWidth/4}
+            Q ${morphedLength*0.3},${morphedWidth/2} 0,${morphedWidth/2}
+            Q -${morphedWidth/3},0 0,-${morphedWidth/2} Z`;
+  };
+  
+  useEffect(() => {
+    // Morph animation
+    const morphInterval = setInterval(() => {
+      setMorphPoints(prev => {
+        const newPoints = prev.map(point => {
+          return Math.max(0.3, Math.min(1.2, point + (Math.random() - 0.5) * 0.1));
+        });
+        
+        if (newPoints.length < 12) {
+          while (newPoints.length < 12) {
+            newPoints.push(0.8 + Math.random() * 0.4);
+          }
+        }
+        return newPoints;
+      });
+      
+      // Morph hands
+      setHandMorph({
+        hour: 0.7 + Math.random() * 0.6,
+        minute: 0.8 + Math.random() * 0.4
+      });
+    }, 200);
+    
+    // Water sloshing animation
+    const waterInterval = setInterval(() => {
+      setWaterOffset(prev => (prev + 1) % 360);
+    }, 50);
+    
+    // Pulse animation on second change
+    const pulseInterval = setInterval(() => {
+      setPulseScale(1.15);
+      setTimeout(() => setPulseScale(1), 100);
+    }, 1000);
+    
+    return () => {
+      clearInterval(morphInterval);
+      clearInterval(waterInterval);
+      clearInterval(pulseInterval);
+    };
+  }, []);
+  
+  // Initialize morph points
+  useEffect(() => {
+    if (morphPoints.length === 0) {
+      setMorphPoints(Array.from({ length: 12 }, () => 0.8 + Math.random() * 0.4));
+    }
+  }, [morphPoints.length]);
+  
+  const blobPath = generateBlobPath(morphPoints);
+  const timeColor = getTimeColor();
+  const hourHandColor = getHourHandColor();
+  const minuteHandColor = getMinuteHandColor();
+  
+  return (
+    <div className="relative w-80 h-80 mx-auto">
+      <svg width="300" height="300" viewBox="0 0 300 300" className="drop-shadow-2xl">
+        <defs>
+          <radialGradient id="amoebaGradientHands" cx="0.3" cy="0.3">
+            <stop offset="0%" stopColor={timeColor} stopOpacity="0.9" />
+            <stop offset="50%" stopColor={timeColor} stopOpacity="0.7" />
+            <stop offset="100%" stopColor={timeColor} stopOpacity="0.5" />
+          </radialGradient>
+          
+          <radialGradient id="hourHandGradient" cx="0.3" cy="0.3">
+            <stop offset="0%" stopColor={hourHandColor} stopOpacity="0.9" />
+            <stop offset="100%" stopColor={hourHandColor} stopOpacity="0.6" />
+          </radialGradient>
+          
+          <radialGradient id="minuteHandGradient" cx="0.3" cy="0.3">
+            <stop offset="0%" stopColor={minuteHandColor} stopOpacity="0.9" />
+            <stop offset="100%" stopColor={minuteHandColor} stopOpacity="0.6" />
+          </radialGradient>
+          
+          <filter id="gooeyHands">
+            <feGaussianBlur in="SourceGraphic" result="blur" stdDeviation="8" />
+            <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 19 -9" result="goo" />
+            <feComposite in="SourceGraphic" in2="goo" operator="atop" />
+          </filter>
+          
+          <clipPath id="amoebaClipHands">
+            <path d={blobPath} />
+          </clipPath>
+        </defs>
+        
+        {/* Main amoeba body */}
+        <path
+          d={blobPath}
+          fill="url(#amoebaGradientHands)"
+          filter="url(#gooeyHands)"
+          style={{
+            transform: `scale(${pulseScale})`,
+            transformOrigin: 'center',
+            transition: 'transform 0.1s ease-out'
+          }}
+        />
+        
+        {/* Water sloshing inside */}
+        <g clipPath="url(#amoebaClipHands)">
+          <ellipse
+            cx="150"
+            cy="150"
+            rx="60"
+            ry="40"
+            fill="rgba(100, 200, 255, 0.6)"
+            style={{
+              transform: `translate(${Math.sin(waterOffset * 0.02) * 10}px, ${Math.cos(waterOffset * 0.03) * 8}px) rotate(${waterOffset * 0.5}deg)`,
+              transformOrigin: 'center'
+            }}
+          />
+          <ellipse
+            cx="150"
+            cy="150"
+            rx="45"
+            ry="30"
+            fill="rgba(150, 220, 255, 0.4)"
+            style={{
+              transform: `translate(${Math.cos(waterOffset * 0.025) * 8}px, ${Math.sin(waterOffset * 0.035) * 6}px) rotate(${-waterOffset * 0.3}deg)`,
+              transformOrigin: 'center'
+            }}
+          />
+        </g>
+        
+        {/* Hour Hand */}
+        <g transform={`translate(150, 150) rotate(${hourAngle})`}>
+          <path
+            d={generateHandPath(50, 16, handMorph.hour)}
+            fill="url(#hourHandGradient)"
+            filter="url(#gooeyHands)"
+            style={{
+              transformOrigin: 'center',
+              transition: 'all 0.2s ease-out'
+            }}
+          />
+        </g>
+        
+        {/* Minute Hand */}
+        <g transform={`translate(150, 150) rotate(${minuteAngle})`}>
+          <path
+            d={generateHandPath(70, 12, handMorph.minute)}
+            fill="url(#minuteHandGradient)"
+            filter="url(#gooeyHands)"
+            style={{
+              transformOrigin: 'center',
+              transition: 'all 0.2s ease-out'
+            }}
+          />
+        </g>
+        
+        {/* Center dot */}
+        <circle
+          cx="150"
+          cy="150"
+          r="8"
+          fill="rgba(255, 255, 255, 0.8)"
+          filter="url(#gooeyHands)"
+        />
+        
+        {/* Glossy highlight */}
+        <ellipse
+          cx="130"
+          cy="120"
+          rx="25"
+          ry="35"
+          fill="rgba(255, 255, 255, 0.3)"
+          style={{
+            transform: `scale(${pulseScale * 0.9})`,
+            transformOrigin: 'center',
+            transition: 'transform 0.1s ease-out'
+          }}
+        />
+      </svg>
+      
+      {/* Digital time display below */}
+      <div className="absolute bottom-0 left-0 right-0 flex justify-center">
+        <div className="font-xanman-wide text-white text-lg drop-shadow-lg bg-black bg-opacity-30 px-3 py-1 rounded-lg">
+          {String(currentTime.getHours()).padStart(2, '0')}:{String(minutes).padStart(2, '0')}:{String(seconds).padStart(2, '0')}
+        </div>
+      </div>
+    </div>
+  );
+};
+
 // Year Clock Component
 const YearClock = ({ currentDate }: { currentDate: Date }) => {
   const currentYear = currentDate.getFullYear();
@@ -673,6 +933,14 @@ export default function Clock() {
 
       {/* Clocks Display */}
       <div className="flex flex-col items-center justify-center min-h-[calc(100vh-200px)] space-y-12">
+        
+        {/* Enhanced Amoeba Clock with Hands */}
+        <div className="glassmorphism rounded-2xl p-8">
+          <h2 className="font-xanman-wide text-2xl mb-8 text-center text-black">
+            AMOEBA ANALOG CLOCK
+          </h2>
+          <AmoebaWithHandsClockComponent currentTime={time} />
+        </div>
         
         {/* Amoeba Clock */}
         <div className="glassmorphism rounded-2xl p-8">
