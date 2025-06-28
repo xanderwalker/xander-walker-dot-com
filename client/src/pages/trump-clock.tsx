@@ -24,6 +24,14 @@ export default function TrumpClock() {
 
   return (
     <div className="min-h-screen bg-black flex items-center justify-center">
+      {/* Temporary debug info - will remove after fixing */}
+      <div className="absolute top-4 left-4 text-white text-sm">
+        Debug: {time.toLocaleTimeString()}
+        <br />
+        Hours: {time.getHours()} Minutes: {time.getMinutes()} Seconds: {time.getSeconds()}
+        <br />
+        Hour Angle: {hourAngle.toFixed(1)}°
+      </div>
       {/* Trump Political Clock - centered, no other elements */}
       <svg
         width="400"
