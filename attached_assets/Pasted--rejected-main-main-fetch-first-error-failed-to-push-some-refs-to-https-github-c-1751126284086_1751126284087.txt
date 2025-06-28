@@ -1,0 +1,40 @@
+ ! [rejected]        main -> main (fetch first)
+error: failed to push some refs to 'https://github.com/xanderwalker/xander-walker-dot-com.git'
+hint: Updates were rejected because the remote contains work that you do
+hint: not have locally. This is usually caused by another repository pushing
+hint: to the same ref. You may want to first integrate the remote changes
+hint: (e.g., 'git pull ...') before pushing again.
+hint: See the 'Note about fast-forwards' in 'git push --help' for details.
+xander@alexanders-MacBook-Pro xanderwalkerdotcom % git pull origin main --allow-unrelated-histories
+
+remote: Enumerating objects: 3, done.
+remote: Total 3 (delta 0), reused 0 (delta 0), pack-reused 3 (from 1)
+Unpacking objects: 100% (3/3), 1.15 KiB | 591.00 KiB/s, done.
+From https://github.com/xanderwalker/xander-walker-dot-com
+ * branch            main       -> FETCH_HEAD
+ * [new branch]      main       -> origin/main
+hint: You have divergent branches and need to specify how to reconcile them.
+hint: You can do so by running one of the following commands sometime before
+hint: your next pull:
+hint: 
+hint:   git config pull.rebase false  # merge
+hint:   git config pull.rebase true   # rebase
+hint:   git config pull.ff only       # fast-forward only
+hint: 
+hint: You can replace "git config" with "git config --global" to set a default
+hint: preference for all repositories. You can also pass --rebase, --no-rebase,
+hint: or --ff-only on the command line to override the configured default per
+hint: invocation.
+fatal: Need to specify how to reconcile divergent branches.
+xander@alexanders-MacBook-Pro xanderwalkerdotcom % git push origin main --force
+
+Enumerating objects: 250, done.
+Counting objects: 100% (250/250), done.
+Delta compression using up to 8 threads
+Compressing objects: 100% (241/241), done.
+Writing objects: 100% (241/241), 14.70 MiB | 2.94 MiB/s, done.
+Total 241 (delta 205), reused 0 (delta 0), pack-reused 0
+remote: Resolving deltas: 100% (205/205), completed with 9 local objects.
+To https://github.com/xanderwalker/xander-walker-dot-com.git
+ + 02d31fc...80d62fc main -> main (forced update)
+xander@alexanders-MacBook-Pro xanderwalkerdotcom % 
