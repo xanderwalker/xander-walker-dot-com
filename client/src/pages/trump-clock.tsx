@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useLocation } from 'wouter';
 import trumpImage from '@assets/image_1751088966989.png';
 import vanceImage from '@assets/image_1751089063177.png';
 import tacoImage from '@assets/image_1751089460552.png';
@@ -6,6 +7,7 @@ import golfBallImage from '@assets/image_1751090576666.png';
 
 export default function TrumpClock() {
   const [time, setTime] = useState(new Date());
+  const [, setLocation] = useLocation();
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -23,7 +25,28 @@ export default function TrumpClock() {
 
 
   return (
-    <div className="min-h-screen bg-black flex items-center justify-center">
+    <div className="min-h-screen bg-black flex items-center justify-center relative">
+      {/* Home navigation button - top left corner */}
+      <button
+        onClick={() => setLocation('/')}
+        className="absolute top-4 left-4 w-12 h-12 bg-cyan-blue rounded-full hover:bg-cyan-400 transition-colors duration-200 flex items-center justify-center shadow-lg hover:shadow-xl z-10"
+        aria-label="Go home"
+      >
+        <svg
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className="text-white"
+        >
+          <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+          <polyline points="9,22 9,12 15,12 15,22"/>
+        </svg>
+      </button>
       {/* Trump Political Clock - centered, no other elements */}
       <svg
         width="400"
