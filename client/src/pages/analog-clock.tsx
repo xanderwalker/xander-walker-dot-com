@@ -116,7 +116,7 @@ export default function AnalogClock() {
               </pattern>
             </defs>
             
-            {/* Golf ball clock face - using actual image */}
+            {/* Golf ball clock face - using actual image, properly centered */}
             <circle cx="150" cy="150" r="130" fill="white" />
             <image
               href={golfBallImage}
@@ -124,10 +124,11 @@ export default function AnalogClock() {
               y="20"
               width="260"
               height="260"
+              preserveAspectRatio="xMidYMid slice"
               style={{ clipPath: 'circle(130px at 150px 150px)' }}
             />
 
-            {/* Trump image as hour hand - larger */}
+            {/* Trump image as hour hand - shorter radius to avoid overlap */}
             <g
               style={{ 
                 transformOrigin: '150px 150px',
@@ -137,14 +138,14 @@ export default function AnalogClock() {
               <image
                 href={trumpImage}
                 x="130"
-                y="95"
+                y="105"
                 width="40"
                 height="50"
                 style={{ filter: 'drop-shadow(2px 2px 4px rgba(0,0,0,0.3))' }}
               />
             </g>
 
-            {/* Vance image as minute hand - larger */}
+            {/* Vance image as minute hand - further out to prevent overlap */}
             <g
               style={{ 
                 transformOrigin: '150px 150px',
@@ -154,14 +155,14 @@ export default function AnalogClock() {
               <image
                 href={vanceImage}
                 x="135"
-                y="75"
+                y="60"
                 width="30"
                 height="40"
                 style={{ filter: 'drop-shadow(2px 2px 4px rgba(0,0,0,0.3))' }}
               />
             </g>
 
-            {/* Taco image as second hand - closer to edge */}
+            {/* Taco image as second hand - all the way to edge */}
             <g
               style={{ 
                 transformOrigin: '150px 150px',
@@ -171,7 +172,7 @@ export default function AnalogClock() {
               <image
                 href={tacoImage}
                 x="142"
-                y="40"
+                y="25"
                 width="16"
                 height="20"
                 style={{ filter: 'drop-shadow(2px 2px 4px rgba(0,0,0,0.3))' }}
