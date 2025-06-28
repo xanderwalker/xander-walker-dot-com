@@ -116,8 +116,12 @@ export default function AnalogClock() {
               </pattern>
             </defs>
             
-            {/* Golf ball clock face - using actual image, properly centered */}
-            <circle cx="150" cy="150" r="130" fill="#f8f9fa" />
+            {/* Golf ball clock face - using actual image, no background */}
+            <defs>
+              <clipPath id="clockFace">
+                <circle cx="150" cy="150" r="130" />
+              </clipPath>
+            </defs>
             <image
               href={golfBallImage}
               x="20"
@@ -125,7 +129,7 @@ export default function AnalogClock() {
               width="260"
               height="260"
               preserveAspectRatio="xMidYMid slice"
-              style={{ clipPath: 'circle(130px at 150px 150px)' }}
+              clipPath="url(#clockFace)"
             />
 
             {/* Trump image as hour hand - shorter radius to avoid overlap */}
