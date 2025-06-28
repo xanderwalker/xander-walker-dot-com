@@ -1,5 +1,6 @@
 import { useRef, useEffect, useState } from 'react';
 import { useLocation } from 'wouter';
+import { trackEvent } from '../lib/analytics';
 
 interface Circle {
   id: string;
@@ -32,6 +33,7 @@ export default function BouncingCircles() {
 
   const navigateToPage = (path: string) => {
     console.log('Navigating to:', path);
+    trackEvent('navigation', 'bouncing_circle', path);
     setLocation(path);
   };
 
