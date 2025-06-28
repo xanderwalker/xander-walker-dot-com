@@ -94,8 +94,134 @@ export default function AnalogClock() {
         </div>
       </div>
 
-      {/* Radar Screen Clock */}
+      {/* Political Clock */}
       <div className="flex items-center justify-center pt-32 pb-16">
+        <div className="relative">
+          
+          {/* Political Clock Face */}
+          <svg
+            width="300"
+            height="300"
+            viewBox="0 0 300 300"
+            className="drop-shadow-2xl"
+          >
+            <defs>
+              {/* Golf ball pattern */}
+              <pattern id="golfBallPattern" x="0" y="0" width="15" height="15" patternUnits="userSpaceOnUse">
+                <circle cx="7.5" cy="7.5" r="3" fill="rgba(0,0,0,0.1)" />
+              </pattern>
+            </defs>
+            
+            {/* Golf ball clock face */}
+            <circle
+              cx="150"
+              cy="150"
+              r="130"
+              fill="white"
+              stroke="#e5e7eb"
+              strokeWidth="3"
+            />
+            
+            {/* Golf ball dimples pattern */}
+            <circle
+              cx="150"
+              cy="150"
+              r="130"
+              fill="url(#golfBallPattern)"
+              opacity="0.8"
+            />
+            
+            {/* Additional golf ball dimples for realism */}
+            {Array.from({ length: 60 }, (_, i) => {
+              const angle = (i * 6) * (Math.PI / 180);
+              const radius = 90 + (i % 3) * 15;
+              const x = 150 + Math.sin(angle) * radius;
+              const y = 150 - Math.cos(angle) * radius;
+              return (
+                <circle
+                  key={i}
+                  cx={x}
+                  cy={y}
+                  r="2"
+                  fill="rgba(0,0,0,0.08)"
+                />
+              );
+            })}
+
+            {/* Trump image as hour hand */}
+            <g
+              style={{ 
+                transformOrigin: '150px 150px',
+                transform: `rotate(${hourAngle}deg)`,
+              }}
+            >
+              <image
+                href="/attached_assets/image_1751088966989.png"
+                x="135"
+                y="100"
+                width="30"
+                height="40"
+                style={{ filter: 'drop-shadow(2px 2px 4px rgba(0,0,0,0.3))' }}
+              />
+            </g>
+
+            {/* Vance image as minute hand */}
+            <g
+              style={{ 
+                transformOrigin: '150px 150px',
+                transform: `rotate(${minuteAngle}deg)`,
+              }}
+            >
+              <image
+                href="/attached_assets/image_1751089063177.png"
+                x="140"
+                y="80"
+                width="20"
+                height="30"
+                style={{ filter: 'drop-shadow(2px 2px 4px rgba(0,0,0,0.3))' }}
+              />
+            </g>
+
+            {/* Taco image as second hand */}
+            <g
+              style={{ 
+                transformOrigin: '150px 150px',
+                transform: `rotate(${secondAngle}deg)`,
+              }}
+            >
+              <image
+                href="/attached_assets/image_1751089460552.png"
+                x="142"
+                y="60"
+                width="16"
+                height="20"
+                style={{ filter: 'drop-shadow(2px 2px 4px rgba(0,0,0,0.3))' }}
+              />
+            </g>
+
+            {/* Center point */}
+            <circle
+              cx="150"
+              cy="150"
+              r="5"
+              fill="rgba(255, 255, 255, 0.9)"
+              stroke="#374151"
+              strokeWidth="2"
+            />
+          </svg>
+
+          {/* Political Clock Title */}
+          <div className="absolute -bottom-10 left-1/2 transform -translate-x-1/2">
+            <h3 className="font-xanman-wide text-lg text-white text-center">
+              POLITICAL TIME
+            </h3>
+          </div>
+
+        </div>
+      </div>
+
+      {/* Radar Screen Clock */}
+      <div className="flex items-center justify-center pb-16">
         <div className="relative">
           
           {/* Radar Clock Face */}
