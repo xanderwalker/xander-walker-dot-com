@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import trumpImage from '@assets/image_1751088966989.png';
 import vanceImage from '@assets/image_1751089063177.png';
 import tacoImage from '@assets/image_1751089460552.png';
+import golfBallImage from '@assets/image_1751089435771.png';
 
 export default function AnalogClock() {
   const [time, setTime] = useState(new Date());
@@ -115,43 +116,18 @@ export default function AnalogClock() {
               </pattern>
             </defs>
             
-            {/* Golf ball clock face */}
-            <circle
-              cx="150"
-              cy="150"
-              r="130"
-              fill="white"
-              stroke="#e5e7eb"
-              strokeWidth="3"
+            {/* Golf ball clock face - using actual image */}
+            <circle cx="150" cy="150" r="130" fill="white" />
+            <image
+              href={golfBallImage}
+              x="20"
+              y="20"
+              width="260"
+              height="260"
+              style={{ clipPath: 'circle(130px at 150px 150px)' }}
             />
-            
-            {/* Golf ball dimples pattern */}
-            <circle
-              cx="150"
-              cy="150"
-              r="130"
-              fill="url(#golfBallPattern)"
-              opacity="0.8"
-            />
-            
-            {/* Additional golf ball dimples for realism */}
-            {Array.from({ length: 60 }, (_, i) => {
-              const angle = (i * 6) * (Math.PI / 180);
-              const radius = 90 + (i % 3) * 15;
-              const x = 150 + Math.sin(angle) * radius;
-              const y = 150 - Math.cos(angle) * radius;
-              return (
-                <circle
-                  key={i}
-                  cx={x}
-                  cy={y}
-                  r="2"
-                  fill="rgba(0,0,0,0.08)"
-                />
-              );
-            })}
 
-            {/* Trump image as hour hand */}
+            {/* Trump image as hour hand - larger */}
             <g
               style={{ 
                 transformOrigin: '150px 150px',
@@ -160,15 +136,15 @@ export default function AnalogClock() {
             >
               <image
                 href={trumpImage}
-                x="135"
-                y="100"
-                width="30"
-                height="40"
+                x="130"
+                y="95"
+                width="40"
+                height="50"
                 style={{ filter: 'drop-shadow(2px 2px 4px rgba(0,0,0,0.3))' }}
               />
             </g>
 
-            {/* Vance image as minute hand */}
+            {/* Vance image as minute hand - larger */}
             <g
               style={{ 
                 transformOrigin: '150px 150px',
@@ -177,15 +153,15 @@ export default function AnalogClock() {
             >
               <image
                 href={vanceImage}
-                x="140"
-                y="80"
-                width="20"
-                height="30"
+                x="135"
+                y="75"
+                width="30"
+                height="40"
                 style={{ filter: 'drop-shadow(2px 2px 4px rgba(0,0,0,0.3))' }}
               />
             </g>
 
-            {/* Taco image as second hand */}
+            {/* Taco image as second hand - closer to edge */}
             <g
               style={{ 
                 transformOrigin: '150px 150px',
@@ -195,7 +171,7 @@ export default function AnalogClock() {
               <image
                 href={tacoImage}
                 x="142"
-                y="60"
+                y="40"
                 width="16"
                 height="20"
                 style={{ filter: 'drop-shadow(2px 2px 4px rgba(0,0,0,0.3))' }}
