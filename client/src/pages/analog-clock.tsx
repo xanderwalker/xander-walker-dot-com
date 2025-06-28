@@ -117,7 +117,7 @@ export default function AnalogClock() {
             </defs>
             
             {/* Golf ball clock face - using actual image, properly centered */}
-            <circle cx="150" cy="150" r="130" fill="white" />
+            <circle cx="150" cy="150" r="130" fill="#f8f9fa" />
             <image
               href={golfBallImage}
               x="20"
