@@ -12,10 +12,10 @@ export default function AnalogClock() {
     return () => clearInterval(timer);
   }, []);
 
-  // Calculate angles for clock hands
-  const secondAngle = (time.getSeconds() * 6) - 90; // 6 degrees per second
-  const minuteAngle = (time.getMinutes() * 6 + time.getSeconds() * 0.1) - 90; // 6 degrees per minute + smooth seconds
-  const hourAngle = ((time.getHours() % 12) * 30 + time.getMinutes() * 0.5) - 90; // 30 degrees per hour + smooth minutes
+  // Calculate angles for clock hands (0 degrees = 12 o'clock position)
+  const secondAngle = (time.getSeconds() * 6); // 6 degrees per second
+  const minuteAngle = (time.getMinutes() * 6 + time.getSeconds() * 0.1); // 6 degrees per minute + smooth seconds
+  const hourAngle = ((time.getHours() % 12) * 30 + time.getMinutes() * 0.5); // 30 degrees per hour + smooth minutes
 
   // Generate hour markers
   const hourMarkers = Array.from({ length: 12 }, (_, i) => {
@@ -170,8 +170,8 @@ export default function AnalogClock() {
             <line
               x1="200"
               y1="200"
-              x2={200 + Math.cos(hourAngle * Math.PI / 180) * 80}
-              y2={200 + Math.sin(hourAngle * Math.PI / 180) * 80}
+              x2={200 + Math.sin(hourAngle * Math.PI / 180) * 80}
+              y2={200 - Math.cos(hourAngle * Math.PI / 180) * 80}
               stroke="rgba(255, 255, 255, 0.9)"
               strokeWidth="8"
               strokeLinecap="round"
@@ -184,8 +184,8 @@ export default function AnalogClock() {
             <line
               x1="200"
               y1="200"
-              x2={200 + Math.cos(minuteAngle * Math.PI / 180) * 120}
-              y2={200 + Math.sin(minuteAngle * Math.PI / 180) * 120}
+              x2={200 + Math.sin(minuteAngle * Math.PI / 180) * 120}
+              y2={200 - Math.cos(minuteAngle * Math.PI / 180) * 120}
               stroke="rgba(255, 255, 255, 0.9)"
               strokeWidth="6"
               strokeLinecap="round"
@@ -198,8 +198,8 @@ export default function AnalogClock() {
             <line
               x1="200"
               y1="200"
-              x2={200 + Math.cos(secondAngle * Math.PI / 180) * 140}
-              y2={200 + Math.sin(secondAngle * Math.PI / 180) * 140}
+              x2={200 + Math.sin(secondAngle * Math.PI / 180) * 140}
+              y2={200 - Math.cos(secondAngle * Math.PI / 180) * 140}
               stroke="#ff6b35"
               strokeWidth="2"
               strokeLinecap="round"
