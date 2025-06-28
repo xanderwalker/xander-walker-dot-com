@@ -94,8 +94,105 @@ export default function AnalogClock() {
         </div>
       </div>
 
-      {/* Dry Amoeba Clock */}
+      {/* Square Geometric Clock */}
       <div className="flex items-center justify-center pt-32 pb-16">
+        <div className="relative">
+          
+          {/* Square Clock Face */}
+          <svg
+            width="280"
+            height="280"
+            viewBox="0 0 280 280"
+            className="drop-shadow-2xl"
+          >
+            <defs>
+              {/* Yellow square gradient */}
+              <linearGradient id="squareGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#fde047" />
+                <stop offset="50%" stopColor="#facc15" />
+                <stop offset="100%" stopColor="#eab308" />
+              </linearGradient>
+            </defs>
+            
+            {/* Yellow square face */}
+            <rect
+              x="40"
+              y="40"
+              width="200"
+              height="200"
+              fill="url(#squareGradient)"
+              stroke="rgba(255,255,255,0.4)"
+              strokeWidth="3"
+              rx="15"
+            />
+            
+            {/* Inner square border */}
+            <rect
+              x="50"
+              y="50"
+              width="180"
+              height="180"
+              fill="none"
+              stroke="rgba(255,255,255,0.2)"
+              strokeWidth="1"
+              rx="10"
+            />
+
+            {/* Red triangle for hour hand */}
+            <polygon
+              points={`140,140 ${140 + Math.sin(hourAngle * Math.PI / 180) * 50},${140 - Math.cos(hourAngle * Math.PI / 180) * 50} ${140 + Math.sin((hourAngle + 15) * Math.PI / 180) * 35},${140 - Math.cos((hourAngle + 15) * Math.PI / 180) * 35}`}
+              fill="#dc2626"
+              stroke="#991b1b"
+              strokeWidth="1"
+            />
+
+            {/* Blue circle for minute hand */}
+            <circle
+              cx={140 + Math.sin(minuteAngle * Math.PI / 180) * 70}
+              cy={140 - Math.cos(minuteAngle * Math.PI / 180) * 70}
+              r="8"
+              fill="#3b82f6"
+              stroke="#1d4ed8"
+              strokeWidth="2"
+            />
+
+            {/* Purple heart for second hand */}
+            <g
+              transform={`translate(${140 + Math.sin(secondAngle * Math.PI / 180) * 85}, ${140 - Math.cos(secondAngle * Math.PI / 180) * 85})`}
+            >
+              <path
+                d="M0,-3 C-3,-8 -8,-8 -8,-3 C-8,0 -5,3 0,8 C5,3 8,0 8,-3 C8,-8 3,-8 0,-3 Z"
+                fill="#8b5cf6"
+                stroke="#7c3aed"
+                strokeWidth="1"
+              />
+            </g>
+
+            {/* Center square */}
+            <rect
+              x="135"
+              y="135"
+              width="10"
+              height="10"
+              fill="rgba(255, 255, 255, 0.9)"
+              stroke="#374151"
+              strokeWidth="1"
+              rx="2"
+            />
+          </svg>
+
+          {/* Square Clock Title */}
+          <div className="absolute -bottom-10 left-1/2 transform -translate-x-1/2">
+            <h3 className="font-xanman-wide text-lg text-white text-center">
+              GEOMETRIC TIME
+            </h3>
+          </div>
+
+        </div>
+      </div>
+
+      {/* Dry Amoeba Clock */}
+      <div className="flex items-center justify-center pb-16">
         <div className="relative">
           
           {/* Dry Amoeba Clock Face */}
