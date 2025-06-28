@@ -68,6 +68,12 @@ export default function Projects() {
       description: "Minimalist clock with 1-pixel balls dropping continuously. 10 balls fall every second, cylinder clears every minute for precise time visualization.",
       tags: "Minimalist • Physics • Time",
       link: "/projects/pixel-clock"
+    },
+    {
+      title: "TRUMP CLOCK",
+      description: "Political satire timepiece featuring a golden golf ball face with Trump as hour hand, Vance as minute hand, and a taco marking seconds.",
+      tags: "Political • Satire • Golf",
+      link: "/projects/trump-clock"
     }
   ];
 
