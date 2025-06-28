@@ -4,76 +4,88 @@ import Layout from '../components/layout';
 export default function Projects() {
   const projects = [
     {
+      title: "TRUMP CLOCK",
+      description: "Political satire timepiece featuring a golden golf ball face with Trump as hour hand, Vance as minute hand, and a taco marking seconds.",
+      tags: "Political • Satire • Golf",
+      timestamp: "June 28, 2025",
+      link: "/projects/trump-clock"
+    },
+    {
       title: "ANALOG CLOCK",
       description: "Traditional 12-hour analog clock with hour, minute, and second hands. Features classic Roman numerals, smooth hand movement, and elegant glassmorphism design on a dark gradient background.",
       tags: "Time • Classic • Interface",
+      timestamp: "June 28, 2025",
       link: "/projects/analog-clock"
     },
     {
       title: "MONET PAINT SWIRLING",
       description: "Interactive paint mixing inspired by Claude Monet's water lily paintings. Mouse movement or device tilting creates beautiful color gradients that blend and morph in real-time like watercolors.",
       tags: "Interactive • Art • Sensors",
+      timestamp: "June 27, 2025",
       link: "/projects/monet-paint"
     },
     {
       title: "SPOTIFY LYRICS",
       description: "Real-time lyrics display for your currently playing Spotify track. Connect with your Spotify account to view synchronized lyrics for any song you're listening to.",
       tags: "Music • API • Real-time",
+      timestamp: "June 27, 2025",
       link: "/projects/spotify-lyrics"
     },
     {
       title: "SPOTIFY API TEST",
       description: "Comprehensive Spotify API data viewer showing all available real-time information. Displays album art, track details, device info, playback state, and raw API responses in readable format.",
       tags: "Music • API • Data • Testing",
+      timestamp: "June 27, 2025",
       link: "/projects/spotify-api-test"
     },
     {
       title: "CAMERA SYSTEM",
       description: "Multi-camera detection and live video streaming system. Automatically detects all available cameras (front/rear) and displays simultaneous video feeds with device identification.",
       tags: "Camera • Video • Hardware",
+      timestamp: "June 27, 2025",
       link: "/projects/camera"
     },
     {
       title: "SENSOR DASHBOARD",
       description: "Comprehensive device sensor monitoring with visual indicators. Displays accelerometer, compass, gyroscope, sound level, brightness, battery, temperature, and proximity sensors in real-time.",
       tags: "Sensors • Hardware • Monitoring",
+      timestamp: "June 27, 2025",
       link: "/projects/sensor-dashboard"
     },
     {
       title: "GLASS OF WATER",
       description: "Realistic water simulation that responds to device tilting. Water particles slosh around the screen using accelerometer data for authentic physics.",
       tags: "Physics • Accelerometer • Fluid",
+      timestamp: "June 26, 2025",
       link: "/projects/glass-of-water"
     },
     {
       title: "333 BALLS",
       description: "Interactive physics simulation with 333 colorful balls that respond to device motion. Features smooth gradient colors, collision detection, and accelerometer controls on mobile.",
       tags: "Physics • Interactive • Mobile",
+      timestamp: "June 26, 2025",
       link: "/projects/333-balls"
     },
     {
       title: "CLOCK",
       description: "A modern digital clock interface with custom styling and real-time updates. Clean design with precise time display.",
-      tags: "Time • Design • Interface", 
+      tags: "Time • Design • Interface",
+      timestamp: "June 26, 2025", 
       link: "/projects/clock"
     },
     {
       title: "ROULETTE WHEEL",
       description: "Interactive roulette wheel with realistic physics simulation. Drag to spin the wheel, drop the ball, and watch it bounce to a winning number.",
       tags: "Physics • Interactive • Gaming",
+      timestamp: "June 27, 2025",
       link: "/projects/roulette"
     },
     {
       title: "PIXEL CLOCK",
       description: "Minimalist clock with 1-pixel balls dropping continuously. 10 balls fall every second, cylinder clears every minute for precise time visualization.",
       tags: "Minimalist • Physics • Time",
+      timestamp: "June 26, 2025",
       link: "/projects/pixel-clock"
-    },
-    {
-      title: "TRUMP CLOCK",
-      description: "Political satire timepiece featuring a golden golf ball face with Trump as hour hand, Vance as minute hand, and a taco marking seconds.",
-      tags: "Political • Satire • Golf",
-      link: "/projects/trump-clock"
     }
   ];
 
@@ -100,8 +112,13 @@ export default function Projects() {
                   </div>
                   
                   {/* Project Tags */}
-                  <div className="font-serif text-gray-500 text-center" style={{fontSize: '14px', lineHeight: '1.3', fontFamily: 'Georgia, serif'}}>
+                  <div className="font-serif text-gray-500 text-center mb-3" style={{fontSize: '14px', lineHeight: '1.3', fontFamily: 'Georgia, serif'}}>
                     {project.tags}
+                  </div>
+                  
+                  {/* Project Timestamp */}
+                  <div className="font-serif text-gray-400 text-center" style={{fontSize: '12px', lineHeight: '1.3', fontFamily: 'Georgia, serif'}}>
+                    {project.timestamp}
                   </div>
                 </div>
               </Link>
