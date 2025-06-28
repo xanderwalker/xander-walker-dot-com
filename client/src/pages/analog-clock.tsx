@@ -16,17 +16,22 @@ export default function AnalogClock() {
   const secondAngle = (time.getSeconds() * 6); // 6 degrees per second
   const minuteAngle = (time.getMinutes() * 6 + time.getSeconds() * 0.1); // 6 degrees per minute + smooth seconds
   const hourAngle = ((time.getHours() % 12) * 30 + time.getMinutes() * 0.5); // 30 degrees per hour + smooth minutes
+  
+  // Debug logging
+  console.log('Current time:', time.toLocaleTimeString());
+  console.log('Hours:', time.getHours(), 'Minutes:', time.getMinutes(), 'Seconds:', time.getSeconds());
+  console.log('Hour angle:', hourAngle, 'Minute angle:', minuteAngle, 'Second angle:', secondAngle);
 
-  // Generate hour markers
+  // Generate hour markers (starting at 12 o'clock and going clockwise)
   const hourMarkers = Array.from({ length: 12 }, (_, i) => {
     const angle = (i * 30) * (Math.PI / 180);
-    const outerX = 200 + Math.cos(angle) * 170;
-    const outerY = 200 + Math.sin(angle) * 170;
-    const innerX = 200 + Math.cos(angle) * 150;
-    const innerY = 200 + Math.sin(angle) * 150;
+    const outerX = 200 + Math.sin(angle) * 170;
+    const outerY = 200 - Math.cos(angle) * 170;
+    const innerX = 200 + Math.sin(angle) * 150;
+    const innerY = 200 - Math.cos(angle) * 150;
     const number = i === 0 ? 12 : i;
-    const textX = 200 + Math.cos(angle) * 135;
-    const textY = 200 + Math.sin(angle) * 135;
+    const textX = 200 + Math.sin(angle) * 135;
+    const textY = 200 - Math.cos(angle) * 135;
     
     return {
       id: i,
@@ -41,10 +46,10 @@ export default function AnalogClock() {
   const minuteMarkers = Array.from({ length: 60 }, (_, i) => {
     if (i % 5 === 0) return null; // Skip hour positions
     const angle = (i * 6) * (Math.PI / 180);
-    const outerX = 200 + Math.cos(angle) * 170;
-    const outerY = 200 + Math.sin(angle) * 170;
-    const innerX = 200 + Math.cos(angle) * 160;
-    const innerY = 200 + Math.sin(angle) * 160;
+    const outerX = 200 + Math.sin(angle) * 170;
+    const outerY = 200 - Math.cos(angle) * 170;
+    const innerX = 200 + Math.sin(angle) * 160;
+    const innerY = 200 - Math.cos(angle) * 160;
     
     return {
       id: i,
