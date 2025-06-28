@@ -175,10 +175,10 @@ export default function AnalogClock() {
             >
               <image
                 href={tacoImage}
-                x="140.6"
-                y="22.5"
-                width="18.4"
-                height="23"
+                x="139.66"
+                y="21.375"
+                width="21.16"
+                height="26.45"
                 style={{ filter: 'drop-shadow(2px 2px 4px rgba(0,0,0,0.3))' }}
               />
             </g>
