@@ -4,6 +4,12 @@ import Layout from '../components/layout';
 export default function Projects() {
   const projects = [
     {
+      title: "JERRY SEINFELD",
+      description: "Interactive cartoon drawing of Jerry Seinfeld with moveable arms and legs. Drag the limbs around to create different poses and animations in this minimalist character interface.",
+      tags: "Interactive • Cartoon • Animation",
+      link: "/projects/jerry-seinfeld"
+    },
+    {
       title: "MONET PAINT SWIRLING",
       description: "Interactive paint mixing inspired by Claude Monet's water lily paintings. Mouse movement or device tilting creates beautiful color gradients that blend and morph in real-time like watercolors.",
       tags: "Interactive • Art • Sensors",

@@ -18,6 +18,7 @@ import Camera from "@/pages/camera";
 import SpotifyLyrics from "@/pages/spotify-lyrics";
 import SpotifyApiTest from "@/pages/spotify-api-test";
 import MonetPaint from "@/pages/monet-paint";
+import JerrySeinfeld from "@/pages/jerry-seinfeld";
 import Contact from "@/pages/contact";
 import NotFound from "@/pages/not-found";
 
@@ -51,6 +52,7 @@ function Router() {
         <Route path="/projects/spotify-lyrics" component={SpotifyLyrics} />
         <Route path="/projects/spotify-api-test" component={SpotifyApiTest} />
         <Route path="/projects/monet-paint" component={MonetPaint} />
+        <Route path="/projects/jerry-seinfeld" component={JerrySeinfeld} />
         <Route path="/contact" component={Contact} />
         <Route component={NotFound} />
       </Switch>
