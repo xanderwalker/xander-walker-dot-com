@@ -94,8 +94,175 @@ export default function AnalogClock() {
         </div>
       </div>
 
-      {/* New York Clock */}
+      {/* Amoeba Clock */}
       <div className="flex items-center justify-center pt-32 pb-16">
+        <div className="relative">
+          
+          {/* Amoeba Clock Face */}
+          <svg
+            width="320"
+            height="320"
+            viewBox="0 0 320 320"
+            className="drop-shadow-2xl"
+          >
+            <defs>
+              {/* Amoeba gradient that shifts colors */}
+              <radialGradient id="amoebaGradient" cx="0.5" cy="0.5" r="0.8">
+                <stop offset="0%" stopColor="#fbbf24">
+                  <animate attributeName="stop-color" 
+                    values="#fbbf24;#ec4899;#3b82f6;#10b981;#fbbf24" 
+                    dur="8s" repeatCount="indefinite" />
+                </stop>
+                <stop offset="50%" stopColor="#ec4899">
+                  <animate attributeName="stop-color" 
+                    values="#ec4899;#3b82f6;#10b981;#fbbf24;#ec4899" 
+                    dur="8s" repeatCount="indefinite" />
+                </stop>
+                <stop offset="100%" stopColor="#3b82f6">
+                  <animate attributeName="stop-color" 
+                    values="#3b82f6;#10b981;#fbbf24;#ec4899;#3b82f6" 
+                    dur="8s" repeatCount="indefinite" />
+                </stop>
+              </radialGradient>
+              
+              {/* Water gradient */}
+              <linearGradient id="waterGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.8" />
+                <stop offset="50%" stopColor="#1d4ed8" stopOpacity="0.9" />
+                <stop offset="100%" stopColor="#1e3a8a" stopOpacity="1" />
+              </linearGradient>
+              
+              {/* Hour hand gradient */}
+              <radialGradient id="hourHandGradient" cx="0.5" cy="0.5" r="0.8">
+                <stop offset="0%" stopColor="#f97316">
+                  <animate attributeName="stop-color" 
+                    values="#f97316;#8b5cf6;#06b6d4;#f59e0b;#f97316" 
+                    dur="6s" repeatCount="indefinite" />
+                </stop>
+                <stop offset="100%" stopColor="#dc2626" stopOpacity="0.7">
+                  <animate attributeName="stop-color" 
+                    values="#dc2626;#7c3aed;#0891b2;#d97706;#dc2626" 
+                    dur="6s" repeatCount="indefinite" />
+                </stop>
+              </radialGradient>
+              
+              {/* Minute hand gradient */}
+              <radialGradient id="minuteHandGradient" cx="0.5" cy="0.5" r="0.8">
+                <stop offset="0%" stopColor="#22c55e">
+                  <animate attributeName="stop-color" 
+                    values="#22c55e;#f59e0b;#ef4444;#8b5cf6;#22c55e" 
+                    dur="5s" repeatCount="indefinite" />
+                </stop>
+                <stop offset="100%" stopColor="#059669" stopOpacity="0.7">
+                  <animate attributeName="stop-color" 
+                    values="#059669;#d97706;#dc2626;#7c3aed;#059669" 
+                    dur="5s" repeatCount="indefinite" />
+                </stop>
+              </radialGradient>
+              
+              {/* Blur filter for soft edges */}
+              <filter id="soften" x="-50%" y="-50%" width="200%" height="200%">
+                <feGaussianBlur in="SourceGraphic" stdDeviation="2"/>
+              </filter>
+            </defs>
+            
+            {/* Morphing amoeba shape */}
+            <path
+              fill="url(#amoebaGradient)"
+              stroke="rgba(255,255,255,0.3)"
+              strokeWidth="2"
+              filter="url(#soften)"
+            >
+              <animate attributeName="d" 
+                values="M160,60 C220,80 260,120 270,160 C280,200 250,240 200,250 C150,260 100,240 80,200 C60,160 80,120 120,80 C140,70 150,65 160,60 Z;
+                        M160,50 C230,70 280,110 290,160 C300,210 260,250 210,260 C160,270 110,250 90,210 C70,170 90,130 130,90 C150,75 155,60 160,50 Z;
+                        M160,70 C210,90 250,130 260,160 C270,190 240,230 190,240 C140,250 90,230 70,190 C50,150 70,110 110,70 C130,60 145,65 160,70 Z;
+                        M160,60 C220,80 260,120 270,160 C280,200 250,240 200,250 C150,260 100,240 80,200 C60,160 80,120 120,80 C140,70 150,65 160,60 Z"
+                dur="12s" repeatCount="indefinite" />
+            </path>
+            
+            {/* Water inside amoeba - sloshing animation */}
+            <clipPath id="amoebaClip">
+              <path>
+                <animate attributeName="d" 
+                  values="M160,60 C220,80 260,120 270,160 C280,200 250,240 200,250 C150,260 100,240 80,200 C60,160 80,120 120,80 C140,70 150,65 160,60 Z;
+                          M160,50 C230,70 280,110 290,160 C300,210 260,250 210,260 C160,270 110,250 90,210 C70,170 90,130 130,90 C150,75 155,60 160,50 Z;
+                          M160,70 C210,90 250,130 260,160 C270,190 240,230 190,240 C140,250 90,230 70,190 C50,150 70,110 110,70 C130,60 145,65 160,70 Z;
+                          M160,60 C220,80 260,120 270,160 C280,200 250,240 200,250 C150,260 100,240 80,200 C60,160 80,120 120,80 C140,70 150,65 160,60 Z"
+                  dur="12s" repeatCount="indefinite" />
+              </path>
+            </clipPath>
+            
+            {/* Water surface with gentle sloshing */}
+            <path
+              clipPath="url(#amoebaClip)"
+              fill="url(#waterGradient)"
+              opacity="0.8"
+            >
+              <animate attributeName="d" 
+                values="M50,200 Q100,195 150,200 T250,205 Q270,210 290,205 L290,300 L50,300 Z;
+                        M50,205 Q100,200 150,195 T250,200 Q270,205 290,210 L290,300 L50,300 Z;
+                        M50,195 Q100,190 150,200 T250,195 Q270,200 290,195 L290,300 L50,300 Z;
+                        M50,200 Q100,195 150,200 T250,205 Q270,210 290,205 L290,300 L50,300 Z"
+                dur="4s" repeatCount="indefinite" />
+            </path>
+            
+            {/* Water surface highlights */}
+            <path
+              clipPath="url(#amoebaClip)"
+              fill="rgba(255,255,255,0.2)"
+              opacity="0.6"
+            >
+              <animate attributeName="d" 
+                values="M50,200 Q120,198 180,202 T290,205 L290,210 Q220,207 160,205 T50,208 Z;
+                        M50,205 Q120,203 180,207 T290,210 L290,215 Q220,212 160,210 T50,213 Z;
+                        M50,195 Q120,193 180,197 T290,200 L290,205 Q220,202 160,200 T50,203 Z;
+                        M50,200 Q120,198 180,202 T290,205 L290,210 Q220,207 160,205 T50,208 Z"
+                dur="4s" repeatCount="indefinite" />
+            </path>
+
+            {/* Hour hand - large soft circle */}
+            <circle
+              cx={160 + Math.sin(hourAngle * Math.PI / 180) * 50}
+              cy={160 - Math.cos(hourAngle * Math.PI / 180) * 50}
+              r="18"
+              fill="url(#hourHandGradient)"
+              filter="url(#soften)"
+              opacity="0.9"
+            />
+
+            {/* Minute hand - smaller soft circle */}
+            <circle
+              cx={160 + Math.sin(minuteAngle * Math.PI / 180) * 80}
+              cy={160 - Math.cos(minuteAngle * Math.PI / 180) * 80}
+              r="12"
+              fill="url(#minuteHandGradient)"
+              filter="url(#soften)"
+              opacity="0.9"
+            />
+
+            {/* Center point */}
+            <circle
+              cx="160"
+              cy="160"
+              r="4"
+              fill="rgba(255, 255, 255, 0.8)"
+              filter="url(#soften)"
+            />
+          </svg>
+
+          {/* Amoeba Clock Title */}
+          <div className="absolute -bottom-10 left-1/2 transform -translate-x-1/2">
+            <h3 className="font-xanman-wide text-lg text-white text-center">
+              FLUID TIME
+            </h3>
+          </div>
+
+        </div>
+      </div>
+
+      {/* New York Clock */}
+      <div className="flex items-center justify-center pb-16">
         <div className="relative">
           
           {/* NY Clock Face */}
