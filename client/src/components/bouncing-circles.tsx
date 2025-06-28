@@ -16,10 +16,12 @@ interface Circle {
   dragStartX?: number;
   dragStartY?: number;
   dragStartTime?: number;
-  // Bubble deformation properties
+  // Enhanced bubble deformation properties
   scaleX: number;
   scaleY: number;
-  deformDecay: number;
+  bounceStartTime: number;
+  bounceCount: number;
+  isReververating: boolean;
 }
 
 export default function BouncingCircles() {
@@ -59,7 +61,9 @@ export default function BouncingCircles() {
         action: () => navigateToPage('/about'),
         scaleX: 1,
         scaleY: 1,
-        deformDecay: 0
+        bounceStartTime: 0,
+        bounceCount: 0,
+        isReververating: false
       },
       {
         id: 'projects',
@@ -73,7 +77,9 @@ export default function BouncingCircles() {
         action: () => navigateToPage('/projects'),
         scaleX: 1,
         scaleY: 1,
-        deformDecay: 0
+        bounceStartTime: 0,
+        bounceCount: 0,
+        isReververating: false
       },
       {
         id: 'store',
@@ -87,7 +93,9 @@ export default function BouncingCircles() {
         action: () => navigateToPage('/portfolio'),
         scaleX: 1,
         scaleY: 1,
-        deformDecay: 0
+        bounceStartTime: 0,
+        bounceCount: 0,
+        isReververating: false
       },
       {
         id: 'contact',
@@ -101,7 +109,9 @@ export default function BouncingCircles() {
         action: () => navigateToPage('/contact'),
         scaleX: 1,
         scaleY: 1,
-        deformDecay: 0
+        bounceStartTime: 0,
+        bounceCount: 0,
+        isReververating: false
       }
     ];
 
@@ -120,6 +130,8 @@ export default function BouncingCircles() {
         return;
       }
 
+      const currentTime = Date.now();
+
       setCircles(prevCircles => 
         prevCircles.map(circle => {
           let newX = circle.x + circle.vx;
@@ -128,51 +140,77 @@ export default function BouncingCircles() {
           let newVy = circle.vy;
           let newScaleX = circle.scaleX;
           let newScaleY = circle.scaleY;
-          let newDeformDecay = circle.deformDecay;
+          let newBounceStartTime = circle.bounceStartTime;
+          let newBounceCount = circle.bounceCount;
+          let newIsReververating = circle.isReververating;
           
-          // Bounce off edges with simplified deformation for mobile
+          // Check for wall collisions and start soap bubble bounce physics
+          let hasCollided = false;
+          
+          // Check horizontal boundaries
           if (newX <= 0 || newX >= window.innerWidth - circle.size) {
             newVx = -newVx;
             newX = Math.max(0, Math.min(window.innerWidth - circle.size, newX));
-            if (isMobile) {
-              // Simplified deformation for mobile performance
-              newScaleX = 0.75;
-              newScaleY = 1.25;
-            } else {
-              newScaleX = 0.75;
-              newScaleY = 1.25;
-            }
-            newDeformDecay = 1.0;
+            hasCollided = true;
+            
+            // Initial bubble deformation on collision
+            newScaleX = 0.7; // More dramatic squish
+            newScaleY = 1.3;
           }
+          
+          // Check vertical boundaries
           if (newY <= 0 || newY >= window.innerHeight - circle.size) {
             newVy = -newVy;
             newY = Math.max(0, Math.min(window.innerHeight - circle.size, newY));
-            if (isMobile) {
-              // Simplified deformation for mobile performance
-              newScaleX = 1.25;
-              newScaleY = 0.75;
-            } else {
-              newScaleX = 1.25;
-              newScaleY = 0.75;
-            }
-            newDeformDecay = 1.0;
+            hasCollided = true;
+            
+            // Initial bubble deformation on collision
+            newScaleX = 1.3;
+            newScaleY = 0.7; // More dramatic squish
           }
-
-          // Simplified recovery for mobile performance
-          if (newDeformDecay > 0) {
-            const recoverySpeed = isMobile ? 0.08 : 0.06; // Faster recovery on mobile
-            const decayRate = isMobile ? 0.92 : 0.96; // Faster decay on mobile
+          
+          // Start reverberation cycle on first collision
+          if (hasCollided && !newIsReververating) {
+            newBounceStartTime = currentTime;
+            newBounceCount = 0;
+            newIsReververating = true;
+          }
+          
+          // Handle soap bubble reverberation physics (4 bounces over 4 seconds)
+          if (newIsReververating) {
+            const timeSinceBounce = currentTime - newBounceStartTime;
+            const cycleDuration = 4000; // 4 seconds total
+            const cycleProgress = Math.min(timeSinceBounce / cycleDuration, 1);
             
-            newScaleX = newScaleX + (1 - newScaleX) * recoverySpeed;
-            newScaleY = newScaleY + (1 - newScaleY) * recoverySpeed;
-            newDeformDecay *= decayRate;
+            // Calculate reverberation frequency - 4 reverberations
+            const frequency = 4;
+            const oscillation = Math.sin(cycleProgress * frequency * Math.PI * 2);
             
-            // Looser tolerance for mobile performance
-            const tolerance = isMobile ? 0.05 : 0.02;
-            if (Math.abs(newScaleX - 1) < tolerance && Math.abs(newScaleY - 1) < tolerance) {
+            // Exponential decay over 4 seconds
+            const decay = Math.exp(-cycleProgress * 3); // Natural exponential decay
+            
+            // Apply oscillating deformation with decay
+            const baseDeformation = 0.3 * decay; // Maximum 30% deformation, decaying
+            const deformationAmount = baseDeformation * oscillation;
+            
+            // Apply the deformation based on collision direction
+            if (Math.abs(newScaleX - 1) > Math.abs(newScaleY - 1)) {
+              // Horizontal collision - oscillate horizontally
+              newScaleX = 1 + deformationAmount;
+              newScaleY = 1 - deformationAmount * 0.5; // Counter-deformation
+            } else {
+              // Vertical collision - oscillate vertically
+              newScaleY = 1 + deformationAmount;
+              newScaleX = 1 - deformationAmount * 0.5; // Counter-deformation
+            }
+            
+            // End reverberation after 4 seconds
+            if (cycleProgress >= 1) {
+              newIsReververating = false;
               newScaleX = 1;
               newScaleY = 1;
-              newDeformDecay = 0;
+              newBounceStartTime = 0;
+              newBounceCount = 0;
             }
           }
 
@@ -184,7 +222,9 @@ export default function BouncingCircles() {
             vy: newVy,
             scaleX: newScaleX,
             scaleY: newScaleY,
-            deformDecay: newDeformDecay
+            bounceStartTime: newBounceStartTime,
+            bounceCount: newBounceCount,
+            isReververating: newIsReververating
           };
         })
       );
@@ -244,7 +284,9 @@ export default function BouncingCircles() {
               vy: 0,
               scaleX: 1,
               scaleY: 1,
-              deformDecay: 0
+              bounceStartTime: 0,
+              bounceCount: 0,
+              isReververating: false
             }
           : c
       ));
@@ -342,7 +384,9 @@ export default function BouncingCircles() {
             dragStartTime: Date.now(),
             scaleX: 1,
             scaleY: 1,
-            deformDecay: 0
+            bounceStartTime: 0,
+            bounceCount: 0,
+            isReververating: false
           }
         : c
     ));
