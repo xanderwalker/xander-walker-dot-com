@@ -132,7 +132,7 @@ export default function AnalogClock() {
               clipPath="url(#clockFace)"
             />
 
-            {/* Trump image as hour hand - shorter radius to avoid overlap */}
+            {/* Trump image as hour hand - moved further out from center */}
             <g
               style={{ 
                 transformOrigin: '150px 150px',
@@ -142,14 +142,14 @@ export default function AnalogClock() {
               <image
                 href={trumpImage}
                 x="130"
-                y="105"
+                y="95"
                 width="40"
                 height="50"
                 style={{ filter: 'drop-shadow(2px 2px 4px rgba(0,0,0,0.3))' }}
               />
             </g>
 
-            {/* Vance image as minute hand - further out to prevent overlap */}
+            {/* Vance image as minute hand - moved further out from center */}
             <g
               style={{ 
                 transformOrigin: '150px 150px',
@@ -159,7 +159,7 @@ export default function AnalogClock() {
               <image
                 href={vanceImage}
                 x="135"
-                y="60"
+                y="50"
                 width="30"
                 height="40"
                 style={{ filter: 'drop-shadow(2px 2px 4px rgba(0,0,0,0.3))' }}
@@ -182,16 +182,6 @@ export default function AnalogClock() {
                 style={{ filter: 'drop-shadow(2px 2px 4px rgba(0,0,0,0.3))' }}
               />
             </g>
-
-            {/* Center point */}
-            <circle
-              cx="150"
-              cy="150"
-              r="5"
-              fill="rgba(255, 255, 255, 0.9)"
-              stroke="#374151"
-              strokeWidth="2"
-            />
           </svg>
 
           {/* Political Clock Title */}
