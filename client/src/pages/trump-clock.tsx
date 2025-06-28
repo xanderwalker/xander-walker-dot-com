@@ -61,10 +61,10 @@ export default function TrumpClock() {
         >
           <image
             href={trumpImage}
-            x="130"
-            y="95"
-            width="40"
-            height="50"
+            x="127"
+            y="92.25"
+            width="46"
+            height="57.5"
             style={{ filter: 'drop-shadow(2px 2px 4px rgba(0,0,0,0.3))' }}
           />
         </g>
@@ -78,10 +78,10 @@ export default function TrumpClock() {
         >
           <image
             href={vanceImage}
-            x="135"
-            y="50"
-            width="30"
-            height="40"
+            x="132.75"
+            y="47"
+            width="34.5"
+            height="46"
             style={{ filter: 'drop-shadow(2px 2px 4px rgba(0,0,0,0.3))' }}
           />
         </g>
@@ -95,10 +95,10 @@ export default function TrumpClock() {
         >
           <image
             href={tacoImage}
-            x="142"
-            y="25"
-            width="16"
-            height="20"
+            x="140.6"
+            y="22.5"
+            width="18.4"
+            height="23"
             style={{ filter: 'drop-shadow(2px 2px 4px rgba(0,0,0,0.3))' }}
           />
         </g>
