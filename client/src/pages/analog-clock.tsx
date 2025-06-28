@@ -152,8 +152,8 @@ export default function AnalogClock() {
             <line x1="60" y1="60" x2="260" y2="260" stroke="#22c55e" strokeWidth="0.5" opacity="0.3" />
             <line x1="260" y1="60" x2="60" y2="260" stroke="#22c55e" strokeWidth="0.5" opacity="0.3" />
 
-            {/* Radar sweep beam - rotating based on milliseconds */}
-            <g transform={`rotate(${(time.getMilliseconds() / 1000) * 360} 160 160)`}>
+            {/* Radar sweep beam - full rotation every second */}
+            <g transform={`rotate(${(time.getSeconds() * 6)} 160 160)`}>
               <path
                 d="M 160 160 L 160 20 A 140 140 0 0 1 195 35 Z"
                 fill="url(#sweepGradient)"
