@@ -1,0 +1,258 @@
+Last login: Sat Jun 28 09:31:18 on ttys000
+xander@alexanders-MacBook-Pro ~ % cd ~/Downloads/xanderwalkerdotcom
+
+xander@alexanders-MacBook-Pro xanderwalkerdotcom % git init
+
+error: could not lock config file /Users/xander/Downloads/xanderwalkerdotcom/.git/config: File exists
+fatal: could not set 'core.repositoryformatversion' to '0'
+xander@alexanders-MacBook-Pro xanderwalkerdotcom % git remote add origin https://github.com/xanderwalker/xander-walker-dot-com.git
+
+error: could not lock config file .git/config: File exists
+fatal: could not set 'remote.origin.url' to 'https://github.com/xanderwalker/xander-walker-dot-com.git'
+xander@alexanders-MacBook-Pro xanderwalkerdotcom % git add .
+
+xander@alexanders-MacBook-Pro xanderwalkerdotcom % git commit -m "Deploy Google Analytics integration and Trump clock positioning refinements"
+
+[main e21b5dd] Deploy Google Analytics integration and Trump clock positioning refinements
+ Committer: alexander walker <xander@alexanders-MacBook-Pro.local>
+Your name and email address were configured automatically based
+on your username and hostname. Please check that they are accurate.
+You can suppress this message by setting them explicitly. Run the
+following command and follow the instructions in your editor to edit
+your configuration file:
+
+    git config --global --edit
+
+After doing this, you may fix the identity used for this commit with:
+
+    git commit --amend --reset-author
+
+ 1 file changed, 3 insertions(+)
+ create mode 100644 .env
+xander@alexanders-MacBook-Pro xanderwalkerdotcom % git push -u origin main --force
+
+fatal: 'origin' does not appear to be a git repository
+fatal: Could not read from remote repository.
+
+Please make sure you have the correct access rights
+and the repository exists.
+xander@alexanders-MacBook-Pro xanderwalkerdotcom % rm -rf .git
+
+rm: .git: Permission denied
+xander@alexanders-MacBook-Pro xanderwalkerdotcom % git init
+
+Initialized empty Git repository in /Users/xander/Downloads/xanderwalkerdotcom/.git/
+xander@alexanders-MacBook-Pro xanderwalkerdotcom % git branch -M main
+
+xander@alexanders-MacBook-Pro xanderwalkerdotcom % git remote add origin https://github.com/xanderwalker/xander-walker-dot-com.git
+
+xander@alexanders-MacBook-Pro xanderwalkerdotcom % git add .
+
+xander@alexanders-MacBook-Pro xanderwalkerdotcom % git commit -m "Deploy Google Analytics integration and Trump clock positioning refinements"
+
+[main (root-commit) 2d5e3ae] Deploy Google Analytics integration and Trump clock positioning refinements
+ Committer: alexander walker <xander@alexanders-MacBook-Pro.local>
+Your name and email address were configured automatically based
+on your username and hostname. Please check that they are accurate.
+You can suppress this message by setting them explicitly. Run the
+following command and follow the instructions in your editor to edit
+your configuration file:
+
+    git config --global --edit
+
+After doing this, you may fix the identity used for this commit with:
+
+    git commit --amend --reset-author
+
+ 174 files changed, 24074 insertions(+)
+ create mode 100644 .env
+ create mode 100644 .gitignore
+ create mode 100644 .replit
+ create mode 100644 attached_assets/2014-02-21_06.58.54_Original_1750891603225.png
+ create mode 100644 attached_assets/2014-02-21_06.58.54_Original_1750960142835.png
+ create mode 100644 attached_assets/IMG_2945_1751029768334.png
+ create mode 100644 attached_assets/IMG_2947_1751031547747.png
+ create mode 100644 attached_assets/IMG_2966_1751086797440.png
+ create mode 100644 attached_assets/IMG_2967_1751086937111.png
+ create mode 100644 attached_assets/IMG_2973_1751089598933.png
+ create mode 100644 attached_assets/IMG_2974_1751090115750.png
+ create mode 100644 attached_assets/IMG_2975_1751090403481.png
+ create mode 100644 attached_assets/IMG_2977_1751090691763.png
+ create mode 100644 attached_assets/IMG_2986_1751126944533.png
+ create mode 100644 attached_assets/IMG_2988_1751127409660.png
+ create mode 100644 attached_assets/IMG_2989_1751127498698.png
+ create mode 100644 attached_assets/IMG_3579_1751064240297.png
+ create mode 100644 attached_assets/IMG_8BA87FCAC816-1_1750889622838.jpeg
+ create mode 100644 attached_assets/Pasted--After-doing-this-you-may-fix-the-identity-used-for-this-commit-with-git-commit-amend-res-1751058431678_1751058431678.txt
+ create mode 100644 attached_assets/Pasted--app-b633fb8e91bd0d90-js-38--1750892589970_1750892589970.txt
+ create mode 100644 attached_assets/Pasted--rejected-main-main-fetch-first-error-failed-to-push-some-refs-to-https-github-c-1751126284086_1751126284087.txt
+ create mode 100644 attached_assets/Pasted-Last-login-Fri-Jun-27-15-56-02-on-ttys000-xander-alexanders-MacBook-Pro-cd-xanderwalkerdotcom--1751065240341_1751065240341.txt
+ create mode 100644 attached_assets/Pasted-Last-login-Fri-Jun-27-16-05-10-on-ttys003-xander-alexanders-MacBook-Pro-cd-Downloads-xanderwalk-1751066767506_1751066767506.txt
+ create mode 100644 attached_assets/Pasted-hint-See-the-Note-about-fast-forwards-in-git-push-help-for-details-xander-alexanders-MacBook-1750976942749_1750976942750.txt
+ create mode 100644 attached_assets/Pov_looking_straight_202506251624_1750958456249.gif
+ create mode 100644 attached_assets/ScreenRecording_06-27-2025 15-40-43_1_1751064073107.mp4
+ create mode 100644 attached_assets/Screenshot 2025-06-26 at 3.46.02 PM_1750977973871.png
+ create mode 100644 attached_assets/Screenshot 2025-06-27 at 1.37.01 PM_1751056634449.png
+ create mode 100644 attached_assets/Screenshot 2025-06-27 at 1.48.42 PM_1751057340236.png
+ create mode 100644 attached_assets/Screenshot 2025-06-27 at 1.54.56 PM_1751057708158.png
+ create mode 100644 attached_assets/Screenshot 2025-06-27 at 11.35.12 AM_1751049323676.png
+ create mode 100644 attached_assets/Screenshot 2025-06-27 at 11.59.28 AM_1751050780773.png
+ create mode 100644 attached_assets/Screenshot 2025-06-27 at 2.12.05 PM_1751058735791.png
+ create mode 100644 attached_assets/Screenshot 2025-06-27 at 4.01.45 PM_1751065324220.png
+ create mode 100644 attached_assets/Screenshot 2025-06-27 at 4.22.17 PM_1751066567873.png
+ create mode 100644 attached_assets/Screenshot 2025-06-28 at 8.50.35 AM_1751125853309.png
+ create mode 100644 attached_assets/Screenshot 2025-06-28 at 8.54.42 AM_1751126130799.png
+ create mode 100644 attached_assets/Xanman_1750889622843.otf
+ create mode 100644 attached_assets/Xanmanwide_1750889622842.otf
+ create mode 100644 attached_assets/aspenweb_1750891603226.png
+ create mode 100644 attached_assets/edvweb_1750891603225.png
+ create mode 100644 attached_assets/flyerweb_1750891603226.png
+ create mode 100644 attached_assets/image_1750989645105.jpeg
+ create mode 100644 attached_assets/image_1751037979337.png
+ create mode 100644 attached_assets/image_1751048961533.png
+ create mode 100644 attached_assets/image_1751049315653.png
+ create mode 100644 attached_assets/image_1751088272517.jpeg
+ create mode 100644 attached_assets/image_1751088966989.png
+ create mode 100644 attached_assets/image_1751089063177.png
+ create mode 100644 attached_assets/image_1751089435771.png
+ create mode 100644 attached_assets/image_1751089460552.png
+ create mode 100644 attached_assets/image_1751090045249.png
+ create mode 100644 attached_assets/image_1751090296521.png
+ create mode 100644 attached_assets/image_1751090576666.png
+ create mode 100644 attached_assets/model3web_1750891603218.png
+ create mode 100644 attached_assets/modelxweb_1750891603226.png
+ create mode 100644 attached_assets/r1tweb_1750891603226.png
+ create mode 100644 attached_assets/tulaneforweb2_1750891603227.png
+ create mode 100644 attached_assets/vikingadventureweb_1750891603225.png
+ create mode 100644 backup_changes.md
+ create mode 100644 client/env.d.ts
+ create mode 100644 client/index.html
+ create mode 100644 client/public/assets/2014-02-21_06.58.54_Original_1750891603225.png
+ create mode 100644 client/public/assets/aspenweb_1750891603226.png
+ create mode 100644 client/public/assets/edvweb_1750891603225.png
+ create mode 100644 client/public/assets/flyerweb_1750891603226.png
+ create mode 100644 client/public/assets/model3web_1750891603218.png
+ create mode 100644 client/public/assets/modelxweb_1750891603226.png
+ create mode 100644 client/public/assets/r1tweb_1750891603226.png
+ create mode 100644 client/public/assets/tulaneforweb2_1750891603227.png
+ create mode 100644 client/public/assets/vikingadventureweb_1750891603225.png
+ create mode 100644 client/public/favicon.svg
+ create mode 100644 client/public/fonts/Xanman.otf
+ create mode 100644 client/public/fonts/Xanmanwide.otf
+ create mode 100644 client/public/og-image.svg
+ create mode 100644 client/src/App.tsx
+ create mode 100644 client/src/components/bouncing-circles.tsx
+ create mode 100644 client/src/components/floating-navigation.tsx
+ create mode 100644 client/src/components/layout.tsx
+ create mode 100644 client/src/components/physics-balls.tsx
+ create mode 100644 client/src/components/ui/accordion.tsx
+ create mode 100644 client/src/components/ui/alert-dialog.tsx
+ create mode 100644 client/src/components/ui/alert.tsx
+ create mode 100644 client/src/components/ui/aspect-ratio.tsx
+ create mode 100644 client/src/components/ui/avatar.tsx
+ create mode 100644 client/src/components/ui/badge.tsx
+ create mode 100644 client/src/components/ui/breadcrumb.tsx
+ create mode 100644 client/src/components/ui/button.tsx
+ create mode 100644 client/src/components/ui/calendar.tsx
+ create mode 100644 client/src/components/ui/card.tsx
+ create mode 100644 client/src/components/ui/carousel.tsx
+ create mode 100644 client/src/components/ui/chart.tsx
+ create mode 100644 client/src/components/ui/checkbox.tsx
+ create mode 100644 client/src/components/ui/collapsible.tsx
+ create mode 100644 client/src/components/ui/command.tsx
+ create mode 100644 client/src/components/ui/context-menu.tsx
+ create mode 100644 client/src/components/ui/dialog.tsx
+ create mode 100644 client/src/components/ui/drawer.tsx
+ create mode 100644 client/src/components/ui/dropdown-menu.tsx
+ create mode 100644 client/src/components/ui/form.tsx
+ create mode 100644 client/src/components/ui/hover-card.tsx
+ create mode 100644 client/src/components/ui/input-otp.tsx
+ create mode 100644 client/src/components/ui/input.tsx
+ create mode 100644 client/src/components/ui/label.tsx
+ create mode 100644 client/src/components/ui/menubar.tsx
+ create mode 100644 client/src/components/ui/navigation-menu.tsx
+ create mode 100644 client/src/components/ui/pagination.tsx
+ create mode 100644 client/src/components/ui/popover.tsx
+ create mode 100644 client/src/components/ui/progress.tsx
+ create mode 100644 client/src/components/ui/radio-group.tsx
+ create mode 100644 client/src/components/ui/resizable.tsx
+ create mode 100644 client/src/components/ui/scroll-area.tsx
+ create mode 100644 client/src/components/ui/select.tsx
+ create mode 100644 client/src/components/ui/separator.tsx
+ create mode 100644 client/src/components/ui/sheet.tsx
+ create mode 100644 client/src/components/ui/sidebar.tsx
+ create mode 100644 client/src/components/ui/skeleton.tsx
+ create mode 100644 client/src/components/ui/slider.tsx
+ create mode 100644 client/src/components/ui/switch.tsx
+ create mode 100644 client/src/components/ui/table.tsx
+ create mode 100644 client/src/components/ui/tabs.tsx
+ create mode 100644 client/src/components/ui/textarea.tsx
+ create mode 100644 client/src/components/ui/toast.tsx
+ create mode 100644 client/src/components/ui/toaster.tsx
+ create mode 100644 client/src/components/ui/toggle-group.tsx
+ create mode 100644 client/src/components/ui/toggle.tsx
+ create mode 100644 client/src/components/ui/tooltip.tsx
+ create mode 100644 client/src/hooks/use-analytics.tsx
+ create mode 100644 client/src/hooks/use-bouncing-animation.ts
+ create mode 100644 client/src/hooks/use-mobile.tsx
+ create mode 100644 client/src/hooks/use-toast.ts
+ create mode 100644 client/src/index.css
+ create mode 100644 client/src/lib/analytics.ts
+ create mode 100644 client/src/lib/queryClient.ts
+ create mode 100644 client/src/lib/utils.ts
+ create mode 100644 client/src/main.tsx
+ create mode 100644 client/src/pages/333-balls.tsx
+ create mode 100644 client/src/pages/about.tsx
+ create mode 100644 client/src/pages/analog-clock.tsx
+ create mode 100644 client/src/pages/camera.tsx
+ create mode 100644 client/src/pages/clock.tsx
+ create mode 100644 client/src/pages/contact.tsx
+ create mode 100644 client/src/pages/glass-of-water.tsx
+ create mode 100644 client/src/pages/home.tsx
+ create mode 100644 client/src/pages/monet-paint.tsx
+ create mode 100644 client/src/pages/not-found.tsx
+ create mode 100644 client/src/pages/pixel-clock.tsx
+ create mode 100644 client/src/pages/portfolio.tsx
+ create mode 100644 client/src/pages/projects.tsx
+ create mode 100644 client/src/pages/roulette.tsx
+ create mode 100644 client/src/pages/sensor-dashboard.tsx
+ create mode 100644 client/src/pages/spotify-api-test.tsx
+ create mode 100644 client/src/pages/spotify-lyrics-old.tsx
+ create mode 100644 client/src/pages/spotify-lyrics.tsx
+ create mode 100644 client/src/pages/trump-clock.tsx
+ create mode 100644 complete_code_transfer.txt
+ create mode 100644 components.json
+ create mode 100644 deployment_transfer_guide.md
+ create mode 100644 drizzle.config.ts
+ create mode 100644 mobile-touch-update.txt
+ create mode 100644 package-lock.json
+ create mode 100644 package.json
+ create mode 100644 postcss.config.js
+ create mode 100644 replit.md
+ create mode 100644 server/db.ts
+ create mode 100644 server/index.ts
+ create mode 100644 server/routes.ts
+ create mode 100644 server/storage.ts
+ create mode 100644 server/vite.ts
+ create mode 100644 shared/schema.ts
+ create mode 100644 tailwind.config.ts
+ create mode 100644 tsconfig.json
+ create mode 100644 vercel.json
+ create mode 100644 vite.config.ts
+xander@alexanders-MacBook-Pro xanderwalkerdotcom % git push -u origin main --force
+
+Enumerating objects: 174, done.
+Counting objects: 100% (174/174), done.
+Delta compression using up to 8 threads
+Compressing objects: 100% (173/173), done.
+Writing objects: 100% (174/174), 46.82 MiB | 9.70 MiB/s, done.
+Total 174 (delta 8), reused 0 (delta 0), pack-reused 0
+remote: Resolving deltas: 100% (8/8), done.
+To https://github.com/xanderwalker/xander-walker-dot-com.git
+ + 80d62fc...2d5e3ae main -> main (forced update)
+branch 'main' set up to track 'origin/main'.
+xander@alexanders-MacBook-Pro xanderwalkerdotcom % git push -u origin main --force
+
+branch 'main' set up to track 'origin/main'.
+Everything up-to-date
+xander@alexanders-MacBook-Pro xanderwalkerdotcom % 
