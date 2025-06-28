@@ -148,7 +148,7 @@ export default function AnalogClock() {
                 style={{ 
                   filter: 'drop-shadow(2px 2px 4px rgba(0,0,0,0.3))',
                   transformOrigin: '23px 28.75px',
-                  transform: 'rotate(-10deg)'
+                  transform: 'rotate(5deg)'
                 }}
               />
             </g>
