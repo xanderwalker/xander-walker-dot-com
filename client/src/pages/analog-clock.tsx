@@ -61,6 +61,10 @@ export default function AnalogClock() {
     });
   };
 
+  const getTimeZone = () => {
+    return Intl.DateTimeFormat().resolvedOptions().timeZone;
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 relative overflow-hidden">
       
@@ -84,8 +88,9 @@ export default function AnalogClock() {
 
       {/* Digital Time Display */}
       <div className="fixed top-8 right-8 z-20">
-        <div className="glassmorphism px-6 py-3 rounded-lg text-white font-xanman-wide text-lg">
-          {formatTime(time)}
+        <div className="glassmorphism px-6 py-3 rounded-lg text-white font-xanman-wide text-lg text-center">
+          <div>{formatTime(time)}</div>
+          <div className="text-sm opacity-75 mt-1">{getTimeZone()}</div>
         </div>
       </div>
 
