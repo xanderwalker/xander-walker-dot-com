@@ -62,7 +62,7 @@ export default function TrumpClock() {
           <image
             href={trumpImage}
             x="127"
-            y="92.25"
+            y="77"
             width="46"
             height="57.5"
             style={{ 
