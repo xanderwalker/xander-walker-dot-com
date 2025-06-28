@@ -94,8 +94,128 @@ export default function AnalogClock() {
         </div>
       </div>
 
-      {/* Amoeba Clock */}
+      {/* Dry Amoeba Clock */}
       <div className="flex items-center justify-center pt-32 pb-16">
+        <div className="relative">
+          
+          {/* Dry Amoeba Clock Face */}
+          <svg
+            width="320"
+            height="320"
+            viewBox="0 0 320 320"
+            className="drop-shadow-2xl"
+          >
+            <defs>
+              {/* Dry amoeba gradient that shifts colors */}
+              <radialGradient id="dryAmoebaGradient" cx="0.5" cy="0.5" r="0.8">
+                <stop offset="0%" stopColor="#fbbf24">
+                  <animate attributeName="stop-color" 
+                    values="#fbbf24;#ec4899;#3b82f6;#10b981;#fbbf24" 
+                    dur="8s" repeatCount="indefinite" />
+                </stop>
+                <stop offset="50%" stopColor="#ec4899">
+                  <animate attributeName="stop-color" 
+                    values="#ec4899;#3b82f6;#10b981;#fbbf24;#ec4899" 
+                    dur="8s" repeatCount="indefinite" />
+                </stop>
+                <stop offset="100%" stopColor="#3b82f6">
+                  <animate attributeName="stop-color" 
+                    values="#3b82f6;#10b981;#fbbf24;#ec4899;#3b82f6" 
+                    dur="8s" repeatCount="indefinite" />
+                </stop>
+              </radialGradient>
+              
+              {/* Dry hour hand gradient */}
+              <radialGradient id="dryHourHandGradient" cx="0.5" cy="0.5" r="0.8">
+                <stop offset="0%" stopColor="#f97316">
+                  <animate attributeName="stop-color" 
+                    values="#f97316;#8b5cf6;#06b6d4;#f59e0b;#f97316" 
+                    dur="6s" repeatCount="indefinite" />
+                </stop>
+                <stop offset="100%" stopColor="#dc2626" stopOpacity="0.7">
+                  <animate attributeName="stop-color" 
+                    values="#dc2626;#7c3aed;#0891b2;#d97706;#dc2626" 
+                    dur="6s" repeatCount="indefinite" />
+                </stop>
+              </radialGradient>
+              
+              {/* Dry minute hand gradient */}
+              <radialGradient id="dryMinuteHandGradient" cx="0.5" cy="0.5" r="0.8">
+                <stop offset="0%" stopColor="#22c55e">
+                  <animate attributeName="stop-color" 
+                    values="#22c55e;#f59e0b;#ef4444;#8b5cf6;#22c55e" 
+                    dur="5s" repeatCount="indefinite" />
+                </stop>
+                <stop offset="100%" stopColor="#059669" stopOpacity="0.7">
+                  <animate attributeName="stop-color" 
+                    values="#059669;#d97706;#dc2626;#7c3aed;#059669" 
+                    dur="5s" repeatCount="indefinite" />
+                </stop>
+              </radialGradient>
+              
+              {/* Blur filter for soft edges */}
+              <filter id="drySoften" x="-50%" y="-50%" width="200%" height="200%">
+                <feGaussianBlur in="SourceGraphic" stdDeviation="2"/>
+              </filter>
+            </defs>
+            
+            {/* Morphing dry amoeba shape */}
+            <path
+              fill="url(#dryAmoebaGradient)"
+              stroke="rgba(255,255,255,0.3)"
+              strokeWidth="2"
+              filter="url(#drySoften)"
+            >
+              <animate attributeName="d" 
+                values="M160,60 C220,80 260,120 270,160 C280,200 250,240 200,250 C150,260 100,240 80,200 C60,160 80,120 120,80 C140,70 150,65 160,60 Z;
+                        M160,50 C230,70 280,110 290,160 C300,210 260,250 210,260 C160,270 110,250 90,210 C70,170 90,130 130,90 C150,75 155,60 160,50 Z;
+                        M160,70 C210,90 250,130 260,160 C270,190 240,230 190,240 C140,250 90,230 70,190 C50,150 70,110 110,70 C130,60 145,65 160,70 Z;
+                        M160,60 C220,80 260,120 270,160 C280,200 250,240 200,250 C150,260 100,240 80,200 C60,160 80,120 120,80 C140,70 150,65 160,60 Z"
+                dur="12s" repeatCount="indefinite" />
+            </path>
+
+            {/* Hour hand - large soft circle */}
+            <circle
+              cx={160 + Math.sin(hourAngle * Math.PI / 180) * 50}
+              cy={160 - Math.cos(hourAngle * Math.PI / 180) * 50}
+              r="18"
+              fill="url(#dryHourHandGradient)"
+              filter="url(#drySoften)"
+              opacity="0.9"
+            />
+
+            {/* Minute hand - smaller soft circle */}
+            <circle
+              cx={160 + Math.sin(minuteAngle * Math.PI / 180) * 80}
+              cy={160 - Math.cos(minuteAngle * Math.PI / 180) * 80}
+              r="12"
+              fill="url(#dryMinuteHandGradient)"
+              filter="url(#drySoften)"
+              opacity="0.9"
+            />
+
+            {/* Center point */}
+            <circle
+              cx="160"
+              cy="160"
+              r="4"
+              fill="rgba(255, 255, 255, 0.8)"
+              filter="url(#drySoften)"
+            />
+          </svg>
+
+          {/* Dry Amoeba Clock Title */}
+          <div className="absolute -bottom-10 left-1/2 transform -translate-x-1/2">
+            <h3 className="font-xanman-wide text-lg text-white text-center">
+              DRY FLUID TIME
+            </h3>
+          </div>
+
+        </div>
+      </div>
+
+      {/* Amoeba Clock */}
+      <div className="flex items-center justify-center pb-16">
         <div className="relative">
           
           {/* Amoeba Clock Face */}
