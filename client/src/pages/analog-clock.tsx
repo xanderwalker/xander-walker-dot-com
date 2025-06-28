@@ -94,8 +94,159 @@ export default function AnalogClock() {
         </div>
       </div>
 
-      {/* Square Geometric Clock */}
+      {/* Radar Screen Clock */}
       <div className="flex items-center justify-center pt-32 pb-16">
+        <div className="relative">
+          
+          {/* Radar Clock Face */}
+          <svg
+            width="320"
+            height="320"
+            viewBox="0 0 320 320"
+            className="drop-shadow-2xl"
+          >
+            <defs>
+              {/* Radar screen gradient */}
+              <radialGradient id="radarGradient" cx="0.5" cy="0.5" r="0.8">
+                <stop offset="0%" stopColor="#0f172a" />
+                <stop offset="70%" stopColor="#1e293b" />
+                <stop offset="100%" stopColor="#334155" />
+              </radialGradient>
+              
+              {/* Radar sweep gradient */}
+              <linearGradient id="sweepGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stopColor="#22c55e" stopOpacity="0" />
+                <stop offset="30%" stopColor="#22c55e" stopOpacity="0.3" />
+                <stop offset="70%" stopColor="#22c55e" stopOpacity="0.6" />
+                <stop offset="100%" stopColor="#22c55e" stopOpacity="0.9" />
+              </linearGradient>
+              
+              {/* Glow filter */}
+              <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+                <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+                <feMerge> 
+                  <feMergeNode in="coloredBlur"/>
+                  <feMergeNode in="SourceGraphic"/>
+                </feMerge>
+              </filter>
+            </defs>
+            
+            {/* Radar screen background */}
+            <circle
+              cx="160"
+              cy="160"
+              r="140"
+              fill="url(#radarGradient)"
+              stroke="#22c55e"
+              strokeWidth="2"
+            />
+            
+            {/* Radar grid circles */}
+            <circle cx="160" cy="160" r="35" fill="none" stroke="#22c55e" strokeWidth="0.5" opacity="0.4" />
+            <circle cx="160" cy="160" r="70" fill="none" stroke="#22c55e" strokeWidth="0.5" opacity="0.4" />
+            <circle cx="160" cy="160" r="105" fill="none" stroke="#22c55e" strokeWidth="0.5" opacity="0.4" />
+            
+            {/* Radar grid lines */}
+            <line x1="160" y1="20" x2="160" y2="300" stroke="#22c55e" strokeWidth="0.5" opacity="0.4" />
+            <line x1="20" y1="160" x2="300" y2="160" stroke="#22c55e" strokeWidth="0.5" opacity="0.4" />
+            <line x1="60" y1="60" x2="260" y2="260" stroke="#22c55e" strokeWidth="0.5" opacity="0.3" />
+            <line x1="260" y1="60" x2="60" y2="260" stroke="#22c55e" strokeWidth="0.5" opacity="0.3" />
+
+            {/* Radar sweep beam - rotating based on milliseconds */}
+            <g transform={`rotate(${(currentTime.getMilliseconds() / 1000) * 360} 160 160)`}>
+              <path
+                d="M 160 160 L 160 20 A 140 140 0 0 1 195 35 Z"
+                fill="url(#sweepGradient)"
+                opacity="0.6"
+              />
+              <line
+                x1="160"
+                y1="160"
+                x2="160"
+                y2="20"
+                stroke="#22c55e"
+                strokeWidth="2"
+                filter="url(#glow)"
+              />
+            </g>
+
+            {/* Battleship (hour hand) */}
+            <g
+              transform={`translate(${160 + Math.sin(hourAngle * Math.PI / 180) * 60}, ${160 - Math.cos(hourAngle * Math.PI / 180) * 60}) rotate(${hourAngle})`}
+            >
+              {/* Ship hull */}
+              <rect x="-8" y="-3" width="16" height="6" fill="#ef4444" rx="1" />
+              {/* Ship superstructure */}
+              <rect x="-4" y="-2" width="8" height="3" fill="#dc2626" />
+              {/* Ship bow */}
+              <polygon points="8,0 12,0 8,-1 8,1" fill="#ef4444" />
+              {/* Radar blip glow */}
+              <circle cx="0" cy="0" r="6" fill="#ef4444" opacity="0.3" filter="url(#glow)" />
+            </g>
+
+            {/* Smaller ship (minute hand) */}
+            <g
+              transform={`translate(${160 + Math.sin(minuteAngle * Math.PI / 180) * 90}, ${160 - Math.cos(minuteAngle * Math.PI / 180) * 90}) rotate(${minuteAngle})`}
+            >
+              {/* Ship hull */}
+              <rect x="-5" y="-2" width="10" height="4" fill="#3b82f6" rx="1" />
+              {/* Ship superstructure */}
+              <rect x="-2" y="-1" width="4" height="2" fill="#1d4ed8" />
+              {/* Ship bow */}
+              <polygon points="5,0 8,0 5,-1 5,1" fill="#3b82f6" />
+              {/* Radar blip glow */}
+              <circle cx="0" cy="0" r="4" fill="#3b82f6" opacity="0.3" filter="url(#glow)" />
+            </g>
+
+            {/* Aircraft (second hand) */}
+            <g
+              transform={`translate(${160 + Math.sin(secondAngle * Math.PI / 180) * 120}, ${160 - Math.cos(secondAngle * Math.PI / 180) * 120}) rotate(${secondAngle})`}
+            >
+              {/* Aircraft body */}
+              <rect x="-1" y="-4" width="2" height="8" fill="#fbbf24" />
+              {/* Wings */}
+              <rect x="-6" y="-1" width="12" height="2" fill="#f59e0b" />
+              {/* Tail */}
+              <polygon points="-1,-4 1,-4 0,-6" fill="#fbbf24" />
+              {/* Radar blip glow */}
+              <circle cx="0" cy="0" r="3" fill="#fbbf24" opacity="0.3" filter="url(#glow)" />
+            </g>
+
+            {/* Center radar hub */}
+            <circle
+              cx="160"
+              cy="160"
+              r="5"
+              fill="#22c55e"
+              stroke="#16a34a"
+              strokeWidth="1"
+              filter="url(#glow)"
+            />
+            
+            {/* Radar screen rim */}
+            <circle
+              cx="160"
+              cy="160"
+              r="140"
+              fill="none"
+              stroke="#22c55e"
+              strokeWidth="3"
+              filter="url(#glow)"
+            />
+          </svg>
+
+          {/* Radar Clock Title */}
+          <div className="absolute -bottom-10 left-1/2 transform -translate-x-1/2">
+            <h3 className="font-xanman-wide text-lg text-white text-center">
+              RADAR TIME
+            </h3>
+          </div>
+
+        </div>
+      </div>
+
+      {/* Square Geometric Clock */}
+      <div className="flex items-center justify-center pb-16">
         <div className="relative">
           
           {/* Square Clock Face */}
