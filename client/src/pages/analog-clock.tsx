@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import trumpImage from '@assets/image_1751088966989.png';
 import vanceImage from '@assets/image_1751089063177.png';
 import tacoImage from '@assets/image_1751089460552.png';
-import golfBallImage from '@assets/image_1751089435771.png';
+import golfBallImage from '@assets/image_1751090296521.png';
 
 export default function AnalogClock() {
   const [time, setTime] = useState(new Date());
