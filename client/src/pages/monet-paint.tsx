@@ -172,119 +172,17 @@ export default function MonetPaint() {
 
       {/* Sensor activation button for mobile */}
       {isMobile && !sensorEnabled && (
-        <div className="fixed top-24 left-1/2 transform -translate-x-1/2 z-30">
+        <div className="fixed top-8 right-8 z-30">
           <button
             onClick={enableSensorMotion}
-            className="bg-white/20 backdrop-blur-md text-white px-6 py-3 rounded-lg border border-white/30 hover:bg-white/30 transition-all duration-300 shadow-lg"
-            style={{ fontFamily: 'Georgia, serif' }}
+            className="glassmorphism px-6 py-3 rounded-lg text-black font-xanman-wide hover:bg-white/30 transition-all duration-300"
           >
-            Enable Motion Sensors
+            ENABLE ACCELEROMETER
           </button>
         </div>
       )}
 
-      {/* Sensor status indicator */}
-      {isMobile && sensorEnabled && (
-        <div className="fixed top-24 left-1/2 transform -translate-x-1/2 z-30">
-          <div className="bg-green-500/20 backdrop-blur-md text-white px-4 py-2 rounded-lg border border-green-400/30 shadow-lg">
-            <div style={{ fontFamily: 'Georgia, serif' }}>
-              <div>Motion Sensors Active</div>
-              {deviceMotion.z > 5 && (
-                <div className="text-sm mt-1">
-                  Tilt: {deviceMotion.x.toFixed(1)}°, {deviceMotion.y.toFixed(1)}° (Intensity: {deviceMotion.z.toFixed(1)})
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
 
-      {/* Main content */}
-      <div className="flex flex-col items-center justify-center min-h-[calc(100vh-200px)] space-y-12 px-8">
-        
-        {/* Title Card */}
-        <div className="glassmorphism rounded-2xl p-12 text-center max-w-4xl">
-          <h2 className="font-xanman-wide text-4xl md:text-6xl mb-6 text-black">
-            MONET PAINT SWIRLING
-          </h2>
-          <p className="text-xl text-gray-700 mb-8 leading-relaxed" style={{fontFamily: 'Georgia, serif'}}>
-            Interactive paint mixing inspired by Claude Monet's water lily paintings. 
-            Move your mouse around the screen or tilt your mobile device to create 
-            beautiful color gradients that blend and morph in real-time.
-          </p>
-          
-          {/* Instructions */}
-          <div className="grid md:grid-cols-2 gap-8 mt-8">
-            <div className="glassmorphism rounded-xl p-6">
-              <h3 className="font-xanman-wide text-xl mb-4 text-black">DESKTOP</h3>
-              <p className="text-gray-600" style={{fontFamily: 'Georgia, serif'}}>
-                Move your mouse cursor around the screen to create dynamic paint swirls. 
-                The colors will follow your movement, creating beautiful gradients that 
-                blend and flow like watercolors on canvas.
-              </p>
-            </div>
-            
-            <div className="glassmorphism rounded-xl p-6">
-              <h3 className="font-xanman-wide text-xl mb-4 text-black">MOBILE</h3>
-              <p className="text-gray-600" style={{fontFamily: 'Georgia, serif'}}>
-                {sensorEnabled || !isMobile
-                  ? "Tilt and rotate your device to control the paint mixing. The accelerometer responds to your device's orientation, creating immersive color flows that react to your movements."
-                  : "Tap the 'Enable Motion Sensors' button above to activate device tilt controls. Once enabled, tilt and rotate your device to control the paint mixing."
-                }
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Color Palette Reference */}
-        <div className="glassmorphism rounded-2xl p-8 max-w-4xl w-full">
-          <h3 className="font-xanman-wide text-2xl mb-6 text-center text-black">
-            MONET COLOR PALETTE
-          </h3>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="text-center">
-              <div className="w-full h-20 rounded-lg mb-2" style={{background: '#ff6b35'}}></div>
-              <p className="text-sm" style={{fontFamily: 'Georgia, serif'}}>Sunset Orange</p>
-            </div>
-            <div className="text-center">
-              <div className="w-full h-20 rounded-lg mb-2" style={{background: '#36c9dd'}}></div>
-              <p className="text-sm" style={{fontFamily: 'Georgia, serif'}}>Water Lily Blue</p>
-            </div>
-            <div className="text-center">
-              <div className="w-full h-20 rounded-lg mb-2" style={{background: '#22c55e'}}></div>
-              <p className="text-sm" style={{fontFamily: 'Georgia, serif'}}>Garden Green</p>
-            </div>
-            <div className="text-center">
-              <div className="w-full h-20 rounded-lg mb-2" style={{background: '#8b5cf6'}}></div>
-              <p className="text-sm" style={{fontFamily: 'Georgia, serif'}}>Impressionist Purple</p>
-            </div>
-          </div>
-        </div>
-
-        {/* Technical Details */}
-        <div className="glassmorphism rounded-2xl p-8 max-w-4xl w-full">
-          <h3 className="font-xanman-wide text-2xl mb-6 text-center text-black">
-            TECHNICAL IMPLEMENTATION
-          </h3>
-          <div className="text-gray-700 space-y-4" style={{fontFamily: 'Georgia, serif'}}>
-            <p>
-              This interactive background uses CSS custom properties and multiple radial gradients 
-              to create dynamic color mixing effects. The gradients respond to mouse position on 
-              desktop and device accelerometer data on mobile devices.
-            </p>
-            <p>
-              The color palette is inspired by Claude Monet's water lily series, featuring soft 
-              blues, warm oranges, natural greens, and subtle purples that blend together like 
-              watercolors bleeding into wet paper.
-            </p>
-            <p>
-              Real-time position updates create smooth transitions between color states, 
-              simulating the organic flow of paint mixing on canvas.
-            </p>
-          </div>
-        </div>
-
-      </div>
     </div>
   );
 }
