@@ -16,11 +16,6 @@ export default function AnalogClock() {
   const secondAngle = (time.getSeconds() * 6); // 6 degrees per second
   const minuteAngle = (time.getMinutes() * 6 + time.getSeconds() * 0.1); // 6 degrees per minute + smooth seconds
   const hourAngle = ((time.getHours() % 12) * 30 + time.getMinutes() * 0.5); // 30 degrees per hour + smooth minutes
-  
-  // Debug logging
-  console.log('Current time:', time.toLocaleTimeString());
-  console.log('Hours:', time.getHours(), 'Minutes:', time.getMinutes(), 'Seconds:', time.getSeconds());
-  console.log('Hour angle:', hourAngle, 'Minute angle:', minuteAngle, 'Second angle:', secondAngle);
 
   // Generate hour markers (starting at 12 o'clock and going clockwise)
   const hourMarkers = Array.from({ length: 12 }, (_, i) => {
