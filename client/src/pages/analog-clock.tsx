@@ -1,5 +1,8 @@
 import { Link } from 'wouter';
 import { useState, useEffect } from 'react';
+import trumpImage from '@assets/image_1751088966989.png';
+import vanceImage from '@assets/image_1751089063177.png';
+import tacoImage from '@assets/image_1751089460552.png';
 
 export default function AnalogClock() {
   const [time, setTime] = useState(new Date());
@@ -148,70 +151,55 @@ export default function AnalogClock() {
               );
             })}
 
-            {/* Trump avatar as hour hand */}
+            {/* Trump image as hour hand */}
             <g
               style={{ 
                 transformOrigin: '150px 150px',
                 transform: `rotate(${hourAngle}deg)`,
               }}
             >
-              {/* Trump simplified avatar */}
-              <g transform="translate(140, 90)">
-                {/* Hair */}
-                <path d="M5,5 Q15,0 20,5 Q18,8 15,10 Q10,12 5,10 Z" fill="#fbbf24" />
-                {/* Face */}
-                <ellipse cx="12" cy="15" rx="8" ry="10" fill="#fde68a" />
-                {/* Eyes */}
-                <circle cx="9" cy="13" r="1" fill="#1f2937" />
-                <circle cx="15" cy="13" r="1" fill="#1f2937" />
-                {/* Mouth */}
-                <ellipse cx="12" cy="18" rx="2" ry="1" fill="#dc2626" />
-                {/* Suit */}
-                <rect x="8" y="25" width="8" height="15" fill="#1f2937" rx="2" />
-                {/* Tie */}
-                <rect x="11" y="25" width="2" height="12" fill="#dc2626" />
-              </g>
+              <image
+                href={trumpImage}
+                x="135"
+                y="100"
+                width="30"
+                height="40"
+                style={{ filter: 'drop-shadow(2px 2px 4px rgba(0,0,0,0.3))' }}
+              />
             </g>
 
-            {/* Vance avatar as minute hand */}
+            {/* Vance image as minute hand */}
             <g
               style={{ 
                 transformOrigin: '150px 150px',
                 transform: `rotate(${minuteAngle}deg)`,
               }}
             >
-              {/* Vance simplified avatar */}
-              <g transform="translate(143, 70)">
-                {/* Bald head */}
-                <ellipse cx="7" cy="10" rx="6" ry="8" fill="#fde68a" />
-                {/* Beard */}
-                <path d="M3,16 Q7,20 11,16 Q9,18 7,18 Q5,18 3,16" fill="#8b5cf6" />
-                {/* Eyes */}
-                <circle cx="5" cy="9" r="0.8" fill="#3b82f6" />
-                <circle cx="9" cy="9" r="0.8" fill="#3b82f6" />
-                {/* Suit */}
-                <rect x="3" y="18" width="8" height="12" fill="#1e40af" rx="1" />
-                {/* Pink tie */}
-                <rect x="6" y="18" width="2" height="10" fill="#ec4899" />
-              </g>
+              <image
+                href={vanceImage}
+                x="140"
+                y="80"
+                width="20"
+                height="30"
+                style={{ filter: 'drop-shadow(2px 2px 4px rgba(0,0,0,0.3))' }}
+              />
             </g>
 
-            {/* Taco as second hand */}
+            {/* Taco image as second hand */}
             <g
               style={{ 
                 transformOrigin: '150px 150px',
                 transform: `rotate(${secondAngle}deg)`,
               }}
             >
-              {/* Taco simplified */}
-              <g transform="translate(145, 50)">
-                {/* Taco shell */}
-                <path d="M0,8 Q5,0 10,8 Q8,12 5,12 Q2,12 0,8" fill="#fbbf24" stroke="#f59e0b" strokeWidth="0.5" />
-                {/* Filling */}
-                <ellipse cx="5" cy="8" rx="3" ry="2" fill="#dc2626" />
-                <rect x="3" y="7" width="4" height="1" fill="#22c55e" />
-                <rect x="3.5" y="6" width="3" height="0.5" fill="#fef3c7" />
-              </g>
+              <image
+                href={tacoImage}
+                x="142"
+                y="60"
+                width="16"
+                height="20"
+                style={{ filter: 'drop-shadow(2px 2px 4px rgba(0,0,0,0.3))' }}
+              />
             </g>
 
             {/* Center point */}
