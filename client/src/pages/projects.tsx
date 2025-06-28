@@ -3,7 +3,12 @@ import Layout from '../components/layout';
 
 export default function Projects() {
   const projects = [
-
+    {
+      title: "ANALOG CLOCK",
+      description: "Traditional 12-hour analog clock with hour, minute, and second hands. Features classic Roman numerals, smooth hand movement, and elegant glassmorphism design on a dark gradient background.",
+      tags: "Time • Classic • Interface",
+      link: "/projects/analog-clock"
+    },
     {
       title: "MONET PAINT SWIRLING",
       description: "Interactive paint mixing inspired by Claude Monet's water lily paintings. Mouse movement or device tilting creates beautiful color gradients that blend and morph in real-time like watercolors.",
