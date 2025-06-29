@@ -9,6 +9,9 @@ interface TennisBall {
   vx: number;
   vy: number;
   active: boolean;
+  radius: number;
+  bounces: number;
+  settled: boolean;
 }
 
 interface Gladiator {
@@ -228,7 +231,10 @@ export default function TennisBallGun() {
       y: cannon.y - 20,
       vx,
       vy,
-      active: true
+      active: true,
+      radius: 8,
+      bounces: 0,
+      settled: false
     };
     
     setTennisBalls(prev => [...prev, newBall]);
@@ -271,16 +277,157 @@ export default function TennisBallGun() {
         return { ...prev, x: Math.max(30, Math.min(canvasSize.width - 30, newX)) };
       });
       
-      // Update tennis balls
-      setTennisBalls(prev => prev.map(ball => ({
-        ...ball,
-        x: ball.x + ball.vx,
-        y: ball.y + ball.vy
-      })).filter(ball => 
-        ball.x > -20 && ball.x < canvasSize.width + 20 && 
-        ball.y > -20 && ball.y < canvasSize.height + 20 && 
-        ball.active
-      ));
+      // Update tennis balls with advanced physics
+      setTennisBalls(prev => {
+        let updatedBalls = prev.map(ball => {
+          if (!ball.active) return ball;
+          
+          let newX = ball.x + ball.vx;
+          let newY = ball.y + ball.vy;
+          let newVx = ball.vx;
+          let newVy = ball.vy;
+          let newBounces = ball.bounces;
+          let newSettled = ball.settled;
+          
+          // Apply gravity if not settled
+          if (!ball.settled) {
+            newVy += 0.3; // Gravity
+          }
+          
+          // Ground collision and settling
+          if (newY + ball.radius >= canvasSize.height) {
+            newY = canvasSize.height - ball.radius;
+            if (Math.abs(newVy) < 2 && Math.abs(newVx) < 1) {
+              // Ball has settled
+              newSettled = true;
+              newVx *= 0.8; // Rolling friction
+              newVy = 0;
+            } else {
+              newVy *= -0.6; // Bounce with energy loss
+              newVx *= 0.9; // Friction
+              newBounces++;
+            }
+          }
+          
+          // Wall collisions
+          if (newX - ball.radius <= 0 || newX + ball.radius >= canvasSize.width) {
+            newX = Math.max(ball.radius, Math.min(canvasSize.width - ball.radius, newX));
+            newVx *= -0.8;
+            newBounces++;
+          }
+          
+          // Ceiling collision
+          if (newY - ball.radius <= 0) {
+            newY = ball.radius;
+            newVy *= -0.7;
+            newBounces++;
+          }
+          
+          return {
+            ...ball,
+            x: newX,
+            y: newY,
+            vx: newVx,
+            vy: newVy,
+            bounces: newBounces,
+            settled: newSettled
+          };
+        });
+        
+        // Ball-to-ball collision detection
+        for (let i = 0; i < updatedBalls.length; i++) {
+          for (let j = i + 1; j < updatedBalls.length; j++) {
+            const ball1 = updatedBalls[i];
+            const ball2 = updatedBalls[j];
+            
+            if (!ball1.active || !ball2.active) continue;
+            
+            const dx = ball2.x - ball1.x;
+            const dy = ball2.y - ball1.y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            const minDistance = ball1.radius + ball2.radius;
+            
+            if (distance < minDistance) {
+              // Collision detected
+              const overlap = minDistance - distance;
+              const separationX = (dx / distance) * overlap * 0.5;
+              const separationY = (dy / distance) * overlap * 0.5;
+              
+              // Separate balls
+              updatedBalls[i] = {
+                ...ball1,
+                x: ball1.x - separationX,
+                y: ball1.y - separationY
+              };
+              updatedBalls[j] = {
+                ...ball2,
+                x: ball2.x + separationX,
+                y: ball2.y + separationY
+              };
+              
+              // Exchange velocities (simplified elastic collision)
+              if (!ball1.settled && !ball2.settled) {
+                const tempVx = ball1.vx;
+                const tempVy = ball1.vy;
+                updatedBalls[i] = {
+                  ...updatedBalls[i],
+                  vx: ball2.vx * 0.8,
+                  vy: ball2.vy * 0.8,
+                  settled: false
+                };
+                updatedBalls[j] = {
+                  ...updatedBalls[j],
+                  vx: tempVx * 0.8,
+                  vy: tempVy * 0.8,
+                  settled: false
+                };
+              }
+            }
+          }
+        }
+        
+        // Check for obstacle collisions
+        updatedBalls = updatedBalls.map(ball => {
+          if (!ball.active) return ball;
+          
+          for (const obstacle of obstacles) {
+            // Simple rectangle collision detection
+            if (ball.x + ball.radius > obstacle.x && 
+                ball.x - ball.radius < obstacle.x + obstacle.width &&
+                ball.y + ball.radius > obstacle.y && 
+                ball.y - ball.radius < obstacle.y + obstacle.height) {
+              
+              // Determine collision side and bounce
+              const centerX = obstacle.x + obstacle.width / 2;
+              const centerY = obstacle.y + obstacle.height / 2;
+              const dx = ball.x - centerX;
+              const dy = ball.y - centerY;
+              
+              if (Math.abs(dx) > Math.abs(dy)) {
+                // Side collision
+                ball.vx *= -0.7;
+                ball.x = dx > 0 ? obstacle.x + obstacle.width + ball.radius : obstacle.x - ball.radius;
+              } else {
+                // Top/bottom collision
+                ball.vy *= -0.7;
+                ball.y = dy > 0 ? obstacle.y + obstacle.height + ball.radius : obstacle.y - ball.radius;
+              }
+              
+              ball.bounces++;
+              ball.settled = false;
+            }
+          }
+          
+          return ball;
+        });
+        
+        // Remove balls that have rolled off screen
+        return updatedBalls.filter(ball => 
+          ball.x > -ball.radius * 2 && ball.x < canvasSize.width + ball.radius * 2 && 
+          ball.y > -ball.radius * 2 && ball.y < canvasSize.height + ball.radius * 2 && 
+          ball.active
+        );
+      });
       
       // Update gladiators
       setGladiators(prev => {
@@ -332,7 +479,7 @@ export default function TennisBallGun() {
               const dy = ball.y - (gladiator.y + gladiator.height / 2);
               const distance = Math.sqrt(dx * dx + dy * dy);
               
-              if (distance < 25) { // Collision detected
+              if (distance < ball.radius + 15) { // Collision detected
                 // Remove ball
                 remainingBalls[i] = { ...ball, active: false };
                 
@@ -357,18 +504,7 @@ export default function TennisBallGun() {
         return remainingBalls.filter(ball => ball.active);
       });
       
-      // Collision detection - tennis balls vs obstacles
-      setTennisBalls(prev => {
-        return prev.map(ball => {
-          for (const obstacle of obstacles) {
-            if (ball.x > obstacle.x && ball.x < obstacle.x + obstacle.width &&
-                ball.y > obstacle.y && ball.y < obstacle.y + obstacle.height) {
-              return { ...ball, active: false };
-            }
-          }
-          return ball;
-        }).filter(ball => ball.active);
-      });
+      // Note: Obstacle collision is now handled in the main physics update above
       
       // Update wave
       if (gameTime > wave * 30000) { // New wave every 30 seconds
@@ -460,23 +596,36 @@ export default function TennisBallGun() {
     tennisBalls.forEach(ball => {
       if (!ball.active) return;
       
+      // Different color based on state
+      let ballColor = '#e6ff00'; // Default yellow
+      if (ball.settled) ballColor = '#ccdd00'; // Slightly darker when settled
+      if (ball.bounces > 5) ballColor = '#ffcc00'; // Orange-ish after many bounces
+      
+      // Draw tennis ball shadow if settled
+      if (ball.settled) {
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+        ctx.beginPath();
+        ctx.ellipse(ball.x + 2, ball.y + ball.radius + 2, ball.radius * 0.8, ball.radius * 0.3, 0, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      
       // Draw tennis ball (simplified as yellow circle with lines)
-      ctx.fillStyle = '#e6ff00';
+      ctx.fillStyle = ballColor;
       ctx.beginPath();
-      ctx.arc(ball.x, ball.y, 8, 0, Math.PI * 2);
+      ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
       ctx.fill();
       
       // Tennis ball lines
       ctx.strokeStyle = 'white';
       ctx.lineWidth = 1;
       ctx.beginPath();
-      ctx.arc(ball.x, ball.y, 8, 0, Math.PI * 2);
-      ctx.moveTo(ball.x - 8, ball.y);
-      ctx.lineTo(ball.x + 8, ball.y);
-      ctx.moveTo(ball.x, ball.y - 8);
-      ctx.quadraticCurveTo(ball.x + 4, ball.y, ball.x, ball.y + 8);
-      ctx.moveTo(ball.x, ball.y - 8);
-      ctx.quadraticCurveTo(ball.x - 4, ball.y, ball.x, ball.y + 8);
+      ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+      ctx.moveTo(ball.x - ball.radius, ball.y);
+      ctx.lineTo(ball.x + ball.radius, ball.y);
+      ctx.moveTo(ball.x, ball.y - ball.radius);
+      ctx.quadraticCurveTo(ball.x + 4, ball.y, ball.x, ball.y + ball.radius);
+      ctx.moveTo(ball.x, ball.y - ball.radius);
+      ctx.quadraticCurveTo(ball.x - 4, ball.y, ball.x, ball.y + ball.radius);
       ctx.stroke();
     });
     
@@ -523,6 +672,7 @@ export default function TennisBallGun() {
     <div 
       className="min-h-screen bg-gradient-to-b from-green-800 via-green-700 to-green-900 text-white overflow-hidden"
       style={{
+        fontFamily: 'Georgia, "Times New Roman", Times, serif',
         touchAction: 'manipulation',
         userSelect: 'none'
       }}
