@@ -4,6 +4,13 @@ import Layout from '../components/layout';
 export default function Projects() {
   const projects = [
     {
+      title: "WIND CHIMES",
+      description: "100 swaying reeds responding to real local wind data. Like a field of grass dancing in your actual weather conditions. Uses location services to fetch live wind speed and direction.",
+      tags: "Kinetic Art • Weather API • Location",
+      timestamp: "June 29, 2025",
+      link: "/projects/wind-chimes"
+    },
+    {
       title: "SLOT MACHINE",
       description: "Classic vintage Las Vegas slot machine with 10 symbols, pullable handle, realistic spinning reels, coin payouts, and authentic casino sound effects. Features three reels, paytable, and falling coins animation.",
       tags: "Casino • Vintage • Animation",
