@@ -57,9 +57,10 @@ export default function TennisBallGun() {
   const [wave, setWave] = useState(1);
   
   // Game entities
+  const [canvasSize, setCanvasSize] = useState({ width: 700, height: 400 });
   const [cannon, setCannon] = useState<Cannon>({
-    x: 400,
-    y: 550,
+    x: 350,
+    y: 370,
     angle: -Math.PI / 2, // Pointing up
     power: 15,
     cooldown: 0
@@ -70,27 +71,50 @@ export default function TennisBallGun() {
   const [obstacles, setObstacles] = useState<Obstacle[]>([]);
   const [keys, setKeys] = useState<Set<string>>(new Set());
   const [mousePos, setMousePos] = useState({ x: 400, y: 300 });
+  const [mouseDown, setMouseDown] = useState(false);
 
-  // Initialize obstacles
+  // Initialize responsive canvas size and obstacles
   useEffect(() => {
+    const updateCanvasSize = () => {
+      const maxWidth = Math.min(700, window.innerWidth - 40);
+      const maxHeight = Math.min(450, window.innerHeight - 180);
+      setCanvasSize({ width: maxWidth, height: maxHeight });
+      
+      // Update cannon position relative to canvas size
+      setCannon(prev => ({
+        ...prev,
+        x: maxWidth / 2,
+        y: maxHeight - 30
+      }));
+    };
+    
+    updateCanvasSize();
+    window.addEventListener('resize', updateCanvasSize);
+    
+    return () => window.removeEventListener('resize', updateCanvasSize);
+  }, []);
+
+  // Initialize obstacles based on canvas size
+  useEffect(() => {
+    const { width, height } = canvasSize;
     const newObstacles: Obstacle[] = [
       // Top barriers
-      { x: 100, y: 100, width: 80, height: 60, health: 100, maxHealth: 100, type: 'wall' },
-      { x: 620, y: 100, width: 80, height: 60, health: 100, maxHealth: 100, type: 'wall' },
+      { x: width * 0.15, y: height * 0.15, width: 60, height: 40, health: 100, maxHealth: 100, type: 'wall' },
+      { x: width * 0.75, y: height * 0.15, width: 60, height: 40, health: 100, maxHealth: 100, type: 'wall' },
       
-      // Middle barriers
-      { x: 200, y: 250, width: 60, height: 40, health: 80, maxHealth: 80, type: 'barrier' },
-      { x: 540, y: 250, width: 60, height: 40, health: 80, maxHealth: 80, type: 'barrier' },
+      // Middle barriers  
+      { x: width * 0.25, y: height * 0.5, width: 50, height: 30, health: 80, maxHealth: 80, type: 'barrier' },
+      { x: width * 0.65, y: height * 0.5, width: 50, height: 30, health: 80, maxHealth: 80, type: 'barrier' },
       
       // Side pillars
-      { x: 50, y: 200, width: 30, height: 150, health: 120, maxHealth: 120, type: 'pillar' },
-      { x: 720, y: 200, width: 30, height: 150, health: 120, maxHealth: 120, type: 'pillar' },
+      { x: width * 0.08, y: height * 0.35, width: 25, height: 100, health: 120, maxHealth: 120, type: 'pillar' },
+      { x: width * 0.87, y: height * 0.35, width: 25, height: 100, health: 120, maxHealth: 120, type: 'pillar' },
       
       // Center cover
-      { x: 350, y: 180, width: 100, height: 50, health: 150, maxHealth: 150, type: 'wall' }
+      { x: width * 0.4, y: height * 0.3, width: 80, height: 35, health: 150, maxHealth: 150, type: 'wall' }
     ];
     setObstacles(newObstacles);
-  }, []);
+  }, [canvasSize]);
 
   // Spawn gladiators
   const spawnGladiator = useCallback(() => {
@@ -158,8 +182,9 @@ export default function TennisBallGun() {
       });
     };
     
-    const handleClick = (e: MouseEvent) => {
+    const handleMouseDown = (e: MouseEvent) => {
       if (!gameStarted) return;
+      setMouseDown(true);
       
       const rect = canvas.getBoundingClientRect();
       const mouseX = e.clientX - rect.left;
@@ -168,12 +193,20 @@ export default function TennisBallGun() {
       fireTennisBall(mouseX, mouseY);
     };
     
+    const handleMouseUp = () => {
+      setMouseDown(false);
+    };
+    
     canvas.addEventListener('mousemove', handleMouseMove);
-    canvas.addEventListener('click', handleClick);
+    canvas.addEventListener('mousedown', handleMouseDown);
+    canvas.addEventListener('mouseup', handleMouseUp);
+    document.addEventListener('mouseup', handleMouseUp); // Handle mouse up outside canvas
     
     return () => {
       canvas.removeEventListener('mousemove', handleMouseMove);
-      canvas.removeEventListener('click', handleClick);
+      canvas.removeEventListener('mousedown', handleMouseDown);
+      canvas.removeEventListener('mouseup', handleMouseUp);
+      document.removeEventListener('mouseup', handleMouseUp);
     };
   }, [gameStarted, cannon]);
 
@@ -199,7 +232,7 @@ export default function TennisBallGun() {
     };
     
     setTennisBalls(prev => [...prev, newBall]);
-    setCannon(prev => ({ ...prev, cooldown: 15 })); // 15 frame cooldown
+    setCannon(prev => ({ ...prev, cooldown: 5 })); // 5 frame cooldown for rapid fire
   };
 
   // Game loop
@@ -225,12 +258,17 @@ export default function TennisBallGun() {
         cooldown: Math.max(0, prev.cooldown - 1)
       }));
       
+      // Continuous firing when mouse is held down
+      if (mouseDown && cannon.cooldown === 0) {
+        fireTennisBall(mousePos.x, mousePos.y);
+      }
+      
       // Move cannon with arrow keys
       setCannon(prev => {
         let newX = prev.x;
         if (keys.has('arrowleft') || keys.has('a')) newX -= 3;
         if (keys.has('arrowright') || keys.has('d')) newX += 3;
-        return { ...prev, x: Math.max(30, Math.min(770, newX)) };
+        return { ...prev, x: Math.max(30, Math.min(canvasSize.width - 30, newX)) };
       });
       
       // Update tennis balls
@@ -239,8 +277,8 @@ export default function TennisBallGun() {
         x: ball.x + ball.vx,
         y: ball.y + ball.vy
       })).filter(ball => 
-        ball.x > -20 && ball.x < 820 && 
-        ball.y > -20 && ball.y < 620 && 
+        ball.x > -20 && ball.x < canvasSize.width + 20 && 
+        ball.y > -20 && ball.y < canvasSize.height + 20 && 
         ball.active
       ));
       
@@ -257,9 +295,9 @@ export default function TennisBallGun() {
           }
           
           // Bounce off screen edges
-          if (newX < 0 || newX > 800 - gladiator.width) {
+          if (newX < 0 || newX > canvasSize.width - gladiator.width) {
             gladiator.vx *= -1;
-            newX = Math.max(0, Math.min(800 - gladiator.width, newX));
+            newX = Math.max(0, Math.min(canvasSize.width - gladiator.width, newX));
           }
           
           return {
@@ -269,7 +307,7 @@ export default function TennisBallGun() {
           };
         }).filter(gladiator => {
           // Remove gladiators that reached bottom (they score)
-          if (gladiator.y > 600) {
+          if (gladiator.y > canvasSize.height) {
             setGladiatorScore(prev => prev + 1);
             return false;
           }
@@ -359,20 +397,20 @@ export default function TennisBallGun() {
     
     // Clear canvas
     ctx.fillStyle = '#2a5934'; // Tennis court green
-    ctx.fillRect(0, 0, 800, 600);
+    ctx.fillRect(0, 0, canvasSize.width, canvasSize.height);
     
     // Draw court lines
     ctx.strokeStyle = 'white';
     ctx.lineWidth = 2;
     ctx.beginPath();
     // Center line
-    ctx.moveTo(0, 300);
-    ctx.lineTo(800, 300);
+    ctx.moveTo(0, canvasSize.height / 2);
+    ctx.lineTo(canvasSize.width, canvasSize.height / 2);
     // Side lines
-    ctx.moveTo(50, 0);
-    ctx.lineTo(50, 600);
-    ctx.moveTo(750, 0);
-    ctx.lineTo(750, 600);
+    ctx.moveTo(canvasSize.width * 0.1, 0);
+    ctx.lineTo(canvasSize.width * 0.1, canvasSize.height);
+    ctx.moveTo(canvasSize.width * 0.9, 0);
+    ctx.lineTo(canvasSize.width * 0.9, canvasSize.height);
     ctx.stroke();
     
     // Draw obstacles
@@ -468,7 +506,7 @@ export default function TennisBallGun() {
     ctx.lineTo(mousePos.x, mousePos.y + 10);
     ctx.stroke();
     
-  }, [cannon, tennisBalls, gladiators, obstacles, mousePos]);
+  }, [cannon, tennisBalls, gladiators, obstacles, mousePos, canvasSize]);
 
   const startGame = () => {
     setGameStarted(true);
@@ -482,56 +520,68 @@ export default function TennisBallGun() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-green-800 via-green-700 to-green-900 text-white">
+    <div 
+      className="min-h-screen bg-gradient-to-b from-green-800 via-green-700 to-green-900 text-white overflow-hidden"
+      style={{
+        touchAction: 'manipulation',
+        userSelect: 'none'
+      }}
+      onWheel={(e) => e.preventDefault()}
+      onTouchStart={(e) => e.touches.length > 1 && e.preventDefault()}
+    >
       {/* Home Link */}
-      <div className="fixed top-4 left-4 z-50">
+      <div className="fixed top-2 left-2 z-50">
         <Link href="/">
-          <button className="bg-yellow-600 hover:bg-yellow-500 text-black font-bold px-4 py-2 rounded-full border-2 border-yellow-700 transition-colors">
+          <button className="bg-yellow-600 hover:bg-yellow-500 text-black font-bold px-3 py-1 text-sm rounded-full border-2 border-yellow-700 transition-colors">
             ← HOME
           </button>
         </Link>
       </div>
 
-      {/* Page Header */}
-      <div className="text-center pt-16 pb-4">
-        <h1 className="text-4xl md:text-6xl font-bold text-yellow-400 mb-2">TENNIS BALL GUN</h1>
-        <p className="text-xl text-yellow-200">Defend against American Gladiators!</p>
+      {/* Page Header - Compact */}
+      <div className="text-center pt-8 pb-2">
+        <h1 className="text-2xl md:text-4xl font-bold text-yellow-400 mb-1">TENNIS BALL GUN</h1>
+        <p className="text-sm text-yellow-200">Defend against American Gladiators!</p>
       </div>
 
-      {/* Score Display */}
-      <div className="flex justify-center gap-8 mb-4">
-        <div className="bg-blue-600 px-4 py-2 rounded-lg">
-          <span className="font-bold">YOUR SCORE: {playerScore}</span>
+      {/* Score Display - Compact */}
+      <div className="flex justify-center gap-4 mb-2 text-xs">
+        <div className="bg-blue-600 px-2 py-1 rounded">
+          <span className="font-bold">YOUR: {playerScore}</span>
         </div>
-        <div className="bg-red-600 px-4 py-2 rounded-lg">
-          <span className="font-bold">GLADIATOR SCORE: {gladiatorScore}</span>
+        <div className="bg-red-600 px-2 py-1 rounded">
+          <span className="font-bold">ENEMY: {gladiatorScore}</span>
         </div>
-        <div className="bg-purple-600 px-4 py-2 rounded-lg">
+        <div className="bg-purple-600 px-2 py-1 rounded">
           <span className="font-bold">WAVE: {wave}</span>
         </div>
       </div>
 
-      {/* Game Canvas */}
-      <div className="flex justify-center">
-        <div className="relative">
+      {/* Game Canvas - Responsive */}
+      <div className="flex justify-center px-2">
+        <div className="relative max-w-full">
           <canvas
             ref={canvasRef}
-            width={800}
-            height={600}
-            className="border-4 border-yellow-400 bg-green-600 cursor-crosshair"
+            width={canvasSize.width}
+            height={canvasSize.height}
+            className="border-2 border-yellow-400 bg-green-600 cursor-crosshair max-w-full"
+            style={{
+              touchAction: 'none',
+              userSelect: 'none'
+            }}
           />
           
           {!gameStarted && (
             <div className="absolute inset-0 bg-black bg-opacity-75 flex items-center justify-center">
-              <div className="text-center">
-                <h2 className="text-3xl font-bold mb-4">AMERICAN GLADIATORS DEFENSE</h2>
-                <p className="text-lg mb-6">
+              <div className="text-center p-4">
+                <h2 className="text-xl md:text-2xl font-bold mb-2">AMERICAN GLADIATORS DEFENSE</h2>
+                <p className="text-sm mb-4">
                   Stop the gladiators from reaching the bottom!<br/>
-                  Click to shoot tennis balls • Use A/D or arrow keys to move
+                  Hold mouse to shoot • A/D keys to move
                 </p>
                 <button
                   onClick={startGame}
-                  className="bg-yellow-600 hover:bg-yellow-500 text-black font-bold px-8 py-4 rounded-lg text-xl"
+                  className="bg-yellow-600 hover:bg-yellow-500 text-black font-bold px-6 py-2 rounded-lg text-lg"
                 >
                   START GAME
                 </button>
