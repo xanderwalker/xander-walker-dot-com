@@ -54,7 +54,8 @@ export default function CameraKaleidoscope() {
       setSaveStatus('saved');
       queryClient.invalidateQueries({ queryKey: ['/api/kaleidoscope-submissions'] });
     },
-    onError: () => {
+    onError: (error) => {
+      console.error('Save submission error:', error);
       setSaveStatus('error');
     },
   });

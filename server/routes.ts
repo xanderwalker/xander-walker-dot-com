@@ -92,12 +92,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Kaleidoscope submission routes
   app.post('/api/kaleidoscope-submissions', async (req, res) => {
     try {
+      console.log('Received submission request body:', JSON.stringify(req.body, null, 2));
       const validatedData = insertKaleidoscopeSubmissionSchema.parse(req.body);
+      console.log('Validated data:', validatedData);
       const submission = await storage.createKaleidoscopeSubmission(validatedData);
+      console.log('Created submission:', submission);
       res.json(submission);
     } catch (error) {
       console.error('Error creating kaleidoscope submission:', error);
-      res.status(400).json({ error: 'Invalid submission data' });
+      if (error instanceof Error) {
+        console.error('Error details:', error.message);
+        console.error('Error stack:', error.stack);
+      }
+      res.status(400).json({ error: 'Invalid submission data', details: error instanceof Error ? error.message : 'Unknown error' });
     }
   });
 
