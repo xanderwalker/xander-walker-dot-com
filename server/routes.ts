@@ -1,6 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
+import { insertKaleidoscopeSubmissionSchema } from "@shared/schema";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Lyrics API route
@@ -85,6 +86,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
         lyrics: 'Error fetching lyrics. Please try again later.',
         source: 'system'
       });
+    }
+  });
+
+  // Kaleidoscope submission routes
+  app.post('/api/kaleidoscope-submissions', async (req, res) => {
+    try {
+      const validatedData = insertKaleidoscopeSubmissionSchema.parse(req.body);
+      const submission = await storage.createKaleidoscopeSubmission(validatedData);
+      res.json(submission);
+    } catch (error) {
+      console.error('Error creating kaleidoscope submission:', error);
+      res.status(400).json({ error: 'Invalid submission data' });
+    }
+  });
+
+  app.get('/api/kaleidoscope-submissions', async (req, res) => {
+    try {
+      const submissions = await storage.getAllKaleidoscopeSubmissions();
+      res.json(submissions);
+    } catch (error) {
+      console.error('Error fetching kaleidoscope submissions:', error);
+      res.status(500).json({ error: 'Failed to fetch submissions' });
     }
   });
 

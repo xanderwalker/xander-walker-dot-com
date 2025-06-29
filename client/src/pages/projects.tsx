@@ -11,6 +11,13 @@ export default function Projects() {
       link: "/projects/camera-kaleidoscope"
     },
     {
+      title: "KALEIDOSCOPE GALLERY",
+      description: "Community gallery showcasing all the beautiful kaleidoscope flower gardens created by visitors. Browse, download, and enjoy the creative submissions from around the world.",
+      tags: "Gallery • Community • Art • Collection",
+      timestamp: "June 29, 2025",
+      link: "/projects/kaleidoscope-gallery"
+    },
+    {
       title: "TENNIS BALL GUN",
       description: "American Gladiators-style defense game. Aim your tennis ball cannon to stop gladiators from reaching the bottom. Features multiple gladiator types, shields, obstacles, and progressive waves.",
       tags: "Game • Defense • American Gladiators",

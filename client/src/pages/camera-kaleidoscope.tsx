@@ -1,5 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Link } from 'wouter';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { apiRequest } from '@/lib/queryClient';
 
 interface CameraDevice {
   deviceId: string;
@@ -28,6 +30,34 @@ export default function CameraKaleidoscope() {
   const [flowers, setFlowers] = useState<Flower[]>([]);
   const [screenFull, setScreenFull] = useState(false);
   const [finalScreenshot, setFinalScreenshot] = useState<string | null>(null);
+  const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
+  
+  const queryClient = useQueryClient();
+  
+  const saveSubmissionMutation = useMutation({
+    mutationFn: async (data: { imageData: string; flowerCount: number }) => {
+      const response = await fetch('/api/kaleidoscope-submissions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to save submission');
+      }
+      
+      return response.json();
+    },
+    onSuccess: () => {
+      setSaveStatus('saved');
+      queryClient.invalidateQueries({ queryKey: ['/api/kaleidoscope-submissions'] });
+    },
+    onError: () => {
+      setSaveStatus('error');
+    },
+  });
   
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -272,6 +302,13 @@ export default function CameraKaleidoscope() {
     const screenshot = canvas.toDataURL('image/png');
     setFinalScreenshot(screenshot);
     
+    // Save to gallery
+    setSaveStatus('saving');
+    saveSubmissionMutation.mutate({
+      imageData: screenshot,
+      flowerCount: flowers.length
+    });
+    
     // Stop camera
     if (stream) {
       stream.getTracks().forEach(track => track.stop());
@@ -284,7 +321,7 @@ export default function CameraKaleidoscope() {
     if (animationRef.current) {
       cancelAnimationFrame(animationRef.current);
     }
-  }, [stream]);
+  }, [stream, saveSubmissionMutation, flowers.length]);
 
   // Effect to take screenshot when screen is full
   useEffect(() => {
@@ -466,7 +503,26 @@ export default function CameraKaleidoscope() {
         <div className="absolute inset-0 flex flex-col items-center justify-center z-20 bg-black/90">
           <div className="text-center p-8 bg-white/10 backdrop-blur-lg rounded-2xl max-w-2xl mx-4">
             <h2 className="text-2xl font-bold mb-4">Garden Complete!</h2>
-            <p className="mb-6">Your kaleidoscope flower garden has been created with {flowers.length} flowers.</p>
+            <p className="mb-4">Your kaleidoscope flower garden has been created with {flowers.length} flowers.</p>
+            
+            {/* Save status */}
+            <div className="mb-6">
+              {saveStatus === 'saving' && (
+                <div className="text-yellow-400 text-sm mb-2">
+                  💾 Saving to gallery...
+                </div>
+              )}
+              {saveStatus === 'saved' && (
+                <div className="text-green-400 text-sm mb-2">
+                  ✅ Saved to gallery!
+                </div>
+              )}
+              {saveStatus === 'error' && (
+                <div className="text-red-400 text-sm mb-2">
+                  ❌ Failed to save to gallery
+                </div>
+              )}
+            </div>
             
             <div className="mb-6">
               <img 
@@ -477,13 +533,21 @@ export default function CameraKaleidoscope() {
             </div>
             
             <div className="space-y-4">
-              <a
-                href={finalScreenshot}
-                download="kaleidoscope-garden.png"
-                className="inline-block px-6 py-3 bg-green-600 hover:bg-green-700 rounded-lg text-white font-semibold transition-colors"
-              >
-                Save Garden
-              </a>
+              <div className="flex flex-wrap gap-4 justify-center">
+                <a
+                  href={finalScreenshot}
+                  download="kaleidoscope-garden.png"
+                  className="px-6 py-3 bg-green-600 hover:bg-green-700 rounded-lg text-white font-semibold transition-colors"
+                >
+                  Download Image
+                </a>
+                
+                <Link href="/projects/kaleidoscope-gallery">
+                  <button className="px-6 py-3 bg-purple-600 hover:bg-purple-700 rounded-lg text-white font-semibold transition-colors">
+                    View Gallery
+                  </button>
+                </Link>
+              </div>
               
               <div>
                 <Link href="/projects">
