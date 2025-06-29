@@ -22,6 +22,7 @@ import SpotifyApiTest from "@/pages/spotify-api-test";
 import MonetPaint from "@/pages/monet-paint";
 import AnalogClock from "@/pages/analog-clock";
 import TrumpClock from "@/pages/trump-clock";
+import SlotMachine from "@/pages/slot-machine";
 import Contact from "@/pages/contact";
 import NotFound from "@/pages/not-found";
 
@@ -60,6 +61,7 @@ function Router() {
         <Route path="/projects/monet-paint" component={MonetPaint} />
         <Route path="/projects/analog-clock" component={AnalogClock} />
         <Route path="/projects/trump-clock" component={TrumpClock} />
+        <Route path="/projects/slot-machine" component={SlotMachine} />
         <Route path="/contact" component={Contact} />
         <Route component={NotFound} />
       </Switch>

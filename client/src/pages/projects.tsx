@@ -4,6 +4,13 @@ import Layout from '../components/layout';
 export default function Projects() {
   const projects = [
     {
+      title: "SLOT MACHINE",
+      description: "Classic vintage Las Vegas slot machine with 10 symbols, pullable handle, realistic spinning reels, coin payouts, and authentic casino sound effects. Features three reels, paytable, and falling coins animation.",
+      tags: "Casino • Vintage • Animation",
+      timestamp: "June 28, 2025",
+      link: "/projects/slot-machine"
+    },
+    {
       title: "TRUMP CLOCK",
       description: "Political satire timepiece featuring a golden golf ball face with Trump as hour hand, Vance as minute hand, and a taco marking seconds.",
       tags: "Political • Satire • Golf",
