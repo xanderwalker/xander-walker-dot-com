@@ -4,6 +4,13 @@ import Layout from '../components/layout';
 export default function Projects() {
   const projects = [
     {
+      title: "TENNIS BALL GUN",
+      description: "American Gladiators-style defense game. Aim your tennis ball cannon to stop gladiators from reaching the bottom. Features multiple gladiator types, shields, obstacles, and progressive waves.",
+      tags: "Game • Defense • American Gladiators",
+      timestamp: "June 29, 2025",
+      link: "/projects/tennis-ball-gun"
+    },
+    {
       title: "WIND CHIMES",
       description: "100 swaying reeds responding to real local wind data. Like a field of grass dancing in your actual weather conditions. Uses location services to fetch live wind speed and direction.",
       tags: "Kinetic Art • Weather API • Location",

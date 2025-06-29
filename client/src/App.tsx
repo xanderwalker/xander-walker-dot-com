@@ -24,6 +24,7 @@ import AnalogClock from "@/pages/analog-clock";
 import TrumpClock from "@/pages/trump-clock";
 import SlotMachine from "@/pages/slot-machine";
 import WindChimes from "@/pages/wind-chimes";
+import TennisBallGun from "@/pages/tennis-ball-gun";
 import Contact from "@/pages/contact";
 import NotFound from "@/pages/not-found";
 
@@ -64,6 +65,7 @@ function Router() {
         <Route path="/projects/trump-clock" component={TrumpClock} />
         <Route path="/projects/slot-machine" component={SlotMachine} />
         <Route path="/projects/wind-chimes" component={WindChimes} />
+        <Route path="/projects/tennis-ball-gun" component={TennisBallGun} />
         <Route path="/contact" component={Contact} />
         <Route component={NotFound} />
       </Switch>
