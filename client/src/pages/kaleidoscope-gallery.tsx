@@ -10,7 +10,7 @@ interface KaleidoscopeSubmission {
   createdAt: string;
 }
 
-export default function KaleidoscopeGallery() {
+export default function CameraGallery() {
   const { data: submissions = [], isLoading, error } = useQuery<KaleidoscopeSubmission[]>({
     queryKey: ['/api/kaleidoscope-submissions'],
   });
@@ -41,7 +41,7 @@ export default function KaleidoscopeGallery() {
 
   if (error) {
     return (
-      <Layout title="KALEIDOSCOPE GALLERY" subtitle="Error loading submissions">
+      <Layout title="CAMERA GALLERY" subtitle="Error loading photos">
         <div className="min-h-screen bg-gradient-to-b from-purple-900 via-purple-800 to-black text-white flex items-center justify-center">
           <div className="text-center">
             <p className="text-red-400 text-lg mb-4">Failed to load gallery</p>
@@ -73,9 +73,9 @@ export default function KaleidoscopeGallery() {
       </div>
 
       <div className="absolute top-4 right-4 z-50">
-        <Link href="/projects/camera-kaleidoscope">
+        <Link href="/projects/cameras">
           <button className="px-4 py-2 bg-pink-600/80 backdrop-blur-sm rounded-lg text-white hover:bg-pink-700/80 transition-colors">
-            Create New Garden
+            Back to Cameras
           </button>
         </Link>
       </div>
@@ -83,13 +83,13 @@ export default function KaleidoscopeGallery() {
       {/* Header */}
       <div className="pt-20 pb-8 text-center">
         <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-pink-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent">
-          KALEIDOSCOPE GALLERY
+          CAMERA GALLERY
         </h1>
         <p className="text-xl text-gray-300 max-w-2xl mx-auto px-4">
-          A collection of beautiful kaleidoscope flower gardens created by visitors
+          A collection of composite photos created with our camera systems
         </p>
         <div className="mt-4 text-sm text-gray-400">
-          {submissions.length} garden{submissions.length !== 1 ? 's' : ''} created
+          {submissions.length} photo{submissions.length !== 1 ? 's' : ''} captured
         </div>
       </div>
 
@@ -97,14 +97,14 @@ export default function KaleidoscopeGallery() {
       <div className="container mx-auto px-4 pb-20">
         {submissions.length === 0 ? (
           <div className="text-center py-20">
-            <div className="text-6xl mb-6">🌸</div>
-            <h3 className="text-2xl font-semibold mb-4">No gardens yet</h3>
+            <div className="text-6xl mb-6">📸</div>
+            <h3 className="text-2xl font-semibold mb-4">No photos yet</h3>
             <p className="text-gray-400 mb-8 max-w-md mx-auto">
-              Be the first to create a beautiful kaleidoscope flower garden! Your creation will appear here for everyone to enjoy.
+              Start capturing photos with our camera systems! Your composite images will appear here for everyone to enjoy.
             </p>
-            <Link href="/projects/camera-kaleidoscope">
+            <Link href="/projects/cameras">
               <button className="px-8 py-4 bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-700 hover:to-purple-700 rounded-lg text-white font-semibold transition-all transform hover:scale-105">
-                Create First Garden
+                Start Taking Photos
               </button>
             </Link>
           </div>
@@ -128,7 +128,7 @@ export default function KaleidoscopeGallery() {
                 <div className="p-4">
                   <div className="flex justify-between items-start mb-2">
                     <div className="text-sm font-semibold text-pink-300">
-                      {submission.flowerCount} Flowers
+                      {submission.flowerCount} Photos
                     </div>
                     <div className="text-xs text-gray-400">
                       #{submission.id}
@@ -143,10 +143,10 @@ export default function KaleidoscopeGallery() {
                   <div className="mt-3">
                     <a
                       href={submission.imageData}
-                      download={`kaleidoscope-garden-${submission.id}.png`}
+                      download={`camera-composite-${submission.id}.jpg`}
                       className="block w-full px-3 py-2 bg-gradient-to-r from-pink-600/20 to-purple-600/20 hover:from-pink-600/40 hover:to-purple-600/40 rounded-lg text-white text-sm text-center transition-all border border-pink-400/20 hover:border-pink-400/40"
                     >
-                      Download Garden
+                      Download Photo
                     </a>
                   </div>
                 </div>
