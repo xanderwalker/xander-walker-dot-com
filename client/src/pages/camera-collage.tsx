@@ -385,6 +385,41 @@ export default function CameraCollage() {
             </div>
           )}
           
+          {/* Sectional Pattern Preview */}
+          {selectedCamera && (
+            <div className="mb-8 bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20">
+              <h3 className="text-xl font-bold text-white mb-4 text-center">
+                Sectional Grid Pattern Preview
+              </h3>
+              
+              <div className="bg-gray-900 rounded-lg p-4 max-w-xs mx-auto" style={{ aspectRatio: '5/4' }}>
+                <svg className="w-full h-full" viewBox="0 0 5 4">
+                  {Array.from({ length: 20 }, (_, i) => {
+                    const col = i % 5;
+                    const row = Math.floor(i / 5);
+
+                    return (
+                      <rect
+                        key={i}
+                        x={col}
+                        y={row}
+                        width={0.95}
+                        height={0.95}
+                        fill="rgba(236, 72, 153, 0.3)"
+                        stroke="rgba(236, 72, 153, 0.8)"
+                        strokeWidth="0.02"
+                      />
+                    );
+                  })}
+                </svg>
+              </div>
+              
+              <div className="text-center mt-4 text-sm text-gray-300">
+                20 sections in optimized 5×4 grid layout
+              </div>
+            </div>
+          )}
+          
           {/* Start capture button */}
           <button
             onClick={startViewfinder}

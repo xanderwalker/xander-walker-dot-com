@@ -484,6 +484,41 @@ export default function CameraSquares() {
               </Card>
             )}
 
+            {/* Square Pattern Preview */}
+            {selectedCamera && (
+              <Card className="bg-gray-900 border-gray-700 p-6 mb-6">
+                <div className="text-center">
+                  <h3 className="text-lg font-semibold mb-4">Square Grid Pattern Preview</h3>
+                  
+                  <div className="aspect-square bg-black rounded-lg p-4 max-w-xs mx-auto">
+                    <svg className="w-full h-full" viewBox="0 0 10 10">
+                      {Array.from({ length: 100 }, (_, i) => {
+                        const col = i % 10;
+                        const row = Math.floor(i / 10);
+
+                        return (
+                          <rect
+                            key={i}
+                            x={col}
+                            y={row}
+                            width={0.9}
+                            height={0.9}
+                            fill="rgba(59, 130, 246, 0.3)"
+                            stroke="rgba(59, 130, 246, 0.8)"
+                            strokeWidth="0.02"
+                          />
+                        );
+                      })}
+                    </svg>
+                  </div>
+                  
+                  <div className="text-sm text-gray-300 mt-4">
+                    100 perfect squares in 10×10 grid
+                  </div>
+                </div>
+              </Card>
+            )}
+
             {!stream && selectedCamera && hasPermission !== false && (
               <Button 
                 onClick={() => startCamera(selectedCamera)}

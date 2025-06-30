@@ -402,6 +402,48 @@ export default function CameraHexagon() {
             </div>
           )}
           
+          {/* Hexagon Pattern Preview */}
+          <div className="mb-8 bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20">
+            <h3 className="text-xl font-bold text-white mb-4 text-center">
+              Hexagon Pattern Preview
+            </h3>
+            
+            <div className="aspect-square bg-gray-900 rounded-lg p-4 max-w-xs mx-auto">
+              <svg className="w-full h-full" viewBox="0 0 10 10">
+                {Array.from({ length: 100 }, (_, i) => {
+                  const col = i % 10;
+                  const row = Math.floor(i / 10);
+                  
+                  // Hexagon positioning
+                  const centerX = col + 0.5 + (row % 2) * 0.5; // Offset every other row for honeycomb
+                  const centerY = row * 0.85 + 0.5; // Tighter vertical spacing
+                  const radius = 0.4;
+                  
+                  const points = Array.from({ length: 6 }, (_, j) => {
+                    const angle = (j * Math.PI) / 3;
+                    const x = centerX + radius * Math.cos(angle);
+                    const y = centerY + radius * Math.sin(angle);
+                    return `${x},${y}`;
+                  }).join(' ');
+
+                  return (
+                    <polygon
+                      key={i}
+                      points={points}
+                      fill="rgba(34, 197, 94, 0.3)"
+                      stroke="rgba(34, 197, 94, 0.8)"
+                      strokeWidth="0.02"
+                    />
+                  );
+                })}
+              </svg>
+            </div>
+            
+            <div className="text-center mt-4 text-sm text-gray-300">
+              100 interlocking hexagons in honeycomb pattern
+            </div>
+          </div>
+
           <button
             onClick={startViewfinder}
             className="px-8 py-4 bg-green-600 hover:bg-green-700 rounded-lg text-white text-xl font-semibold transition-colors"

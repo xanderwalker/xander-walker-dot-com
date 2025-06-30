@@ -384,6 +384,41 @@ export default function CameraOptimal80() {
             </div>
           )}
           
+          {/* Micro-Rectangle Pattern Preview */}
+          {selectedCamera && (
+            <div className="mb-8 bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20">
+              <h3 className="text-xl font-bold text-white mb-4 text-center">
+                Micro-Rectangle Grid Pattern Preview
+              </h3>
+              
+              <div className="bg-gray-900 rounded-lg p-4 max-w-xs mx-auto" style={{ aspectRatio: '10/8' }}>
+                <svg className="w-full h-full" viewBox="0 0 10 8">
+                  {Array.from({ length: 80 }, (_, i) => {
+                    const col = i % 10;
+                    const row = Math.floor(i / 10);
+
+                    return (
+                      <rect
+                        key={i}
+                        x={col}
+                        y={row}
+                        width={0.98}
+                        height={0.98}
+                        fill="rgba(168, 85, 247, 0.3)"
+                        stroke="rgba(168, 85, 247, 0.8)"
+                        strokeWidth="0.01"
+                      />
+                    );
+                  })}
+                </svg>
+              </div>
+              
+              <div className="text-center mt-4 text-sm text-gray-300">
+                80 micro-rectangles in ultra-dense 10×8 grid
+              </div>
+            </div>
+          )}
+          
           <button
             onClick={startViewfinder}
             disabled={!selectedCamera}

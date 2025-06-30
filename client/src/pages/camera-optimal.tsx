@@ -384,6 +384,41 @@ export default function CameraOptimal() {
             </div>
           )}
           
+          {/* Rectangular Pattern Preview */}
+          {selectedCamera && (
+            <div className="mb-8 bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20">
+              <h3 className="text-xl font-bold text-white mb-4 text-center">
+                Rectangular Grid Pattern Preview
+              </h3>
+              
+              <div className="bg-gray-900 rounded-lg p-4 max-w-xs mx-auto" style={{ aspectRatio: '4/3' }}>
+                <svg className="w-full h-full" viewBox="0 0 4 3">
+                  {Array.from({ length: 12 }, (_, i) => {
+                    const col = i % 4;
+                    const row = Math.floor(i / 4);
+
+                    return (
+                      <rect
+                        key={i}
+                        x={col}
+                        y={row}
+                        width={0.95}
+                        height={0.95}
+                        fill="rgba(34, 197, 94, 0.3)"
+                        stroke="rgba(34, 197, 94, 0.8)"
+                        strokeWidth="0.02"
+                      />
+                    );
+                  })}
+                </svg>
+              </div>
+              
+              <div className="text-center mt-4 text-sm text-gray-300">
+                12 rectangles in perfect 4×3 aspect ratio grid
+              </div>
+            </div>
+          )}
+          
           <button
             onClick={startViewfinder}
             disabled={!selectedCamera}
