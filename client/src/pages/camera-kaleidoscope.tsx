@@ -10,15 +10,10 @@ interface CameraDevice {
   facing: 'user' | 'environment' | 'unknown';
 }
 
-interface Flower {
+interface CapturedPhoto {
   id: number;
-  x: number;
-  y: number;
-  vy: number;
   imageData: string;
-  rotation: number;
-  settled: boolean;
-  size: number;
+  timestamp: number;
 }
 
 export default function CameraKaleidoscope() {
@@ -27,10 +22,11 @@ export default function CameraKaleidoscope() {
   const [stream, setStream] = useState<MediaStream | null>(null);
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
   const [isCapturing, setIsCapturing] = useState(false);
-  const [flowers, setFlowers] = useState<Flower[]>([]);
-  const [screenFull, setScreenFull] = useState(false);
-  const [finalScreenshot, setFinalScreenshot] = useState<string | null>(null);
+  const [capturedPhotos, setCapturedPhotos] = useState<CapturedPhoto[]>([]);
+  const [collageReady, setCollageReady] = useState(false);
+  const [finalCollage, setFinalCollage] = useState<string | null>(null);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
+  const [captureCountdown, setCaptureCountdown] = useState<number | null>(null);
   
   const queryClient = useQueryClient();
   

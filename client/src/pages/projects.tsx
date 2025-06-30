@@ -4,11 +4,11 @@ import Layout from '../components/layout';
 export default function Projects() {
   const projects = [
     {
-      title: "CAMERA KALEIDOSCOPE",
-      description: "Live camera kaleidoscope garden creator. Takes photos every second, transforms them into beautiful kaleidoscope flowers that fall from the sky and stack up. When the screen fills with flowers, saves the final garden as a screenshot.",
-      tags: "Camera • Kaleidoscope • Art • Live Capture",
+      title: "4-PHOTO COLLAGE",
+      description: "Create unique collages from 4 consecutive photos. Each photo contributes one quarter section (top, upper-middle, lower-middle, bottom) to form a single artistic composition. Automatic capture with countdown timer.",
+      tags: "Camera • Collage • Photography • Art",
       timestamp: "June 29, 2025",
-      link: "/projects/camera-kaleidoscope"
+      link: "/projects/camera-collage"
     },
     {
       title: "KALEIDOSCOPE GALLERY",

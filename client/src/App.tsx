@@ -26,6 +26,7 @@ import SlotMachine from "@/pages/slot-machine";
 import WindChimes from "@/pages/wind-chimes";
 import TennisBallGun from "@/pages/tennis-ball-gun";
 import CameraKaleidoscope from "@/pages/camera-kaleidoscope";
+import CameraCollage from "@/pages/camera-collage";
 import KaleidoscopeGallery from "@/pages/kaleidoscope-gallery";
 import Contact from "@/pages/contact";
 import NotFound from "@/pages/not-found";
@@ -66,6 +67,7 @@ function Router() {
         <Route path="/projects/analog-clock" component={AnalogClock} />
         <Route path="/projects/trump-clock" component={TrumpClock} />
         <Route path="/projects/camera-kaleidoscope" component={CameraKaleidoscope} />
+        <Route path="/projects/camera-collage" component={CameraCollage} />
         <Route path="/projects/kaleidoscope-gallery" component={KaleidoscopeGallery} />
         <Route path="/projects/slot-machine" component={SlotMachine} />
         <Route path="/projects/wind-chimes" component={WindChimes} />
