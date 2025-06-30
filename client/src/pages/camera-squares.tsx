@@ -28,80 +28,96 @@ export default function CameraSquares() {
   const [isCapturing, setIsCapturing] = useState(false);
   const [finalCollage, setFinalCollage] = useState<string | null>(null);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
+  const [hasPermission, setHasPermission] = useState<boolean | null>(null);
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const isMobile = useIsMobile();
   const queryClient = useQueryClient();
 
-  // Get available cameras
-  useEffect(() => {
-    const getCameras = async () => {
-      try {
-        const devices = await navigator.mediaDevices.enumerateDevices();
-        const videoDevices = devices.filter(device => device.kind === 'videoinput');
+  // Initialize cameras
+  const initializeCameras = async () => {
+    try {
+      // Request camera permission first
+      await navigator.mediaDevices.getUserMedia({ video: true });
+      
+      const devices = await navigator.mediaDevices.enumerateDevices();
+      const videoDevices = devices.filter(device => device.kind === 'videoinput');
+      
+      const cameraDevices: CameraDevice[] = videoDevices.map(device => {
+        let facing: 'user' | 'environment' | 'unknown' = 'unknown';
         
-        const cameraDevices: CameraDevice[] = videoDevices.map(device => {
-          const label = device.label || `Camera ${device.deviceId.slice(0, 8)}`;
-          let facing: 'user' | 'environment' | 'unknown' = 'unknown';
-          
-          if (label.toLowerCase().includes('front') || label.toLowerCase().includes('user')) {
-            facing = 'user';
-          } else if (label.toLowerCase().includes('back') || label.toLowerCase().includes('environment')) {
-            facing = 'environment';
-          }
-          
-          return {
-            deviceId: device.deviceId,
-            label,
-            kind: device.kind,
-            facing
-          };
-        });
-
-        setCameras(cameraDevices);
-        if (cameraDevices.length > 0) {
-          setSelectedCamera(cameraDevices[0]);
+        if (device.label.toLowerCase().includes('front') || device.label.toLowerCase().includes('user')) {
+          facing = 'user';
+        } else if (device.label.toLowerCase().includes('back') || device.label.toLowerCase().includes('rear') || device.label.toLowerCase().includes('environment')) {
+          facing = 'environment';
         }
-      } catch (error) {
-        console.error('Error getting cameras:', error);
+        
+        const cameraDevice: CameraDevice = {
+          deviceId: device.deviceId,
+          label: device.label || `Camera ${videoDevices.indexOf(device) + 1}`,
+          kind: device.kind,
+          facing
+        };
+        return cameraDevice;
+      });
+      
+      setCameras(cameraDevices);
+      if (cameraDevices.length > 0 && !selectedCamera) {
+        const rearCamera = cameraDevices.find(cam => cam.facing === 'environment');
+        setSelectedCamera(rearCamera || cameraDevices[0]);
       }
-    };
+    } catch (error) {
+      console.error('Error getting cameras:', error);
+      setHasPermission(false);
+    }
+  };
 
-    getCameras();
+  useEffect(() => {
+    initializeCameras();
   }, []);
 
+  // Start camera
   const startCamera = async (camera: CameraDevice) => {
     try {
       if (stream) {
         stream.getTracks().forEach(track => track.stop());
       }
-
-      const constraints = {
-        video: {
+      
+      const mediaStream = await navigator.mediaDevices.getUserMedia({
+        video: { 
           deviceId: camera.deviceId,
           width: { ideal: 1920 },
-          height: { ideal: 1080 },
-          frameRate: { ideal: 30 }
+          height: { ideal: 1080 }
         }
-      };
-
-      const newStream = await navigator.mediaDevices.getUserMedia(constraints);
-      setStream(newStream);
-
+      });
+      
+      setStream(mediaStream);
+      setHasPermission(true);
+      
       if (videoRef.current) {
-        videoRef.current.srcObject = newStream;
+        videoRef.current.srcObject = mediaStream;
       }
     } catch (error) {
       console.error('Error starting camera:', error);
+      setHasPermission(false);
     }
   };
 
   useEffect(() => {
-    if (selectedCamera) {
+    if (selectedCamera && hasPermission !== false) {
       startCamera(selectedCamera);
     }
-  }, [selectedCamera]);
+  }, [selectedCamera, hasPermission]);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+      }
+    };
+  }, [stream]);
 
   const capturePhoto = useCallback(() => {
     if (!videoRef.current || !canvasRef.current || !stream) return '';
@@ -428,8 +444,22 @@ export default function CameraSquares() {
               Click the shutter button to automatically capture 100 photos in sequence (100 per second). Each photo contributes one square section to create a perfect 10x10 grid composite.
             </p>
             
+            {hasPermission === false && (
+              <div className="text-center mb-8">
+                <p className="text-red-400 mb-4">Camera permission is required</p>
+                <Button 
+                  onClick={initializeCameras}
+                  size="lg"
+                  className="bg-blue-600 hover:bg-blue-700"
+                >
+                  <Camera className="w-6 h-6 mr-2" />
+                  Grant Camera Permission
+                </Button>
+              </div>
+            )}
+            
             {/* Camera selection */}
-            {cameras.length > 0 && (
+            {cameras.length > 0 && hasPermission !== false && (
               <Card className="bg-gray-900 border-gray-700 p-6 mb-6">
                 <div className="flex flex-col items-center gap-4">
                   <h3 className="text-lg font-semibold">Select Camera</h3>
@@ -455,7 +485,7 @@ export default function CameraSquares() {
               </Card>
             )}
 
-            {!stream && selectedCamera && (
+            {!stream && selectedCamera && hasPermission !== false && (
               <Button 
                 onClick={() => startCamera(selectedCamera)}
                 size="lg"
