@@ -25,6 +25,7 @@ export default function CameraCollage() {
   const [finalCollage, setFinalCollage] = useState<string | null>(null);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
   const [showViewfinder, setShowViewfinder] = useState(false);
+  const [isCapturingSequence, setIsCapturingSequence] = useState(false);
   
   const queryClient = useQueryClient();
   
@@ -229,25 +230,47 @@ export default function CameraCollage() {
     setCapturedPhotos([]);
   };
 
-  // Take single photo manually
-  const capturePhoto = () => {
-    const photoData = takePhoto();
-    if (photoData) {
-      const newPhoto: CapturedPhoto = {
-        id: capturedPhotos.length,
-        imageData: photoData,
-        timestamp: Date.now()
-      };
-      
-      const updatedPhotos = [...capturedPhotos, newPhoto];
-      setCapturedPhotos(updatedPhotos);
-      
-      // Check if we have 4 photos
-      if (updatedPhotos.length === 4) {
-        setShowViewfinder(false);
-        createCollage(updatedPhotos);
+  // Take all 4 photos in sequence
+  const captureAllPhotos = () => {
+    setCapturedPhotos([]);
+    setIsCapturingSequence(true);
+    let photoCount = 0;
+    
+    const captureSequence = () => {
+      const photoData = takePhoto();
+      if (photoData) {
+        const newPhoto: CapturedPhoto = {
+          id: photoCount,
+          imageData: photoData,
+          timestamp: Date.now()
+        };
+        
+        setCapturedPhotos(prev => {
+          const updated = [...prev, newPhoto];
+          
+          // If we have all 4 photos, create collage
+          if (updated.length === 4) {
+            setIsCapturingSequence(false);
+            setTimeout(() => {
+              setShowViewfinder(false);
+              createCollage(updated);
+            }, 500); // Brief delay to show final photo
+          }
+          
+          return updated;
+        });
+        
+        photoCount++;
+        
+        // Continue capturing if we need more photos
+        if (photoCount < 4) {
+          setTimeout(captureSequence, 1000); // 1 second between photos
+        }
       }
-    }
+    };
+    
+    // Start the sequence
+    captureSequence();
   };
 
   // Cleanup
@@ -325,7 +348,7 @@ export default function CameraCollage() {
         <div className="flex flex-col items-center justify-center min-h-screen p-8">
           <h1 className="text-4xl font-bold mb-8 text-center">4-Photo Collage</h1>
           <p className="text-xl mb-8 text-center max-w-2xl">
-            Create a unique collage from 4 consecutive photos. Each photo contributes one quarter (top, upper-middle, lower-middle, bottom) to the final collage.
+            Click the shutter button to automatically capture 4 photos in sequence (one per second). Each photo contributes one quarter section to create a unique collage.
           </p>
           
           {/* Camera selection */}
@@ -414,14 +437,41 @@ export default function CameraCollage() {
 
             {/* Bottom controls */}
             <div className="absolute bottom-8 left-0 right-0 flex justify-center pointer-events-auto">
-              <button
-                onClick={capturePhoto}
-                className="w-20 h-20 bg-white border-4 border-gray-300 rounded-full hover:bg-gray-100 transition-all duration-200 shadow-lg"
-                style={{ boxShadow: '0 0 0 4px rgba(255,255,255,0.3)' }}
-              >
-                <div className="w-full h-full bg-white rounded-full border-2 border-gray-400"></div>
-              </button>
+              <div className="text-center">
+                {isCapturingSequence && (
+                  <div className="text-white text-lg mb-4 font-semibold">
+                    Taking photo {capturedPhotos.length + 1} of 4...
+                  </div>
+                )}
+                <button
+                  onClick={captureAllPhotos}
+                  disabled={isCapturingSequence}
+                  className={`w-20 h-20 border-4 border-gray-300 rounded-full transition-all duration-200 shadow-lg ${
+                    isCapturingSequence 
+                      ? 'bg-gray-400 cursor-not-allowed' 
+                      : 'bg-white hover:bg-gray-100'
+                  }`}
+                  style={{ boxShadow: '0 0 0 4px rgba(255,255,255,0.3)' }}
+                >
+                  <div className={`w-full h-full rounded-full border-2 ${
+                    isCapturingSequence 
+                      ? 'bg-gray-400 border-gray-500' 
+                      : 'bg-white border-gray-400'
+                  }`}></div>
+                </button>
+              </div>
             </div>
+
+            {/* Flash effect overlay when taking photo */}
+            {isCapturingSequence && (
+              <div 
+                className="absolute inset-0 bg-white pointer-events-none"
+                style={{
+                  opacity: capturedPhotos.length > 0 ? 0 : 0.7,
+                  transition: 'opacity 0.1s ease-out'
+                }}
+              />
+            )}
           </div>
         </div>
       )}
