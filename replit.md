@@ -137,6 +137,8 @@ Changelog:
 - June 30, 2025. Created optimal camera utilization system with 16×9 rectangles - maximum efficiency camera capturing 144 photos in perfect 16:9 aspect ratio grid (16 cols × 9 rows) at 143fps. Each rectangle fills exactly 1/144th of frame with zero waste, matching natural camera aspect ratios for maximum sensor utilization. Features real-time grid fill visualization showing captured sections in green, current capture rectangle blinking yellow, and live viewfinder with progress overlay during ultra-fast capture sequence.
 - June 30, 2025. Updated typography across all projects to serif fonts (Times New Roman, Georgia) matching Internet Archive styling for classic, readable appearance. Applied globally through CSS and Tailwind configuration.
 - June 30, 2025. Reorganized camera systems to show most recent first - Optimal Camera Utilization now featured at top, followed by Square Grid, Hexagonal Collage, and Sectional Collage systems.
+- June 30, 2025. Enhanced all camera systems with live viewfinder overlays - added real-time capture progress visualization to all cameras showing captured (color-coded), current (yellow), and upcoming (white outline) sections during photo sequences.
+- June 30, 2025. Renamed camera systems for better organization - "Hybrid Tessellation Camera" (hex-square), "Ultra-Detail Micro Camera" (80-photo), "Aspect Ratio Camera" (12-photo), "Rapid Square Camera" (100 squares), "Honeycomb Pattern Camera" (hexagons), "Sectional Grid Camera" (20-photo collage).
 ```
 
 ## User Preferences

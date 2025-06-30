@@ -4,44 +4,44 @@ import Layout from '../components/layout';
 export default function Cameras() {
   const cameras = [
     {
-      title: "64-PHOTO HEX-SQUARE HYBRID", 
-      description: "Innovative tessellation combining hexagonal and square patterns in an 8×8 alternating grid. Creates stunning geometric composites with natural honeycomb-square hybrid tessellation.",
-      tags: "64 Photos • 8fps • Hex-Square Pattern • Geometric Hybrid",
+      title: "HYBRID TESSELLATION CAMERA", 
+      description: "Advanced geometric patterns combining hexagonal and square shapes in an alternating 8×8 grid. Creates stunning dual-pattern composites with perfect tessellation symmetry.",
+      tags: "64 Photos • 8fps • Hex-Square Hybrid • Advanced Geometry",
       timestamp: "June 30, 2025",
       link: "/projects/camera-hex-square"
     },
     {
-      title: "80-PHOTO MAXIMUM DETAIL", 
-      description: "Ultra-high resolution tessellation capturing 80 photos in a 10×8 grid at 8fps. Each micro-rectangle contributes precise detail for the most comprehensive composite image possible.",
-      tags: "80 Photos • 8fps • 10×8 Grid • Maximum Detail",
+      title: "ULTRA-DETAIL MICRO CAMERA", 
+      description: "Maximum resolution capture system with micro-rectangle tessellation in a dense 10×8 grid. Each tiny section contributes precise detail for ultra-high definition composites.",
+      tags: "80 Photos • 8fps • Micro-Rectangles • Ultra Resolution",
       timestamp: "June 30, 2025",
       link: "/projects/camera-optimal-80"
     },
     {
-      title: "12-PHOTO OPTIMAL UTILIZATION", 
-      description: "Perfect aspect ratio system capturing 12 photos in 4×3 rectangles. Each section maintains camera's natural proportions with no distortion, creating clean composite images.",
-      tags: "12 Photos • 4fps • 4×3 Grid • Perfect Aspect Ratio",
+      title: "ASPECT RATIO CAMERA", 
+      description: "Perfect proportional capture maintaining camera's natural 4×3 aspect ratio. No distortion, clean rectangular sections that preserve original image quality and composition.",
+      tags: "12 Photos • 4fps • 4×3 Rectangles • No Distortion",
       timestamp: "June 30, 2025",
       link: "/projects/camera-optimal"
     },
     {
-      title: "100-SHOT SQUARE GRID", 
-      description: "Ultra-fast capture system taking 100 photos in 1 second. Creates perfect 10x10 grid composite images where each photo contributes one square section with no gaps between sections.",
-      tags: "100 Photos • 100fps • Perfect Grid • Square Sections",
+      title: "RAPID SQUARE CAMERA", 
+      description: "Ultra-fast burst mode creating perfect square tessellations at maximum speed. Captures 100 photos in 1 second for dynamic action sequences and motion studies.",
+      tags: "100 Photos • 100fps • Square Grid • Burst Mode",
       timestamp: "June 30, 2025",
       link: "/projects/camera-squares"
     },
     {
-      title: "100-SHOT HEXAGONAL COLLAGE", 
-      description: "Ultra-fast capture system taking 100 photos in 1 second. Creates interlocking honeycomb composite images where each photo contributes one hexagonal section with no gaps between sections.",
-      tags: "100 Photos • 100fps • Interlocking Hexagons • Honeycomb Pattern",
+      title: "HONEYCOMB PATTERN CAMERA", 
+      description: "Natural hexagonal tessellation inspired by bee hive structures. Creates organic honeycomb patterns with interlocking hexagons for artistic geometric compositions.",
+      tags: "100 Photos • 100fps • Hexagon Grid • Natural Patterns",
       timestamp: "June 30, 2025",
       link: "/projects/camera-hexagon"
     },
     {
-      title: "20-PHOTO SECTIONAL COLLAGE",
-      description: "High-speed capture system that takes 20 photos in 5 seconds. Each photo contributes one specific grid section to create a seamless composite image with square sections.",
-      tags: "20 Photos • 4fps • Square Grid • 5x4 Layout",
+      title: "SECTIONAL GRID CAMERA",
+      description: "Classic grid-based capture system dividing the frame into equal rectangular sections. Reliable 5×4 layout perfect for balanced compositions and portrait photography.",
+      tags: "20 Photos • 4fps • Rectangular Grid • Classic Layout",
       timestamp: "June 30, 2025",
       link: "/projects/camera-collage"
     }

@@ -267,7 +267,7 @@ export default function CameraHexSquare() {
 
   if (showGallery && finalComposite) {
     return (
-      <Layout title="64-PHOTO HEX-SQUARE COMPOSITE">
+      <Layout title="HYBRID TESSELLATION CAMERA">
         <div className="min-h-screen bg-black text-white p-4">
           <div className="max-w-4xl mx-auto text-center">
             <h1 className="text-3xl font-bold mb-6" style={{ fontFamily: 'Georgia, "Times New Roman", Times, serif' }}>
@@ -309,15 +309,15 @@ export default function CameraHexSquare() {
   }
 
   return (
-    <Layout title="64-PHOTO HEX-SQUARE CAMERA">
+    <Layout title="HYBRID TESSELLATION CAMERA">
       <div className="min-h-screen bg-black text-white">
         <div className="max-w-6xl mx-auto p-4">
           <div className="text-center mb-6">
             <h1 className="text-4xl font-bold mb-2" style={{ fontFamily: 'Georgia, "Times New Roman", Times, serif' }}>
-              64-PHOTO HEX-SQUARE COMPOSITE
+              HYBRID TESSELLATION CAMERA
             </h1>
             <p className="text-gray-300 text-lg" style={{ fontFamily: 'Georgia, "Times New Roman", Times, serif' }}>
-              Alternating hexagonal and square tessellation pattern
+              Advanced geometric patterns combining hexagonal and square shapes
             </p>
           </div>
 

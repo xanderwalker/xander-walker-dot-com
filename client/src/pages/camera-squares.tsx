@@ -290,7 +290,7 @@ export default function CameraSquares() {
   };
 
   return (
-    <Layout>
+    <Layout title="RAPID SQUARE CAMERA">
       <div className="relative min-h-screen bg-black text-white overflow-hidden">
         
         {/* Live viewfinder */}
