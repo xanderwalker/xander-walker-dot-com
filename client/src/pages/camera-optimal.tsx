@@ -1,11 +1,6 @@
-import { useState, useRef, useCallback, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { Link } from 'wouter';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useIsMobile } from '@/hooks/use-mobile';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { Camera, Download, Grid3X3, Square } from 'lucide-react';
-import type { KaleidoscopeSubmission } from '@shared/schema';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 interface CameraDevice {
   deviceId: string;
@@ -24,31 +19,48 @@ export default function CameraOptimal() {
   const [cameras, setCameras] = useState<CameraDevice[]>([]);
   const [selectedCamera, setSelectedCamera] = useState<CameraDevice | null>(null);
   const [stream, setStream] = useState<MediaStream | null>(null);
-  const [capturedPhotos, setCapturedPhotos] = useState<CapturedPhoto[]>([]);
+  const [hasPermission, setHasPermission] = useState<boolean | null>(null);
   const [isCapturing, setIsCapturing] = useState(false);
+  const [capturedPhotos, setCapturedPhotos] = useState<CapturedPhoto[]>([]);
   const [finalCollage, setFinalCollage] = useState<string | null>(null);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
-  const [hasPermission, setHasPermission] = useState<boolean | null>(null);
   const [showViewfinder, setShowViewfinder] = useState(false);
   const [isCapturingSequence, setIsCapturingSequence] = useState(false);
-
+  
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const isMobile = useIsMobile();
+  const captureTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const queryClient = useQueryClient();
-
-  // Optimal grid dimensions for 4:3 aspect ratio (simplified for testing)
-  const GRID_COLS = 4;
-  const GRID_ROWS = 3;
-  const TOTAL_PHOTOS = GRID_COLS * GRID_ROWS; // 12 photos
+  
+  const saveSubmissionMutation = useMutation({
+    mutationFn: async (data: { imageData: string; flowerCount: number }) => {
+      const response = await fetch('/api/kaleidoscope-submissions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to save submission');
+      }
+      
+      return response.json();
+    },
+    onSuccess: () => {
+      setSaveStatus('saved');
+      queryClient.invalidateQueries({ queryKey: ['/api/kaleidoscope-submissions'] });
+    },
+    onError: (error) => {
+      console.error('Save submission error:', error);
+      setSaveStatus('error');
+    },
+  });
 
   // Initialize cameras
   const initializeCameras = async () => {
     try {
-      // Request camera permission first
-      const tempStream = await navigator.mediaDevices.getUserMedia({ video: true });
-      tempStream.getTracks().forEach(track => track.stop()); // Stop temp stream
-      
       const devices = await navigator.mediaDevices.enumerateDevices();
       const videoDevices = devices.filter(device => device.kind === 'videoinput');
       
@@ -78,14 +90,10 @@ export default function CameraOptimal() {
         setSelectedCamera(rearCamera || cameraDevices[0]);
       }
     } catch (error) {
-      console.error('Error getting cameras:', error);
+      console.error('Error initializing cameras:', error);
       setHasPermission(false);
     }
   };
-
-  useEffect(() => {
-    initializeCameras();
-  }, []);
 
   // Start camera
   const startCamera = async (camera: CameraDevice) => {
@@ -103,7 +111,6 @@ export default function CameraOptimal() {
       });
       
       setStream(mediaStream);
-      setHasPermission(true);
       
       if (videoRef.current) {
         videoRef.current.srcObject = mediaStream;
@@ -113,139 +120,6 @@ export default function CameraOptimal() {
       setHasPermission(false);
     }
   };
-
-  // Connect stream to video element when stream changes
-  useEffect(() => {
-    if (stream && videoRef.current) {
-      videoRef.current.srcObject = stream;
-    }
-  }, [stream]);
-
-  // Cleanup on unmount
-  useEffect(() => {
-    return () => {
-      if (stream) {
-        stream.getTracks().forEach(track => track.stop());
-      }
-    };
-  }, [stream]);
-
-  const capturePhoto = useCallback(() => {
-    if (!videoRef.current || !canvasRef.current || !stream) return '';
-    
-    const video = videoRef.current;
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext('2d')!;
-    
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-    
-    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-    
-    return canvas.toDataURL('image/jpeg', 0.9);
-  }, [stream]);
-
-  // Create optimal rectangular grid collage from 144 photos (16x9 grid)
-  const createOptimalCollage = useCallback((photos: CapturedPhoto[]) => {
-    if (photos.length !== TOTAL_PHOTOS || !canvasRef.current) return;
-    
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext('2d')!;
-    
-    // Use 4:3 aspect ratio for optimal output
-    const collageWidth = 1200;
-    const collageHeight = 900;
-    canvas.width = collageWidth;
-    canvas.height = collageHeight;
-    
-    ctx.fillStyle = '#000';
-    ctx.fillRect(0, 0, collageWidth, collageHeight);
-    
-    // Calculate perfect rectangle dimensions
-    const rectWidth = collageWidth / GRID_COLS;
-    const rectHeight = collageHeight / GRID_ROWS;
-    
-    let loadedCount = 0;
-    
-    photos.forEach((photo, index) => {
-      const img = new Image();
-      img.onload = () => {
-        const col = index % GRID_COLS;
-        const row = Math.floor(index / GRID_COLS);
-        
-        // Calculate source section from the photo (matching grid position)
-        const sourceWidth = img.width / GRID_COLS;
-        const sourceHeight = img.height / GRID_ROWS;
-        const sourceX = col * sourceWidth;
-        const sourceY = row * sourceHeight;
-        
-        // Calculate destination position (perfect grid with no gaps)
-        const destX = col * rectWidth;
-        const destY = row * rectHeight;
-        
-        // Draw the photo section as a perfect rectangle
-        ctx.drawImage(
-          img,
-          sourceX, sourceY, sourceWidth, sourceHeight,
-          destX, destY, rectWidth, rectHeight
-        );
-        
-        loadedCount++;
-        if (loadedCount === TOTAL_PHOTOS) {
-          const collageData = canvas.toDataURL('image/jpeg', 0.9);
-          
-          console.log('Collage completed, saving and returning to viewfinder...');
-          
-          setSaveStatus('saving');
-          
-          saveSubmissionMutation.mutate({
-            imageData: collageData,
-            flowerCount: TOTAL_PHOTOS
-          });
-          
-          // Clear captured photos and reset after short delay
-          setTimeout(() => {
-            setCapturedPhotos([]);
-            setSaveStatus('saved');
-            console.log('Returned to viewfinder');
-            
-            // Clear saved status after another delay
-            setTimeout(() => {
-              setSaveStatus('idle');
-            }, 2000);
-          }, 1000);
-        }
-      };
-      img.src = photo.imageData;
-    });
-  }, [stream, TOTAL_PHOTOS, GRID_COLS, GRID_ROWS]);
-
-  const { data: submissions = [] } = useQuery<KaleidoscopeSubmission[]>({
-    queryKey: ['/api/kaleidoscope-submissions'],
-  });
-
-  const saveSubmissionMutation = useMutation({
-    mutationFn: async (data: { imageData: string; flowerCount: number }) => {
-      const response = await fetch('/api/kaleidoscope-submissions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-      });
-      if (!response.ok) {
-        throw new Error('Failed to save submission');
-      }
-      return response.json();
-    },
-    onSuccess: () => {
-      setSaveStatus('saved');
-      queryClient.invalidateQueries({ queryKey: ['/api/kaleidoscope-submissions'] });
-    },
-    onError: () => {
-      setSaveStatus('error');
-    },
-  });
 
   // Take a photo
   const takePhoto = useCallback(() => {
@@ -264,16 +138,13 @@ export default function CameraOptimal() {
   }, []);
 
   // Start viewfinder mode
-  const startViewfinder = async () => {
-    if (selectedCamera) {
-      await startCamera(selectedCamera);
-    }
+  const startViewfinder = () => {
     setShowViewfinder(true);
     setIsCapturing(true);
     setCapturedPhotos([]);
   };
 
-  // Take all 12 photos in sequence
+  // Take all 12 photos in sequence for 4×3 rectangular grid
   const captureAllPhotos = () => {
     setCapturedPhotos([]);
     setIsCapturingSequence(true);
@@ -291,13 +162,11 @@ export default function CameraOptimal() {
         setCapturedPhotos(prev => {
           const updated = [...prev, newPhoto];
           
-          console.log(`Captured photo ${updated.length}/${TOTAL_PHOTOS}`);
-          
-          if (updated.length === TOTAL_PHOTOS) {
+          if (updated.length === 12) {
             setIsCapturingSequence(false);
             setTimeout(() => {
               setShowViewfinder(false);
-              createOptimalCollage(updated);
+              createRectangularCollage(updated);
             }, 500);
           }
           
@@ -306,7 +175,7 @@ export default function CameraOptimal() {
         
         photoCount++;
         
-        if (photoCount < TOTAL_PHOTOS) {
+        if (photoCount < 12) {
           setTimeout(captureSequence, 250); // 4 fps for easier testing
         }
       }
@@ -315,25 +184,63 @@ export default function CameraOptimal() {
     captureSequence();
   };
 
-  const downloadImage = () => {
-    if (!finalCollage) return;
+  // Create 4×3 rectangular grid collage from 12 photos
+  const createRectangularCollage = useCallback((photos: CapturedPhoto[]) => {
+    if (photos.length !== 12 || !canvasRef.current) return;
     
-    const link = document.createElement('a');
-    link.download = `optimal-collage-${Date.now()}.jpg`;
-    link.href = finalCollage;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
-
-  const resetCamera = () => {
-    setCapturedPhotos([]);
-    setFinalCollage(null);
-    setSaveStatus('idle');
-    if (selectedCamera) {
-      startCamera(selectedCamera);
-    }
-  };
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext('2d')!;
+    
+    // Create 4:3 aspect ratio canvas
+    const collageWidth = 1200;
+    const collageHeight = 900; // 4:3 ratio
+    canvas.width = collageWidth;
+    canvas.height = collageHeight;
+    
+    ctx.fillStyle = '#000';
+    ctx.fillRect(0, 0, collageWidth, collageHeight);
+    
+    // 4×3 grid layout
+    const cols = 4;
+    const rows = 3;
+    const rectWidth = collageWidth / cols;  // 300px each
+    const rectHeight = collageHeight / rows; // 300px each
+    
+    let loadedCount = 0;
+    
+    photos.forEach((photo, index) => {
+      const img = new Image();
+      img.onload = () => {
+        const col = index % cols;
+        const row = Math.floor(index / cols);
+        
+        // Calculate destination rectangle position
+        const destX = col * rectWidth;
+        const destY = row * rectHeight;
+        
+        // Draw the photo to fill the entire rectangle
+        ctx.drawImage(
+          img,
+          0, 0, img.width, img.height,
+          destX, destY, rectWidth, rectHeight
+        );
+        
+        loadedCount++;
+        if (loadedCount === 12) {
+          const collageData = canvas.toDataURL('image/jpeg', 0.9);
+          setFinalCollage(collageData);
+          
+          // Save to gallery
+          setSaveStatus('saving');
+          saveSubmissionMutation.mutate({
+            imageData: collageData,
+            flowerCount: 12
+          });
+        }
+      };
+      img.src = photo.imageData;
+    });
+  }, [saveSubmissionMutation]);
 
   // Initialize cameras on mount
   useEffect(() => {
@@ -342,16 +249,19 @@ export default function CameraOptimal() {
 
   // Start camera when selected camera changes
   useEffect(() => {
-    if (selectedCamera && hasPermission && !stream) {
+    if (selectedCamera && hasPermission) {
       startCamera(selectedCamera);
     }
-  }, [selectedCamera, hasPermission, stream]);
+  }, [selectedCamera, hasPermission]);
 
   // Cleanup
   useEffect(() => {
     return () => {
       if (stream) {
         stream.getTracks().forEach(track => track.stop());
+      }
+      if (captureTimeoutRef.current) {
+        clearInterval(captureTimeoutRef.current);
       }
     };
   }, [stream]);
@@ -371,7 +281,7 @@ export default function CameraOptimal() {
       <div className="min-h-screen bg-black text-white flex items-center justify-center">
         <div className="text-center max-w-md mx-4">
           <h2 className="text-2xl font-bold mb-4">Camera Access Required</h2>
-          <p className="mb-6">This app needs camera access to create optimal collages. Please enable camera permissions and refresh the page.</p>
+          <p className="mb-6">This app needs camera access to create rectangular collages. Please enable camera permissions and refresh the page.</p>
           <Link href="/projects/cameras">
             <button className="px-6 py-3 bg-blue-600 hover:bg-blue-700 rounded-lg text-white font-semibold transition-colors">
               Back to Cameras
@@ -417,9 +327,9 @@ export default function CameraOptimal() {
       {/* Camera selection and controls */}
       {!isCapturing && !finalCollage && (
         <div className="flex flex-col items-center justify-center min-h-screen p-8">
-          <h1 className="text-4xl font-bold mb-8 text-center">12-Photo Optimal Collage</h1>
+          <h1 className="text-4xl font-bold mb-8 text-center">12-Photo Rectangular Collage</h1>
           <p className="text-xl mb-8 text-center max-w-2xl">
-            Click the shutter button to automatically capture 12 photos in sequence (4 per second). Each photo contributes one rectangle to create a seamless 4×3 grid composite with maximum camera sensor utilization.
+            Click the shutter button to automatically capture 12 photos in sequence (4 per second). Each photo fills one rectangle in a perfect 4×3 grid layout for optimal space utilization.
           </p>
           
           {/* Camera selection */}
@@ -457,11 +367,11 @@ export default function CameraOptimal() {
       {/* Viewfinder mode */}
       {showViewfinder && (
         <div className="absolute inset-0 z-10">
-          {/* Grid overlay for preview */}
+          {/* Grid overlay showing 4×3 layout */}
           <div className="absolute inset-0 pointer-events-none">
             <svg className="w-full h-full" viewBox="0 0 4 3" preserveAspectRatio="none">
-              {/* 4x3 grid lines */}
-              {Array.from({ length: GRID_COLS - 1 }, (_, i) => (
+              {/* Vertical grid lines */}
+              {Array.from({ length: 3 }, (_, i) => (
                 <line
                   key={`v${i}`}
                   x1={i + 1}
@@ -473,7 +383,8 @@ export default function CameraOptimal() {
                   vectorEffect="non-scaling-stroke"
                 />
               ))}
-              {Array.from({ length: GRID_ROWS - 1 }, (_, i) => (
+              {/* Horizontal grid lines */}
+              {Array.from({ length: 2 }, (_, i) => (
                 <line
                   key={`h${i}`}
                   x1="0"
@@ -493,7 +404,7 @@ export default function CameraOptimal() {
             <div className="text-center">
               {isCapturingSequence && (
                 <div className="text-white text-lg mb-4 font-semibold">
-                  Taking photo {capturedPhotos.length + 1} of {TOTAL_PHOTOS}...
+                  Taking photo {capturedPhotos.length + 1} of 12...
                 </div>
               )}
               <button
@@ -520,12 +431,12 @@ export default function CameraOptimal() {
       {/* Final collage display */}
       {finalCollage && (
         <div className="min-h-screen bg-black text-white flex flex-col items-center justify-center p-8">
-          <h1 className="text-4xl font-bold mb-8 text-center">Optimal Collage Complete!</h1>
+          <h1 className="text-4xl font-bold mb-8 text-center">Rectangular Collage Complete!</h1>
           
           <div className="mb-8 max-w-4xl">
             <img 
               src={finalCollage} 
-              alt="Optimal collage"
+              alt="Rectangular collage"
               className="w-full h-auto rounded-lg shadow-2xl"
             />
           </div>
@@ -534,7 +445,7 @@ export default function CameraOptimal() {
             <div className="flex gap-4">
               <a
                 href={finalCollage}
-                download="optimal-collage.jpg"
+                download="rectangular-collage.jpg"
                 className="px-6 py-3 bg-green-600 hover:bg-green-700 rounded-lg text-white font-semibold transition-colors"
               >
                 Download Collage
