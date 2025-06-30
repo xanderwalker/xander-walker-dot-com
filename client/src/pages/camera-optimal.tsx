@@ -192,19 +192,28 @@ export default function CameraOptimal() {
         if (loadedCount === TOTAL_PHOTOS) {
           const collageData = canvas.toDataURL('image/jpeg', 0.9);
           
+          console.log('Collage completed, saving and returning to viewfinder...');
+          
+          // Immediately stop capturing state
+          setIsCapturing(false);
           setSaveStatus('saving');
+          
           saveSubmissionMutation.mutate({
             imageData: collageData,
             flowerCount: TOTAL_PHOTOS
           });
           
-          // Auto-return to viewfinder after short delay
+          // Clear captured photos and reset after short delay
           setTimeout(() => {
             setCapturedPhotos([]);
-            setIsCapturing(false);
-            setSaveStatus('idle');
-            // Keep camera stream running for next photo
-          }, 2000);
+            setSaveStatus('saved');
+            console.log('Returned to viewfinder');
+            
+            // Clear saved status after another delay
+            setTimeout(() => {
+              setSaveStatus('idle');
+            }, 2000);
+          }, 1000);
         }
       };
       img.src = photo.imageData;
@@ -263,8 +272,11 @@ export default function CameraOptimal() {
         setCapturedPhotos(prev => {
           const updated = [...prev, newPhoto];
           
+          console.log(`Captured photo ${updated.length}/${TOTAL_PHOTOS}`);
+          
           // Create collage when we have all photos
           if (updated.length === TOTAL_PHOTOS) {
+            console.log('All photos captured, creating collage...');
             setTimeout(() => createOptimalCollage(updated), 100);
           }
           
