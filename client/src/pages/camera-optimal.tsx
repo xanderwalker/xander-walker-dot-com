@@ -379,20 +379,100 @@ export default function CameraOptimal() {
           </div>
         )}
 
-        {/* Capturing progress */}
+        {/* Capturing progress with real-time grid fill */}
         {isCapturing && (
-          <div className="fixed inset-0 z-30 bg-black flex items-center justify-center">
-            <div className="text-center">
-              <div className="text-6xl font-bold mb-4">{capturedPhotos.length}</div>
-              <div className="text-2xl mb-8">/ {TOTAL_PHOTOS} RECTANGLES</div>
+          <div className="fixed inset-0 z-30">
+            {/* Video continues in background */}
+            <video
+              ref={videoRef}
+              autoPlay
+              playsInline
+              muted
+              className="w-full h-full object-cover opacity-50"
+            />
+            
+            {/* Real-time grid visualization */}
+            <div className="absolute inset-0 pointer-events-none">
+              <svg className="w-full h-full" viewBox="0 0 16 9" preserveAspectRatio="none">
+                {/* Grid lines */}
+                {Array.from({ length: GRID_COLS - 1 }, (_, i) => (
+                  <line
+                    key={`v${i}`}
+                    x1={i + 1}
+                    y1="0"
+                    x2={i + 1}
+                    y2="9"
+                    stroke="rgba(255,255,255,0.3)"
+                    strokeWidth="0.02"
+                    vectorEffect="non-scaling-stroke"
+                  />
+                ))}
+                {Array.from({ length: GRID_ROWS - 1 }, (_, i) => (
+                  <line
+                    key={`h${i}`}
+                    x1="0"
+                    y1={i + 1}
+                    x2="16"
+                    y2={i + 1}
+                    stroke="rgba(255,255,255,0.3)"
+                    strokeWidth="0.02"
+                    vectorEffect="non-scaling-stroke"
+                  />
+                ))}
+                
+                {/* Filled rectangles */}
+                {capturedPhotos.map((photo, index) => {
+                  const col = index % GRID_COLS;
+                  const row = Math.floor(index / GRID_COLS);
+                  return (
+                    <rect
+                      key={photo.id}
+                      x={col}
+                      y={row}
+                      width="1"
+                      height="1"
+                      fill="rgba(0,255,0,0.4)"
+                      stroke="rgba(0,255,0,0.8)"
+                      strokeWidth="0.02"
+                      vectorEffect="non-scaling-stroke"
+                    />
+                  );
+                })}
+                
+                {/* Current capture rectangle (blinking) */}
+                {capturedPhotos.length < TOTAL_PHOTOS && (() => {
+                  const currentIndex = capturedPhotos.length;
+                  const col = currentIndex % GRID_COLS;
+                  const row = Math.floor(currentIndex / GRID_COLS);
+                  return (
+                    <rect
+                      x={col}
+                      y={row}
+                      width="1"
+                      height="1"
+                      fill="rgba(255,255,0,0.6)"
+                      stroke="rgba(255,255,0,1)"
+                      strokeWidth="0.04"
+                      vectorEffect="non-scaling-stroke"
+                      className="animate-pulse"
+                    />
+                  );
+                })()}
+              </svg>
+            </div>
+            
+            {/* Progress overlay */}
+            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center bg-black/70 p-8 rounded-lg">
+              <div className="text-6xl font-bold mb-4 text-green-400">{capturedPhotos.length}</div>
+              <div className="text-2xl mb-8 text-white">/ {TOTAL_PHOTOS} RECTANGLES</div>
               <div className="w-64 h-2 bg-gray-800 rounded-full overflow-hidden">
                 <div 
-                  className="h-full bg-blue-500 transition-all duration-100"
+                  className="h-full bg-green-500 transition-all duration-100"
                   style={{ width: `${(capturedPhotos.length / TOTAL_PHOTOS) * 100}%` }}
                 />
               </div>
-              <div className="text-lg mt-4">Capturing at ~143fps...</div>
-              <div className="text-sm mt-2 opacity-75">Maximum camera utilization</div>
+              <div className="text-lg mt-4 text-white">Capturing at ~143fps...</div>
+              <div className="text-sm mt-2 opacity-75 text-gray-300">Filling grid in real-time</div>
             </div>
           </div>
         )}
