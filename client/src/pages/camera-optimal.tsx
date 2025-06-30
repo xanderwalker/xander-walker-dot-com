@@ -247,8 +247,27 @@ export default function CameraOptimal() {
     },
   });
 
+  // Take a photo
+  const takePhoto = useCallback(() => {
+    if (!videoRef.current || !canvasRef.current) return null;
+    
+    const video = videoRef.current;
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext('2d')!;
+    
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    
+    ctx.drawImage(video, 0, 0);
+    
+    return canvas.toDataURL('image/jpeg', 0.9);
+  }, []);
+
   // Start viewfinder mode
-  const startViewfinder = () => {
+  const startViewfinder = async () => {
+    if (selectedCamera) {
+      await startCamera(selectedCamera);
+    }
     setShowViewfinder(true);
     setIsCapturing(true);
     setCapturedPhotos([]);
@@ -261,7 +280,7 @@ export default function CameraOptimal() {
     let photoCount = 0;
     
     const captureSequence = () => {
-      const photoData = capturePhoto();
+      const photoData = takePhoto();
       if (photoData) {
         const newPhoto: CapturedPhoto = {
           id: photoCount,
@@ -315,6 +334,27 @@ export default function CameraOptimal() {
       startCamera(selectedCamera);
     }
   };
+
+  // Initialize cameras on mount
+  useEffect(() => {
+    initializeCameras();
+  }, []);
+
+  // Start camera when selected camera changes
+  useEffect(() => {
+    if (selectedCamera && hasPermission && !stream) {
+      startCamera(selectedCamera);
+    }
+  }, [selectedCamera, hasPermission, stream]);
+
+  // Cleanup
+  useEffect(() => {
+    return () => {
+      if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+      }
+    };
+  }, [stream]);
 
   if (hasPermission === null) {
     return (
