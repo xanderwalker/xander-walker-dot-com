@@ -11,26 +11,20 @@ export default function Cameras() {
       link: "/projects/camera-hex-square"
     },
     {
-      title: "ULTRA-DETAIL MICRO CAMERA", 
+      title: "80 RECTANGLE CAMERA", 
       description: "Maximum resolution capture system with micro-rectangle tessellation in a dense 10×8 grid. Each tiny section contributes precise detail for ultra-high definition composites.",
       tags: "80 Photos • 8fps • Micro-Rectangles • Ultra Resolution",
       timestamp: "June 30, 2025",
       link: "/projects/camera-optimal-80"
     },
     {
-      title: "ASPECT RATIO CAMERA", 
+      title: "12 RECTANGLE CAMERA", 
       description: "Perfect proportional capture maintaining camera's natural 4×3 aspect ratio. No distortion, clean rectangular sections that preserve original image quality and composition.",
       tags: "12 Photos • 4fps • 4×3 Rectangles • No Distortion",
       timestamp: "June 30, 2025",
       link: "/projects/camera-optimal"
     },
-    {
-      title: "RAPID SQUARE CAMERA", 
-      description: "Ultra-fast burst mode creating perfect square tessellations at maximum speed. Captures 100 photos in 1 second for dynamic action sequences and motion studies.",
-      tags: "100 Photos • 100fps • Square Grid • Burst Mode",
-      timestamp: "June 30, 2025",
-      link: "/projects/camera-squares"
-    },
+
     {
       title: "HONEYCOMB PATTERN CAMERA", 
       description: "Natural hexagonal tessellation inspired by bee hive structures. Creates organic honeycomb patterns with interlocking hexagons for artistic geometric compositions.",
