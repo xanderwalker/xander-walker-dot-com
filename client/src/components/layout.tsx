@@ -14,9 +14,9 @@ export default function Layout({ children, title = "XANDER WALKER", subtitle = "
       <BouncingCircles />
       
       <div className="relative z-40 min-h-screen flex flex-col items-center justify-center px-4 md:px-8 pointer-events-none">
-        <header className="text-center mb-12 md:mb-16 relative z-40 pointer-events-auto">
+        <header className="text-center mb-12 md:mb-16 relative z-40 pointer-events-auto max-w-full px-2 overflow-hidden">
           <Link href="/">
-            <h1 className={`text-8xl md:text-9xl lg:text-[12rem] font-bold text-black mb-4 cursor-pointer hover:scale-105 transition-transform duration-300 uppercase ${
+            <h1 className={`text-3xl md:text-4xl lg:text-5xl font-bold text-black mb-4 cursor-pointer hover:scale-105 transition-transform duration-300 uppercase break-words leading-tight ${
               title === "XANDER WALKER" ? "font-xanman-wide" : ""
             }`}>
               {title}
