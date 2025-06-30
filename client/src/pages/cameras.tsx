@@ -49,7 +49,7 @@ export default function Cameras() {
 
   return (
     <Layout 
-      title="CAMERA SYSTEMS" 
+      title="cameras" 
       subtitle="Advanced photo collage and composite creators"
     >
       <div className="min-h-screen bg-white text-gray-900 p-8">
@@ -64,7 +64,7 @@ export default function Cameras() {
             {cameras.map((camera, index) => (
               <div
                 key={index}
-                className="glassmorphism rounded-2xl p-8 hover:scale-105 transition-all duration-300"
+                className="p-8 hover:scale-105 transition-all duration-300"
               >
                 <div className="mb-6">
                   <h2 className="text-2xl font-bold mb-3 text-black">
