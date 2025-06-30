@@ -34,10 +34,10 @@ export default function CameraOptimal() {
   const isMobile = useIsMobile();
   const queryClient = useQueryClient();
 
-  // Optimal grid dimensions for 16:9 aspect ratio
-  const GRID_COLS = 16;
-  const GRID_ROWS = 9;
-  const TOTAL_PHOTOS = GRID_COLS * GRID_ROWS; // 144 photos
+  // Optimal grid dimensions for 4:3 aspect ratio (simplified for testing)
+  const GRID_COLS = 4;
+  const GRID_ROWS = 3;
+  const TOTAL_PHOTOS = GRID_COLS * GRID_ROWS; // 12 photos
 
   // Initialize cameras
   const initializeCameras = async () => {
@@ -142,9 +142,9 @@ export default function CameraOptimal() {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d')!;
     
-    // Use 16:9 aspect ratio for optimal output
-    const collageWidth = 1920;
-    const collageHeight = 1080;
+    // Use 4:3 aspect ratio for optimal output
+    const collageWidth = 1200;
+    const collageHeight = 900;
     canvas.width = collageWidth;
     canvas.height = collageHeight;
     
@@ -263,7 +263,7 @@ export default function CameraOptimal() {
         photoCount++;
         
         if (photoCount < TOTAL_PHOTOS) {
-          setTimeout(captureSequence, 7); // ~143 fps for maximum speed
+          setTimeout(captureSequence, 250); // 4 fps for easier testing
         }
       }
     };
@@ -308,17 +308,17 @@ export default function CameraOptimal() {
             
             {/* Grid overlay for preview */}
             <div className="absolute inset-0 pointer-events-none">
-              <svg className="w-full h-full" viewBox="0 0 16 9" preserveAspectRatio="none">
-                {/* 16x9 grid lines */}
+              <svg className="w-full h-full" viewBox="0 0 4 3" preserveAspectRatio="none">
+                {/* 4x3 grid lines */}
                 {Array.from({ length: GRID_COLS - 1 }, (_, i) => (
                   <line
                     key={`v${i}`}
                     x1={i + 1}
                     y1="0"
                     x2={i + 1}
-                    y2="9"
-                    stroke="rgba(255,255,255,0.2)"
-                    strokeWidth="0.02"
+                    y2="3"
+                    stroke="rgba(255,255,255,0.4)"
+                    strokeWidth="0.05"
                     vectorEffect="non-scaling-stroke"
                   />
                 ))}
@@ -327,10 +327,10 @@ export default function CameraOptimal() {
                     key={`h${i}`}
                     x1="0"
                     y1={i + 1}
-                    x2="16"
+                    x2="4"
                     y2={i + 1}
-                    stroke="rgba(255,255,255,0.2)"
-                    strokeWidth="0.02"
+                    stroke="rgba(255,255,255,0.4)"
+                    strokeWidth="0.05"
                     vectorEffect="non-scaling-stroke"
                   />
                 ))}
@@ -393,7 +393,7 @@ export default function CameraOptimal() {
             
             {/* Real-time grid visualization */}
             <div className="absolute inset-0 pointer-events-none">
-              <svg className="w-full h-full" viewBox="0 0 16 9" preserveAspectRatio="none">
+              <svg className="w-full h-full" viewBox="0 0 4 3" preserveAspectRatio="none">
                 {/* Grid lines */}
                 {Array.from({ length: GRID_COLS - 1 }, (_, i) => (
                   <line
@@ -401,9 +401,9 @@ export default function CameraOptimal() {
                     x1={i + 1}
                     y1="0"
                     x2={i + 1}
-                    y2="9"
-                    stroke="rgba(255,255,255,0.3)"
-                    strokeWidth="0.02"
+                    y2="3"
+                    stroke="rgba(255,255,255,0.5)"
+                    strokeWidth="0.05"
                     vectorEffect="non-scaling-stroke"
                   />
                 ))}
@@ -412,10 +412,10 @@ export default function CameraOptimal() {
                     key={`h${i}`}
                     x1="0"
                     y1={i + 1}
-                    x2="16"
+                    x2="4"
                     y2={i + 1}
-                    stroke="rgba(255,255,255,0.3)"
-                    strokeWidth="0.02"
+                    stroke="rgba(255,255,255,0.5)"
+                    strokeWidth="0.05"
                     vectorEffect="non-scaling-stroke"
                   />
                 ))}
@@ -471,8 +471,8 @@ export default function CameraOptimal() {
                   style={{ width: `${(capturedPhotos.length / TOTAL_PHOTOS) * 100}%` }}
                 />
               </div>
-              <div className="text-lg mt-4 text-white">Capturing at ~143fps...</div>
-              <div className="text-sm mt-2 opacity-75 text-gray-300">Filling grid in real-time</div>
+              <div className="text-lg mt-4 text-white">Capturing at 4fps...</div>
+              <div className="text-sm mt-2 opacity-75 text-gray-300">Filling {GRID_COLS}×{GRID_ROWS} grid in real-time</div>
             </div>
           </div>
         )}
