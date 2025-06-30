@@ -24,7 +24,7 @@ export default function CameraCollage() {
   const [capturedPhotos, setCapturedPhotos] = useState<CapturedPhoto[]>([]);
   const [finalCollage, setFinalCollage] = useState<string | null>(null);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
-  const [captureCountdown, setCaptureCountdown] = useState<number | null>(null);
+  const [showViewfinder, setShowViewfinder] = useState(false);
   
   const queryClient = useQueryClient();
   
@@ -222,49 +222,32 @@ export default function CameraCollage() {
     });
   }, [stream, saveSubmissionMutation]);
 
-  // Start capture sequence
-  const startCaptureSequence = () => {
+  // Start viewfinder mode
+  const startViewfinder = () => {
+    setShowViewfinder(true);
     setIsCapturing(true);
     setCapturedPhotos([]);
-    setCaptureCountdown(3);
-    
-    // Countdown
-    const countdownInterval = setInterval(() => {
-      setCaptureCountdown(prev => {
-        if (prev === null || prev <= 1) {
-          clearInterval(countdownInterval);
-          setCaptureCountdown(null);
-          
-          // Start taking photos
-          let photoCount = 0;
-          const captureInterval = setInterval(() => {
-            const photoData = takePhoto();
-            if (photoData) {
-              const newPhoto: CapturedPhoto = {
-                id: photoCount,
-                imageData: photoData,
-                timestamp: Date.now()
-              };
-              
-              setCapturedPhotos(prev => {
-                const updated = [...prev, newPhoto];
-                if (updated.length === 4) {
-                  clearInterval(captureInterval);
-                  createCollage(updated);
-                }
-                return updated;
-              });
-              
-              photoCount++;
-            }
-          }, 1000); // Take photo every second
-          
-          captureTimeoutRef.current = captureInterval;
-          return null;
-        }
-        return prev - 1;
-      });
-    }, 1000);
+  };
+
+  // Take single photo manually
+  const capturePhoto = () => {
+    const photoData = takePhoto();
+    if (photoData) {
+      const newPhoto: CapturedPhoto = {
+        id: capturedPhotos.length,
+        imageData: photoData,
+        timestamp: Date.now()
+      };
+      
+      const updatedPhotos = [...capturedPhotos, newPhoto];
+      setCapturedPhotos(updatedPhotos);
+      
+      // Check if we have 4 photos
+      if (updatedPhotos.length === 4) {
+        setShowViewfinder(false);
+        createCollage(updatedPhotos);
+      }
+    }
   };
 
   // Cleanup
@@ -325,13 +308,13 @@ export default function CameraCollage() {
         </div>
       )}
 
-      {/* Hidden video element */}
+      {/* Video element - show when in viewfinder mode */}
       <video
         ref={videoRef}
         autoPlay
         playsInline
         muted
-        className="hidden"
+        className={showViewfinder ? "absolute inset-0 w-full h-full object-cover" : "hidden"}
       />
 
       {/* Hidden canvas for processing */}
@@ -369,7 +352,7 @@ export default function CameraCollage() {
           
           {/* Start capture button */}
           <button
-            onClick={startCaptureSequence}
+            onClick={startViewfinder}
             className="px-8 py-4 bg-green-600 hover:bg-green-700 rounded-lg text-white text-xl font-semibold transition-colors"
           >
             Start 4-Photo Collage
@@ -377,37 +360,68 @@ export default function CameraCollage() {
         </div>
       )}
 
-      {/* Countdown display */}
-      {captureCountdown !== null && (
-        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
-          <div className="text-8xl font-bold text-white">
-            {captureCountdown}
-          </div>
-        </div>
-      )}
-
-      {/* Capture progress */}
-      {isCapturing && captureCountdown === null && !finalCollage && (
-        <div className="fixed inset-0 bg-black flex flex-col items-center justify-center z-50">
-          <div className="text-4xl font-bold mb-8">Taking Photos...</div>
-          <div className="text-2xl mb-4">Photo {capturedPhotos.length + 1} of 4</div>
-          <div className="w-64 bg-gray-700 rounded-full h-4 mb-8">
-            <div 
-              className="bg-green-500 h-4 rounded-full transition-all duration-1000"
-              style={{ width: `${(capturedPhotos.length / 4) * 100}%` }}
-            />
-          </div>
-          
-          {/* Show captured photos */}
-          <div className="flex gap-4">
-            {capturedPhotos.map((photo, index) => (
-              <div key={photo.id} className="w-20 h-20 border-2 border-white rounded-lg overflow-hidden">
-                <img src={photo.imageData} alt={`Photo ${index + 1}`} className="w-full h-full object-cover" />
+      {/* Viewfinder with controls */}
+      {showViewfinder && !finalCollage && (
+        <div className="fixed inset-0 z-50">
+          {/* Camera controls overlay */}
+          <div className="absolute inset-0 pointer-events-none">
+            {/* Top bar with progress */}
+            <div className="absolute top-4 left-4 right-4 bg-black/50 backdrop-blur-sm rounded-lg p-4 pointer-events-auto">
+              <div className="flex items-center justify-between mb-4">
+                <div className="text-white text-lg font-semibold">
+                  Photo {capturedPhotos.length + 1} of 4
+                </div>
+                <button
+                  onClick={() => {
+                    setShowViewfinder(false);
+                    setIsCapturing(false);
+                    setCapturedPhotos([]);
+                  }}
+                  className="px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg text-white transition-colors"
+                >
+                  Cancel
+                </button>
               </div>
-            ))}
-            {Array.from({ length: 4 - capturedPhotos.length }).map((_, index) => (
-              <div key={`empty-${index}`} className="w-20 h-20 border-2 border-gray-500 border-dashed rounded-lg" />
-            ))}
+              
+              {/* Progress bar */}
+              <div className="w-full bg-gray-700 rounded-full h-2">
+                <div 
+                  className="bg-green-500 h-2 rounded-full transition-all duration-300"
+                  style={{ width: `${(capturedPhotos.length / 4) * 100}%` }}
+                />
+              </div>
+            </div>
+
+            {/* Captured photos preview */}
+            <div className="absolute top-24 left-4 flex gap-2 pointer-events-auto">
+              {capturedPhotos.map((photo, index) => (
+                <div key={photo.id} className="w-16 h-16 border-2 border-green-500 rounded-lg overflow-hidden">
+                  <img src={photo.imageData} alt={`Photo ${index + 1}`} className="w-full h-full object-cover" />
+                </div>
+              ))}
+              {Array.from({ length: 4 - capturedPhotos.length }).map((_, index) => (
+                <div key={`empty-${index}`} className="w-16 h-16 border-2 border-gray-500 border-dashed rounded-lg bg-black/30" />
+              ))}
+            </div>
+
+            {/* Center viewfinder frame */}
+            <div className="absolute inset-4 border-2 border-white/50 rounded-lg pointer-events-none">
+              <div className="absolute top-2 left-2 w-8 h-8 border-t-4 border-l-4 border-white rounded-tl-lg"></div>
+              <div className="absolute top-2 right-2 w-8 h-8 border-t-4 border-r-4 border-white rounded-tr-lg"></div>
+              <div className="absolute bottom-2 left-2 w-8 h-8 border-b-4 border-l-4 border-white rounded-bl-lg"></div>
+              <div className="absolute bottom-2 right-2 w-8 h-8 border-b-4 border-r-4 border-white rounded-br-lg"></div>
+            </div>
+
+            {/* Bottom controls */}
+            <div className="absolute bottom-8 left-0 right-0 flex justify-center pointer-events-auto">
+              <button
+                onClick={capturePhoto}
+                className="w-20 h-20 bg-white border-4 border-gray-300 rounded-full hover:bg-gray-100 transition-all duration-200 shadow-lg"
+                style={{ boxShadow: '0 0 0 4px rgba(255,255,255,0.3)' }}
+              >
+                <div className="w-full h-full bg-white rounded-full border-2 border-gray-400"></div>
+              </button>
+            </div>
           </div>
         </div>
       )}
