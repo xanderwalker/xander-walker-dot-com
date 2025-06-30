@@ -194,8 +194,6 @@ export default function CameraOptimal() {
           
           console.log('Collage completed, saving and returning to viewfinder...');
           
-          // Immediately stop capturing state
-          setIsCapturing(false);
           setSaveStatus('saving');
           
           saveSubmissionMutation.mutate({
@@ -277,6 +275,8 @@ export default function CameraOptimal() {
           // Create collage when we have all photos
           if (updated.length === TOTAL_PHOTOS) {
             console.log('All photos captured, creating collage...');
+            // Immediately stop capturing state
+            setIsCapturing(false);
             setTimeout(() => createOptimalCollage(updated), 100);
           }
           
