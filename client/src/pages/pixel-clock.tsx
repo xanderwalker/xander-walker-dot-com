@@ -121,7 +121,7 @@ export default function PixelClock() {
   const PixelCylinder = () => {
     return (
       <div className="flex flex-col items-center">
-        <div className="font-serif text-lg mb-2 text-black" style={{fontFamily: 'Georgia, serif'}}>Seconds</div>
+        <div className=" text-lg mb-2 text-black" style={{fontFamily: 'Georgia, serif'}}>Seconds</div>
         <div className="relative w-20 h-80 overflow-hidden" style={{
           background: 'linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.7) 100%)',
           borderRadius: '8px',
@@ -161,7 +161,7 @@ export default function PixelClock() {
           ))}
           
         </div>
-        <div className="text-sm mt-2 text-center text-black font-serif" style={{fontFamily: 'Georgia, serif'}}>
+        <div className="text-sm mt-2 text-center text-black " style={{fontFamily: 'Georgia, serif'}}>
           <div>Balls: {pixelBalls.length}</div>
           <div>Settled: {pixelBalls.filter(b => b.isSettled).length}</div>
         </div>
@@ -173,12 +173,12 @@ export default function PixelClock() {
     <div className="min-h-screen bg-gradient-to-b from-gray-50 via-gray-100 to-gray-200 text-black p-4">
       {/* Header */}
       <header className="flex items-center justify-between max-w-6xl mx-auto mb-8">
-        <Link href="/projects" className="text-blue-600 hover:text-blue-700 font-serif text-lg transition-colors" style={{fontFamily: 'Georgia, serif'}}>
+        <Link href="/projects" className="text-blue-600 hover:text-blue-700  text-lg transition-colors" style={{fontFamily: 'Georgia, serif'}}>
           ← BACK TO PROJECTS
         </Link>
         
         <div className="text-center">
-          <h1 className="font-serif text-4xl font-bold text-black" style={{fontFamily: 'Georgia, serif'}}>
+          <h1 className=" text-4xl font-bold text-black" style={{fontFamily: 'Georgia, serif'}}>
             XANDER WALKER
           </h1>
         </div>
@@ -191,10 +191,10 @@ export default function PixelClock() {
         
         {/* Digital Clock */}
         <div className="glassmorphism rounded-2xl p-12 text-center">
-          <div className="font-serif text-6xl md:text-7xl mb-4 text-black tracking-wider" style={{fontFamily: 'Georgia, serif'}}>
+          <div className=" text-6xl md:text-7xl mb-4 text-black tracking-wider" style={{fontFamily: 'Georgia, serif'}}>
             {formatTime(time)}
           </div>
-          <div className="text-xl text-gray-600 uppercase tracking-widest font-serif" style={{fontFamily: 'Georgia, serif'}}>
+          <div className="text-xl text-gray-600 uppercase tracking-widest " style={{fontFamily: 'Georgia, serif'}}>
             {time.toLocaleDateString('en-US', { 
               weekday: 'long',
               year: 'numeric',
@@ -206,7 +206,7 @@ export default function PixelClock() {
         
         {/* Pixel Ball Drop Clock */}
         <div className="glassmorphism rounded-2xl p-8">
-          <h2 className="font-serif text-2xl mb-8 text-center text-black" style={{fontFamily: 'Georgia, serif'}}>
+          <h2 className=" text-2xl mb-8 text-center text-black" style={{fontFamily: 'Georgia, serif'}}>
             PIXEL BALL DROP CLOCK
           </h2>
           <div className="flex justify-center">
@@ -214,7 +214,7 @@ export default function PixelClock() {
           </div>
           
           {/* Instructions */}
-          <div className="mt-6 text-center text-sm text-gray-600 font-serif" style={{fontFamily: 'Georgia, serif'}}>
+          <div className="mt-6 text-center text-sm text-gray-600 " style={{fontFamily: 'Georgia, serif'}}>
             <p>10 pixel balls drop every second</p>
             <p>Cylinder clears at the start of each minute</p>
           </div>

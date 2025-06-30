@@ -908,7 +908,7 @@ export default function AnalogClock() {
                   fill="rgba(255, 255, 255, 0.9)"
                   fontSize="24"
                   fontWeight="bold"
-                  fontFamily="Georgia, serif"
+                  fontFamily="system-ui, -apple-system, sans-serif"
                 >
                   {marker.number}
                 </text>

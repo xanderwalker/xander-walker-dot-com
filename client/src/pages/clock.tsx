@@ -732,7 +732,7 @@ const PixelClockComponent = ({ currentTime }: { currentTime: Date }) => {
   return (
     <div className="flex justify-center">
       <div className="flex flex-col items-center">
-        <div className="font-serif text-lg mb-2 text-black" style={{fontFamily: 'Georgia, serif'}}>HOURGLASS</div>
+        <div className=" text-lg mb-2 text-black" style={{fontFamily: 'Georgia, serif'}}>HOURGLASS</div>
         <div className="relative overflow-hidden" style={{
           width: '220px', // 200 pixels for tube + padding
           height: '340px', // Increased height to accommodate bottom placement
@@ -768,7 +768,7 @@ const PixelClockComponent = ({ currentTime }: { currentTime: Date }) => {
           ))}
           
         </div>
-        <div className="text-sm mt-2 text-center text-black font-serif" style={{fontFamily: 'Georgia, serif'}}>
+        <div className="text-sm mt-2 text-center text-black " style={{fontFamily: 'Georgia, serif'}}>
           <div>Balls: {pixelBalls.length}</div>
           <div>Settled: {pixelBalls.filter(b => b.isSettled).length}</div>
         </div>
@@ -1149,7 +1149,7 @@ export default function Clock() {
     }
     return (
       <div className="flex flex-col items-center">
-        <div className="font-serif text-lg mb-2" style={{fontFamily: 'Georgia, serif'}}>{label}</div>
+        <div className=" text-lg mb-2" style={{fontFamily: 'Georgia, serif'}}>{label}</div>
         <div className="relative w-20 h-80 overflow-hidden" style={{
           background: 'linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(230,230,230,0.7) 50%, rgba(255,255,255,0.9) 100%)',
           borderRadius: '0 0 20px 20px',
@@ -1193,7 +1193,7 @@ export default function Clock() {
             );
           })}
         </div>
-        <div className="font-serif text-sm mt-1 text-gray-600" style={{fontFamily: 'Georgia, serif'}}>
+        <div className=" text-sm mt-1 text-gray-600" style={{fontFamily: 'Georgia, serif'}}>
           {balls.length} {unit}
         </div>
       </div>
@@ -1226,7 +1226,7 @@ export default function Clock() {
         
         {/* Pixel Ball Drop Clock */}
         <div className="glassmorphism rounded-2xl p-8">
-          <h2 className="font-serif text-2xl mb-8 text-center text-black" style={{fontFamily: 'Georgia, serif'}}>
+          <h2 className=" text-2xl mb-8 text-center text-black" style={{fontFamily: 'Georgia, serif'}}>
             PIXEL BALL CLOCK
           </h2>
           <PixelClockComponent currentTime={time} />
@@ -1250,7 +1250,7 @@ export default function Clock() {
         
         {/* Year Clock */}
         <div className="glassmorphism rounded-2xl p-8 w-full max-w-6xl">
-          <h2 className="font-serif text-2xl mb-8 text-center text-black" style={{fontFamily: 'Georgia, serif'}}>
+          <h2 className=" text-2xl mb-8 text-center text-black" style={{fontFamily: 'Georgia, serif'}}>
             Year Progress Clock
           </h2>
           <YearClock currentDate={time} />
@@ -1258,7 +1258,7 @@ export default function Clock() {
         
         {/* Graduated Cylinder Clock */}
         <div className="glassmorphism rounded-2xl p-8">
-          <h2 className="font-serif text-2xl mb-8 text-center text-black" style={{fontFamily: 'Georgia, serif'}}>
+          <h2 className=" text-2xl mb-8 text-center text-black" style={{fontFamily: 'Georgia, serif'}}>
             Ball Drop Clock
           </h2>
           <div className="flex justify-center space-x-8">

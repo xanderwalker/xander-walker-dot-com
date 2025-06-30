@@ -55,10 +55,10 @@ export default function Cameras() {
       <div className="min-h-screen bg-black text-white p-8">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
-            <h1 className="text-5xl font-bold mb-4" style={{ fontFamily: 'Georgia, "Times New Roman", Times, serif' }}>
+            <h1 className="text-5xl font-bold mb-4">
               CAMERA SYSTEMS
             </h1>
-            <p className="text-xl text-gray-300" style={{ fontFamily: 'Georgia, "Times New Roman", Times, serif' }}>
+            <p className="text-xl text-gray-300">
               High-speed photo capture systems that create composite artworks from rapid sequential photography
             </p>
           </div>
@@ -70,15 +70,12 @@ export default function Cameras() {
                 className="bg-white/10 backdrop-blur-lg rounded-2xl p-8 border border-white/20 hover:bg-white/15 transition-all duration-300 hover:scale-105"
               >
                 <div className="mb-6">
-                  <h2 
-                    className="text-2xl font-bold mb-3 text-white"
-                    style={{ fontFamily: 'Georgia, "Times New Roman", Times, serif' }}
-                  >
+                  <h2 className="text-2xl font-bold mb-3 text-white">
                     {camera.title}
                   </h2>
                   <p 
                     className="text-gray-300 text-lg leading-relaxed mb-4"
-                    style={{ fontFamily: 'Georgia, "Times New Roman", Times, serif' }}
+                    
                   >
                     {camera.description}
                   </p>
@@ -87,7 +84,7 @@ export default function Cameras() {
                       <span
                         key={tagIndex}
                         className="px-3 py-1 bg-white/20 rounded-full text-sm text-white"
-                        style={{ fontFamily: 'Georgia, "Times New Roman", Times, serif' }}
+                        
                       >
                         {tag}
                       </span>
@@ -95,7 +92,7 @@ export default function Cameras() {
                   </div>
                   <div 
                     className="text-sm text-gray-400 mb-6"
-                    style={{ fontFamily: 'Georgia, "Times New Roman", Times, serif' }}
+                    
                   >
                     {camera.timestamp}
                   </div>
@@ -104,7 +101,7 @@ export default function Cameras() {
                 <Link href={camera.link}>
                   <button 
                     className="w-full px-6 py-3 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 rounded-lg text-white font-semibold transition-all duration-300 transform hover:scale-105"
-                    style={{ fontFamily: 'Georgia, "Times New Roman", Times, serif' }}
+                    
                   >
                     Open Camera System
                   </button>
@@ -117,7 +114,7 @@ export default function Cameras() {
             <Link href="/projects">
               <button 
                 className="px-8 py-3 bg-white/20 backdrop-blur-sm rounded-lg text-white hover:bg-white/30 transition-colors"
-                style={{ fontFamily: 'Georgia, "Times New Roman", Times, serif' }}
+                
               >
                 ← Back to Projects
               </button>

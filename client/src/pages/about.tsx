@@ -102,14 +102,14 @@ export default function About() {
       <div className="max-w-7xl mx-auto relative z-30">
         {/* Resume Timeline */}
         <div className="mb-12">
-          <h2 className="font-serif mb-12 text-center text-black" style={{fontSize: '55px', lineHeight: '1.2', fontFamily: 'Georgia, serif'}}>
+          <h2 className="mb-12 text-center text-black" style={{fontSize: '55px', lineHeight: '1.2'}}>
             RESUME
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {timelineEvents.map((event, index) => (
               <div key={index} className="glassmorphism rounded-2xl p-6 relative z-30 pointer-events-auto">
                 {/* Date at top */}
-                <div className="font-serif text-black mb-4 text-center" style={{fontSize: '32px', lineHeight: '1.2', fontFamily: 'Georgia, serif'}}>
+                <div className="text-black mb-4 text-center" style={{fontSize: '32px', lineHeight: '1.2'}}>
                   {event.year}
                 </div>
                 
@@ -125,7 +125,7 @@ export default function About() {
                 )}
                 
                 {/* Description below image */}
-                <div className="text-black font-serif text-center" style={{fontSize: '18px', lineHeight: '1.3', fontFamily: 'Georgia, serif'}}>
+                <div className="text-black text-center" style={{fontSize: '18px', lineHeight: '1.3'}}>
                   {event.title}
                 </div>
               </div>

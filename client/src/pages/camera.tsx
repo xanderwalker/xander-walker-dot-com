@@ -129,7 +129,7 @@ export default function Camera() {
         <div className="mb-8 text-center">
           <Link 
             to="/projects" 
-            className="inline-block px-6 py-3 bg-white/10 hover:bg-white/20 backdrop-blur-sm rounded-2xl transition-all duration-300 font-serif text-lg"
+            className="inline-block px-6 py-3 bg-white/10 hover:bg-white/20 backdrop-blur-sm rounded-2xl transition-all duration-300  text-lg"
             style={{fontFamily: 'Georgia, serif'}}
           >
             ← Back to Projects
@@ -139,23 +139,23 @@ export default function Camera() {
         {/* Camera System Container */}
         <div className="max-w-4xl mx-auto">
           <div className="glassmorphism rounded-2xl p-8">
-            <h1 className="font-serif text-3xl mb-6 text-center" style={{fontFamily: 'Georgia, serif'}}>
+            <h1 className=" text-3xl mb-6 text-center" style={{fontFamily: 'Georgia, serif'}}>
               CAMERA SYSTEM
             </h1>
             
             {/* Hardware Limitation Notice */}
             <div className="mb-6 p-4 bg-blue-100/20 rounded-lg text-center">
-              <div className="font-serif text-lg mb-2" style={{fontFamily: 'Georgia, serif'}}>
+              <div className=" text-lg mb-2" style={{fontFamily: 'Georgia, serif'}}>
                 Hardware Limitation Notice
               </div>
-              <div className="font-serif text-sm" style={{fontFamily: 'Georgia, serif'}}>
+              <div className=" text-sm" style={{fontFamily: 'Georgia, serif'}}>
                 Mobile devices can only access one camera at a time. Switch between available cameras using the buttons below.
               </div>
             </div>
             
             {/* Permission Status */}
             <div className="text-center mb-6">
-              <div className={`inline-block px-4 py-2 rounded-lg text-sm font-serif ${
+              <div className={`inline-block px-4 py-2 rounded-lg text-sm  ${
                 permissions.camera ? 'bg-green-600 text-white' : 'bg-red-600 text-white'
               }`} style={{fontFamily: 'Georgia, serif'}}>
                 Camera Permission: {permissions.camera ? 'Granted' : 'Denied'}
@@ -163,7 +163,7 @@ export default function Camera() {
             </div>
 
             {/* Camera Detection Info */}
-            <div className="text-center mb-6 font-serif" style={{fontFamily: 'Georgia, serif'}}>
+            <div className="text-center mb-6 " style={{fontFamily: 'Georgia, serif'}}>
               {cameras.length > 0 ? (
                 <>
                   <div className="text-lg mb-4">Detected {cameras.length} camera(s)</div>
@@ -174,7 +174,7 @@ export default function Camera() {
                       <button
                         key={camera.deviceId}
                         onClick={() => switchToCamera(camera)}
-                        className={`p-4 rounded-lg transition-all duration-300 font-serif ${
+                        className={`p-4 rounded-lg transition-all duration-300  ${
                           activeCamera?.deviceId === camera.deviceId
                             ? 'bg-green-600 text-white'
                             : 'bg-white/10 hover:bg-white/20'
@@ -204,7 +204,7 @@ export default function Camera() {
                 <button
                   onClick={stopCamera}
                   disabled={!activeCamera}
-                  className="px-6 py-3 bg-red-600 text-white rounded-lg disabled:bg-gray-400 hover:bg-red-700 transition-colors font-serif"
+                  className="px-6 py-3 bg-red-600 text-white rounded-lg disabled:bg-gray-400 hover:bg-red-700 transition-colors "
                   style={{fontFamily: 'Georgia, serif'}}
                 >
                   Stop Camera
@@ -216,7 +216,7 @@ export default function Camera() {
             <div className="flex justify-center">
               <div className="bg-black rounded-lg overflow-hidden shadow-2xl max-w-2xl w-full">
                 {activeCamera && (
-                  <div className="p-3 bg-gray-800 text-white text-center font-serif" style={{fontFamily: 'Georgia, serif'}}>
+                  <div className="p-3 bg-gray-800 text-white text-center " style={{fontFamily: 'Georgia, serif'}}>
                     <div className="font-semibold">{activeCamera.label}</div>
                     <div className="text-xs opacity-75">
                       {activeCamera.facing === 'user' ? 'Front Camera' : 
@@ -231,7 +231,7 @@ export default function Camera() {
                   playsInline
                   muted
                 />
-                <div className="p-2 bg-gray-800 text-white text-xs text-center font-serif" style={{fontFamily: 'Georgia, serif'}}>
+                <div className="p-2 bg-gray-800 text-white text-xs text-center " style={{fontFamily: 'Georgia, serif'}}>
                   {activeCamera ? 'Live Stream' : 'No Camera Selected'}
                 </div>
               </div>
@@ -239,7 +239,7 @@ export default function Camera() {
 
             {/* No Cameras Message */}
             {cameras.length === 0 && permissions.camera && (
-              <div className="text-center text-gray-400 font-serif" style={{fontFamily: 'Georgia, serif'}}>
+              <div className="text-center text-gray-400 " style={{fontFamily: 'Georgia, serif'}}>
                 <div className="text-xl mb-2">No cameras detected</div>
                 <div className="text-sm">This device may not have any cameras available</div>
               </div>
@@ -247,7 +247,7 @@ export default function Camera() {
 
             {/* Permission Denied Message */}
             {!permissions.camera && (
-              <div className="text-center text-red-400 font-serif" style={{fontFamily: 'Georgia, serif'}}>
+              <div className="text-center text-red-400 " style={{fontFamily: 'Georgia, serif'}}>
                 <div className="text-xl mb-2">Camera access denied</div>
                 <div className="text-sm">Please allow camera access to use this feature</div>
                 <button

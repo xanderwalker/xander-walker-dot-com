@@ -129,7 +129,7 @@ export default function Projects() {
       <div className="max-w-7xl mx-auto relative z-30">
         {/* Projects Section */}
         <div className="mb-12">
-          <h2 className="font-serif mb-12 text-center text-black" style={{fontSize: '55px', lineHeight: '1.2', fontFamily: 'Georgia, serif'}}>
+          <h2 className=" mb-12 text-center text-black" style={{fontSize: '55px', lineHeight: '1.2'}}>
             PROJECTS
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -137,22 +137,22 @@ export default function Projects() {
               <Link key={index} href={project.link}>
                 <div className="glassmorphism rounded-2xl p-6 relative z-30 pointer-events-auto cursor-pointer hover:bg-opacity-90 transition-all duration-300 group">
                   {/* Project Title */}
-                  <div className="font-serif text-black mb-4 text-center group-hover:text-gray-600 transition-colors" style={{fontSize: '32px', lineHeight: '1.2', fontFamily: 'Georgia, serif'}}>
+                  <div className=" text-black mb-4 text-center group-hover:text-gray-600 transition-colors" style={{fontSize: '32px', lineHeight: '1.2'}}>
                     {project.title}
                   </div>
                   
                   {/* Project Description */}
-                  <div className="text-black font-serif text-center mb-4" style={{fontSize: '18px', lineHeight: '1.3', fontFamily: 'Georgia, serif'}}>
+                  <div className="text-black  text-center mb-4" style={{fontSize: '18px', lineHeight: '1.3'}}>
                     {project.description}
                   </div>
                   
                   {/* Project Tags */}
-                  <div className="font-serif text-gray-500 text-center mb-3" style={{fontSize: '14px', lineHeight: '1.3', fontFamily: 'Georgia, serif'}}>
+                  <div className=" text-gray-500 text-center mb-3" style={{fontSize: '14px', lineHeight: '1.3'}}>
                     {project.tags}
                   </div>
                   
                   {/* Project Timestamp */}
-                  <div className="font-serif text-gray-400 text-center" style={{fontSize: '12px', lineHeight: '1.3', fontFamily: 'Georgia, serif'}}>
+                  <div className=" text-gray-400 text-center" style={{fontSize: '12px', lineHeight: '1.3'}}>
                     {project.timestamp}
                   </div>
                 </div>

@@ -476,13 +476,13 @@ export default function SensorDashboard() {
       {/* Header */}
       <header className="p-4 flex justify-between items-center">
         <Link href="/projects">
-          <button className="text-black hover:text-gray-600 transition-colors text-lg font-serif" style={{fontFamily: 'Georgia, serif'}}>
+          <button className="text-black hover:text-gray-600 transition-colors text-lg " style={{fontFamily: 'Georgia, serif'}}>
             ← BACK TO PROJECTS
           </button>
         </Link>
         
         <Link href="/">
-          <h1 className="text-black font-serif font-bold text-4xl md:text-6xl hover:opacity-70 transition-opacity duration-200 cursor-pointer" style={{fontFamily: 'Georgia, serif'}}>
+          <h1 className="text-black  font-bold text-4xl md:text-6xl hover:opacity-70 transition-opacity duration-200 cursor-pointer" style={{fontFamily: 'Georgia, serif'}}>
             XANDER WALKER
           </h1>
         </Link>
@@ -494,7 +494,7 @@ export default function SensorDashboard() {
       <div className="text-center mb-8">
         <button
           onClick={requestAllPermissions}
-          className="font-serif bg-blue-500 text-white px-6 py-3 rounded-lg text-lg font-bold hover:bg-blue-600 transition-colors"
+          className=" bg-blue-500 text-white px-6 py-3 rounded-lg text-lg font-bold hover:bg-blue-600 transition-colors"
           style={{fontFamily: 'Georgia, serif'}}
         >
           ENABLE ALL SENSORS
@@ -506,10 +506,10 @@ export default function SensorDashboard() {
         
         {/* Accelerometer */}
         <div className="glassmorphism rounded-2xl p-6">
-          <h3 className="font-serif text-xl mb-4 text-center" style={{fontFamily: 'Georgia, serif'}}>ACCELEROMETER</h3>
+          <h3 className=" text-xl mb-4 text-center" style={{fontFamily: 'Georgia, serif'}}>ACCELEROMETER</h3>
           <div className="flex flex-col items-center space-y-4">
             <AccelerometerArrow />
-            <div className="text-sm space-y-1 text-center font-serif" style={{fontFamily: 'Georgia, serif'}}>
+            <div className="text-sm space-y-1 text-center " style={{fontFamily: 'Georgia, serif'}}>
               <div>X: {sensorData.accelerometer.x} m/s²</div>
               <div>Y: {sensorData.accelerometer.y} m/s²</div>
               <div>Z: {sensorData.accelerometer.z} m/s²</div>
@@ -519,10 +519,10 @@ export default function SensorDashboard() {
 
         {/* Compass */}
         <div className="glassmorphism rounded-2xl p-6">
-          <h3 className="font-serif text-xl mb-4 text-center" style={{fontFamily: 'Georgia, serif'}}>COMPASS</h3>
+          <h3 className=" text-xl mb-4 text-center" style={{fontFamily: 'Georgia, serif'}}>COMPASS</h3>
           <div className="flex flex-col items-center space-y-4">
             <CompassArrow />
-            <div className="text-sm text-center font-serif" style={{fontFamily: 'Georgia, serif'}}>
+            <div className="text-sm text-center " style={{fontFamily: 'Georgia, serif'}}>
               <div>{sensorData.compass}° from North</div>
             </div>
           </div>
@@ -530,10 +530,10 @@ export default function SensorDashboard() {
 
         {/* Gyroscope */}
         <div className="glassmorphism rounded-2xl p-6">
-          <h3 className="font-serif text-xl mb-4 text-center" style={{fontFamily: 'Georgia, serif'}}>GYROSCOPE</h3>
+          <h3 className=" text-xl mb-4 text-center" style={{fontFamily: 'Georgia, serif'}}>GYROSCOPE</h3>
           <div className="flex flex-col items-center space-y-4">
             <GyroscopeVisualizer />
-            <div className="text-xs space-y-1 text-center font-serif" style={{fontFamily: 'Georgia, serif'}}>
+            <div className="text-xs space-y-1 text-center " style={{fontFamily: 'Georgia, serif'}}>
               <div>α: {sensorData.gyroscope.alpha}°</div>
               <div>β: {sensorData.gyroscope.beta}°</div>
               <div>γ: {sensorData.gyroscope.gamma}°</div>
@@ -543,16 +543,16 @@ export default function SensorDashboard() {
 
         {/* Sound Level */}
         <div className="glassmorphism rounded-2xl p-6">
-          <h3 className="font-serif text-xl mb-4 text-center" style={{fontFamily: 'Georgia, serif'}}>SOUND LEVEL</h3>
+          <h3 className=" text-xl mb-4 text-center" style={{fontFamily: 'Georgia, serif'}}>SOUND LEVEL</h3>
           <div className="flex flex-col items-center space-y-4">
             <SoundLevelMeter />
-            <div className="text-sm text-center font-serif" style={{fontFamily: 'Georgia, serif'}}>{sensorData.soundLevel}%</div>
+            <div className="text-sm text-center " style={{fontFamily: 'Georgia, serif'}}>{sensorData.soundLevel}%</div>
           </div>
         </div>
 
         {/* Ambient Light */}
         <div className="glassmorphism rounded-2xl p-6">
-          <h3 className="font-serif text-xl mb-4 text-center" style={{fontFamily: 'Georgia, serif'}}>BRIGHTNESS</h3>
+          <h3 className=" text-xl mb-4 text-center" style={{fontFamily: 'Georgia, serif'}}>BRIGHTNESS</h3>
           <div className="flex flex-col items-center space-y-4">
             <div className="w-16 h-16 bg-yellow-200 rounded-full flex items-center justify-center">
               <div
@@ -560,16 +560,16 @@ export default function SensorDashboard() {
                 style={{ opacity: Math.min(sensorData.brightness / 1000, 1) }}
               />
             </div>
-            <div className="text-sm text-center font-serif" style={{fontFamily: 'Georgia, serif'}}>{sensorData.brightness} lux</div>
+            <div className="text-sm text-center " style={{fontFamily: 'Georgia, serif'}}>{sensorData.brightness} lux</div>
           </div>
         </div>
 
         {/* Battery */}
         <div className="glassmorphism rounded-2xl p-6">
-          <h3 className="font-serif text-xl mb-4 text-center" style={{fontFamily: 'Georgia, serif'}}>BATTERY</h3>
+          <h3 className=" text-xl mb-4 text-center" style={{fontFamily: 'Georgia, serif'}}>BATTERY</h3>
           <div className="flex flex-col items-center space-y-4">
             <BatteryIndicator />
-            <div className="text-sm text-center font-serif" style={{fontFamily: 'Georgia, serif'}}>
+            <div className="text-sm text-center " style={{fontFamily: 'Georgia, serif'}}>
               <div>{sensorData.battery.level}%</div>
               <div>{sensorData.battery.charging ? 'Charging' : 'Not Charging'}</div>
             </div>
@@ -580,7 +580,7 @@ export default function SensorDashboard() {
 
         {/* Temperature */}
         <div className="glassmorphism rounded-2xl p-6">
-          <h3 className="font-serif text-xl mb-4 text-center" style={{fontFamily: 'Georgia, serif'}}>TEMPERATURE</h3>
+          <h3 className=" text-xl mb-4 text-center" style={{fontFamily: 'Georgia, serif'}}>TEMPERATURE</h3>
           <div className="flex flex-col items-center space-y-4">
             <div className="w-16 h-24 bg-gray-200 rounded-full relative overflow-hidden">
               <div
@@ -588,13 +588,13 @@ export default function SensorDashboard() {
                 style={{ height: `${Math.min((sensorData.temperature + 20) / 60 * 100, 100)}%` }}
               />
             </div>
-            <div className="text-sm text-center font-serif" style={{fontFamily: 'Georgia, serif'}}>{sensorData.temperature}°C</div>
+            <div className="text-sm text-center " style={{fontFamily: 'Georgia, serif'}}>{sensorData.temperature}°C</div>
           </div>
         </div>
 
         {/* Pressure */}
         <div className="glassmorphism rounded-2xl p-6">
-          <h3 className="font-serif text-xl mb-4 text-center" style={{fontFamily: 'Georgia, serif'}}>PRESSURE</h3>
+          <h3 className=" text-xl mb-4 text-center" style={{fontFamily: 'Georgia, serif'}}>PRESSURE</h3>
           <div className="flex flex-col items-center space-y-4">
             <div className="w-16 h-16 border-4 border-blue-300 rounded-full flex items-center justify-center">
               <div
@@ -605,18 +605,18 @@ export default function SensorDashboard() {
                 }}
               />
             </div>
-            <div className="text-sm text-center font-serif" style={{fontFamily: 'Georgia, serif'}}>{sensorData.pressure} hPa</div>
+            <div className="text-sm text-center " style={{fontFamily: 'Georgia, serif'}}>{sensorData.pressure} hPa</div>
           </div>
         </div>
 
         {/* Proximity */}
         <div className="glassmorphism rounded-2xl p-6">
-          <h3 className="font-serif text-xl mb-4 text-center" style={{fontFamily: 'Georgia, serif'}}>PROXIMITY</h3>
+          <h3 className=" text-xl mb-4 text-center" style={{fontFamily: 'Georgia, serif'}}>PROXIMITY</h3>
           <div className="flex flex-col items-center space-y-4">
             <div className={`w-16 h-16 rounded-full transition-all duration-300 ${
               sensorData.proximity < 5 ? 'bg-red-400' : 'bg-green-400'
             }`} />
-            <div className="text-sm text-center font-serif" style={{fontFamily: 'Georgia, serif'}}>{sensorData.proximity} cm</div>
+            <div className="text-sm text-center " style={{fontFamily: 'Georgia, serif'}}>{sensorData.proximity} cm</div>
           </div>
         </div>
 
@@ -627,8 +627,8 @@ export default function SensorDashboard() {
         
         {/* Location Section */}
         <div className="glassmorphism rounded-2xl p-6">
-          <h3 className="font-serif text-2xl mb-6 text-center" style={{fontFamily: 'Georgia, serif'}}>LOCATION</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-sm font-serif" style={{fontFamily: 'Georgia, serif'}}>
+          <h3 className=" text-2xl mb-6 text-center" style={{fontFamily: 'Georgia, serif'}}>LOCATION</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-sm " style={{fontFamily: 'Georgia, serif'}}>
             <div>
               <div className="font-semibold">Latitude:</div>
               <div>{locationData.latitude ? locationData.latitude.toFixed(6) : 'Not available'}</div>
@@ -658,8 +658,8 @@ export default function SensorDashboard() {
 
         {/* Device Section */}
         <div className="glassmorphism rounded-2xl p-6">
-          <h3 className="font-serif text-2xl mb-6 text-center" style={{fontFamily: 'Georgia, serif'}}>DEVICE</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-sm font-serif" style={{fontFamily: 'Georgia, serif'}}>
+          <h3 className=" text-2xl mb-6 text-center" style={{fontFamily: 'Georgia, serif'}}>DEVICE</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-sm " style={{fontFamily: 'Georgia, serif'}}>
             <div>
               <div className="font-semibold">Platform:</div>
               <div>{deviceData.platform || 'Unknown'}</div>
@@ -701,8 +701,8 @@ export default function SensorDashboard() {
 
         {/* Browser Section */}
         <div className="glassmorphism rounded-2xl p-6">
-          <h3 className="font-serif text-2xl mb-6 text-center" style={{fontFamily: 'Georgia, serif'}}>BROWSER</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-sm font-serif" style={{fontFamily: 'Georgia, serif'}}>
+          <h3 className=" text-2xl mb-6 text-center" style={{fontFamily: 'Georgia, serif'}}>BROWSER</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-sm " style={{fontFamily: 'Georgia, serif'}}>
             <div>
               <div className="font-semibold">Vendor:</div>
               <div>{browserData.vendor || 'Unknown'}</div>
@@ -745,7 +745,7 @@ export default function SensorDashboard() {
       </div>
 
       {/* Permission Status */}
-      <div className="mt-8 text-center text-sm text-gray-600 font-serif" style={{fontFamily: 'Georgia, serif'}}>
+      <div className="mt-8 text-center text-sm text-gray-600 " style={{fontFamily: 'Georgia, serif'}}>
         <div>Permissions: Motion: {permissions.motion ? '✓' : '✗'} | Audio: {permissions.audio ? '✓' : '✗'} | Camera: {permissions.camera ? '✓' : '✗'} | Location: {permissions.location ? '✓' : '✗'}</div>
       </div>
     </div>

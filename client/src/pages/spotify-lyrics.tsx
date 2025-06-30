@@ -330,15 +330,15 @@ export default function SpotifyLyrics() {
       {!accessToken && (
         <div className="flex items-center justify-center min-h-screen px-8 relative z-10">
           <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-12 text-center border border-white/20 max-w-2xl">
-            <h2 className="font-serif text-6xl font-bold text-white mb-8" style={{fontFamily: 'Georgia, serif'}}>
+            <h2 className=" text-6xl font-bold text-white mb-8" style={{fontFamily: 'Georgia, serif'}}>
               SPOTIFY LYRICS
             </h2>
-            <p className="font-serif text-2xl text-gray-300 mb-12" style={{fontFamily: 'Georgia, serif'}}>
+            <p className=" text-2xl text-gray-300 mb-12" style={{fontFamily: 'Georgia, serif'}}>
               Connect to see real-time lyrics for distance reading
             </p>
             <button
               onClick={loginToSpotify}
-              className="font-serif bg-green-600 hover:bg-green-700 text-white px-12 py-6 rounded-lg text-3xl transition-colors duration-200 font-bold"
+              className=" bg-green-600 hover:bg-green-700 text-white px-12 py-6 rounded-lg text-3xl transition-colors duration-200 font-bold"
               style={{fontFamily: 'Georgia, serif'}}
             >
               Connect to Spotify
@@ -346,7 +346,7 @@ export default function SpotifyLyrics() {
             
             <div className="mt-8">
               <Link href="/projects">
-                <button className="text-white hover:text-gray-200 transition-colors text-lg font-serif bg-black/30 px-6 py-3 rounded-lg border border-white/20" style={{fontFamily: 'Georgia, serif'}}>
+                <button className="text-white hover:text-gray-200 transition-colors text-lg  bg-black/30 px-6 py-3 rounded-lg border border-white/20" style={{fontFamily: 'Georgia, serif'}}>
                   ← Back to Projects
                 </button>
               </Link>
@@ -362,7 +362,7 @@ export default function SpotifyLyrics() {
           {/* Top Controls Bar */}
           <div className="flex justify-between items-center p-6 bg-black/20 backdrop-blur-sm">
             <Link href="/projects">
-              <button className="text-white hover:text-gray-200 transition-colors text-lg font-serif bg-black/30 px-4 py-2 rounded-lg border border-white/20" style={{fontFamily: 'Georgia, serif'}}>
+              <button className="text-white hover:text-gray-200 transition-colors text-lg  bg-black/30 px-4 py-2 rounded-lg border border-white/20" style={{fontFamily: 'Georgia, serif'}}>
                 ← BACK
               </button>
             </Link>
@@ -372,14 +372,14 @@ export default function SpotifyLyrics() {
               <button
                 onClick={getCurrentTrack}
                 disabled={loading}
-                className="font-serif bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 text-white px-4 py-2 rounded-lg transition-colors duration-200"
+                className=" bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 text-white px-4 py-2 rounded-lg transition-colors duration-200"
                 style={{fontFamily: 'Georgia, serif'}}
               >
                 {loading ? 'Refreshing...' : 'Refresh'}
               </button>
               <button
                 onClick={logout}
-                className="font-serif bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition-colors duration-200"
+                className=" bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition-colors duration-200"
                 style={{fontFamily: 'Georgia, serif'}}
               >
                 Disconnect
@@ -393,7 +393,7 @@ export default function SpotifyLyrics() {
             {/* Error Messages */}
             {error && (
               <div className="bg-red-500/20 border border-red-500/30 rounded-lg p-4 mb-4">
-                <p className="font-serif text-red-200 text-xl" style={{fontFamily: 'Georgia, serif'}}>
+                <p className=" text-red-200 text-xl" style={{fontFamily: 'Georgia, serif'}}>
                   {error}
                 </p>
               </div>
@@ -404,7 +404,7 @@ export default function SpotifyLyrics() {
               <div className="flex-1 flex items-center justify-center">
                 <div className="text-center">
                   <div className="animate-spin w-16 h-16 border-4 border-white border-t-transparent rounded-full mx-auto mb-8"></div>
-                  <p className="font-serif text-white text-3xl" style={{fontFamily: 'Georgia, serif'}}>Loading...</p>
+                  <p className=" text-white text-3xl" style={{fontFamily: 'Georgia, serif'}}>Loading...</p>
                 </div>
               </div>
             )}
@@ -413,10 +413,10 @@ export default function SpotifyLyrics() {
             {!currentTrack && !loading && (
               <div className="flex-1 flex items-center justify-center">
                 <div className="text-center">
-                  <h3 className="font-serif text-6xl mb-8 text-white" style={{fontFamily: 'Georgia, serif'}}>
+                  <h3 className=" text-6xl mb-8 text-white" style={{fontFamily: 'Georgia, serif'}}>
                     No Track Playing
                   </h3>
-                  <p className="font-serif text-3xl text-gray-300" style={{fontFamily: 'Georgia, serif'}}>
+                  <p className=" text-3xl text-gray-300" style={{fontFamily: 'Georgia, serif'}}>
                     Start playing a song on Spotify
                   </p>
                 </div>
@@ -433,7 +433,7 @@ export default function SpotifyLyrics() {
                     <button
                       onClick={() => fetchLyrics()}
                       disabled={lyricsLoading}
-                      className="font-serif bg-purple-600 hover:bg-purple-700 disabled:bg-gray-600 text-white px-12 py-6 rounded-lg text-3xl transition-colors duration-200 font-bold"
+                      className=" bg-purple-600 hover:bg-purple-700 disabled:bg-gray-600 text-white px-12 py-6 rounded-lg text-3xl transition-colors duration-200 font-bold"
                       style={{fontFamily: 'Georgia, serif'}}
                     >
                       {lyricsLoading ? 'Fetching Lyrics...' : 'Get Lyrics'}
@@ -447,7 +447,7 @@ export default function SpotifyLyrics() {
                     <div className="h-full overflow-y-auto">
                       {(lyrics.syncedLyrics || (currentTrack?.is_playing && lyrics.lyrics)) ? (
                         // Large synchronized lyrics with sliding window effect
-                        <div className="font-serif leading-relaxed space-y-4 text-center" style={{fontFamily: 'Georgia, serif'}}>
+                        <div className=" leading-relaxed space-y-4 text-center" style={{fontFamily: 'Georgia, serif'}}>
                           {(() => {
                             const allLines = lyrics.syncedLyrics || createBasicSync(lyrics.lyrics, currentTrack?.duration_ms || 0);
                             const currentIndex = getCurrentLyricIndex();
@@ -494,7 +494,7 @@ export default function SpotifyLyrics() {
                         </div>
                       ) : (
                         // Large static lyrics
-                        <div className="font-serif text-2xl md:text-4xl whitespace-pre-wrap leading-relaxed text-center text-white" style={{fontFamily: 'Georgia, serif'}}>
+                        <div className=" text-2xl md:text-4xl whitespace-pre-wrap leading-relaxed text-center text-white" style={{fontFamily: 'Georgia, serif'}}>
                           {lyrics.lyrics}
                         </div>
                       )}
@@ -516,10 +516,10 @@ export default function SpotifyLyrics() {
                     className="w-16 h-16 rounded-lg object-cover"
                   />
                   <div>
-                    <h3 className="font-serif text-2xl font-bold text-white" style={{fontFamily: 'Georgia, serif'}}>
+                    <h3 className=" text-2xl font-bold text-white" style={{fontFamily: 'Georgia, serif'}}>
                       {currentTrack.name}
                     </h3>
-                    <p className="font-serif text-xl text-gray-300" style={{fontFamily: 'Georgia, serif'}}>
+                    <p className=" text-xl text-gray-300" style={{fontFamily: 'Georgia, serif'}}>
                       {currentTrack.artists.map(artist => artist.name).join(', ')}
                     </p>
                   </div>
@@ -528,12 +528,12 @@ export default function SpotifyLyrics() {
                 <div className="text-right">
                   <div className="flex items-center space-x-2 mb-2">
                     <div className={`w-3 h-3 rounded-full ${currentTrack.is_playing ? 'bg-green-500 animate-pulse' : 'bg-gray-500'}`}></div>
-                    <p className="font-serif text-lg text-gray-300" style={{fontFamily: 'Georgia, serif'}}>
+                    <p className=" text-lg text-gray-300" style={{fontFamily: 'Georgia, serif'}}>
                       {currentTrack.is_playing ? 'Playing' : 'Paused'}
                     </p>
                   </div>
                   {currentTrack.is_playing && (
-                    <p className="font-serif text-sm text-gray-400" style={{fontFamily: 'Georgia, serif'}}>
+                    <p className=" text-sm text-gray-400" style={{fontFamily: 'Georgia, serif'}}>
                       {Math.floor(currentPosition / 1000)}s / {Math.floor((currentTrack?.duration_ms || 0) / 1000)}s
                     </p>
                   )}
