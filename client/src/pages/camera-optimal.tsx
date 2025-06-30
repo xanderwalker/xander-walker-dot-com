@@ -4,7 +4,7 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Camera, Download, Grid3X3, Square } from 'lucide-react';
-import Layout from '@/components/layout';
+// Layout removed to focus on camera execution
 
 interface CameraDevice {
   deviceId: string;
@@ -191,6 +191,7 @@ export default function CameraOptimal() {
         if (loadedCount === TOTAL_PHOTOS) {
           const collageData = canvas.toDataURL('image/jpeg', 0.9);
           setFinalCollage(collageData);
+          setIsCapturing(false); // Stop capturing state
           
           setSaveStatus('saving');
           saveSubmissionMutation.mutate({
@@ -244,7 +245,7 @@ export default function CameraOptimal() {
     
     const captureSequence = () => {
       if (photoCount >= TOTAL_PHOTOS) {
-        setIsCapturing(false);
+        // Don't set isCapturing to false here - let createOptimalCollage handle it
         return;
       }
       
@@ -299,7 +300,6 @@ export default function CameraOptimal() {
   };
 
   return (
-    <Layout>
       <div className="relative min-h-screen bg-black text-white overflow-hidden">
         
         {/* Live viewfinder */}
@@ -595,6 +595,5 @@ export default function CameraOptimal() {
 
         <canvas ref={canvasRef} className="hidden" />
       </div>
-    </Layout>
   );
 }
