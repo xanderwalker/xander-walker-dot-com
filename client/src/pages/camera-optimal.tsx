@@ -1,11 +1,11 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
+import { Link } from 'wouter';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Camera, Download, Grid3X3, Square } from 'lucide-react';
 import type { KaleidoscopeSubmission } from '@shared/schema';
-// Layout removed to focus on camera execution
 
 interface CameraDevice {
   deviceId: string;
@@ -29,6 +29,8 @@ export default function CameraOptimal() {
   const [finalCollage, setFinalCollage] = useState<string | null>(null);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
+  const [showViewfinder, setShowViewfinder] = useState(false);
+  const [isCapturingSequence, setIsCapturingSequence] = useState(false);
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -245,25 +247,25 @@ export default function CameraOptimal() {
     },
   });
 
-  const startCapture = () => {
-    if (!stream) return;
-    
+  // Start viewfinder mode
+  const startViewfinder = () => {
+    setShowViewfinder(true);
     setIsCapturing(true);
     setCapturedPhotos([]);
-    
+  };
+
+  // Take all 12 photos in sequence
+  const captureAllPhotos = () => {
+    setCapturedPhotos([]);
+    setIsCapturingSequence(true);
     let photoCount = 0;
     
     const captureSequence = () => {
-      if (photoCount >= TOTAL_PHOTOS) {
-        // Don't set isCapturing to false here - let createOptimalCollage handle it
-        return;
-      }
-      
-      const imageData = capturePhoto();
-      if (imageData) {
+      const photoData = capturePhoto();
+      if (photoData) {
         const newPhoto: CapturedPhoto = {
-          id: photoCount + 1,
-          imageData,
+          id: photoCount,
+          imageData: photoData,
           timestamp: Date.now()
         };
         
@@ -272,12 +274,12 @@ export default function CameraOptimal() {
           
           console.log(`Captured photo ${updated.length}/${TOTAL_PHOTOS}`);
           
-          // Create collage when we have all photos
           if (updated.length === TOTAL_PHOTOS) {
-            console.log('All photos captured, creating collage...');
-            // Immediately stop capturing state
-            setIsCapturing(false);
-            setTimeout(() => createOptimalCollage(updated), 100);
+            setIsCapturingSequence(false);
+            setTimeout(() => {
+              setShowViewfinder(false);
+              createOptimalCollage(updated);
+            }, 500);
           }
           
           return updated;
@@ -314,276 +316,217 @@ export default function CameraOptimal() {
     }
   };
 
-  return (
-      <div className="relative min-h-screen bg-black text-white overflow-hidden">
-        
-        {/* Live viewfinder */}
-        {stream && !isCapturing && (
-          <div className="fixed inset-0 z-10">
-            <video
-              ref={videoRef}
-              autoPlay
-              playsInline
-              muted
-              className="w-full h-full object-cover"
-            />
-            
-            {/* Grid overlay for preview */}
-            <div className="absolute inset-0 pointer-events-none">
-              <svg className="w-full h-full" viewBox="0 0 4 3" preserveAspectRatio="none">
-                {/* 4x3 grid lines */}
-                {Array.from({ length: GRID_COLS - 1 }, (_, i) => (
-                  <line
-                    key={`v${i}`}
-                    x1={i + 1}
-                    y1="0"
-                    x2={i + 1}
-                    y2="3"
-                    stroke="rgba(255,255,255,0.4)"
-                    strokeWidth="0.05"
-                    vectorEffect="non-scaling-stroke"
-                  />
-                ))}
-                {Array.from({ length: GRID_ROWS - 1 }, (_, i) => (
-                  <line
-                    key={`h${i}`}
-                    x1="0"
-                    y1={i + 1}
-                    x2="4"
-                    y2={i + 1}
-                    stroke="rgba(255,255,255,0.4)"
-                    strokeWidth="0.05"
-                    vectorEffect="non-scaling-stroke"
-                  />
-                ))}
-              </svg>
-            </div>
-            
-            {/* Gallery link in bottom right */}
-            <div className="absolute bottom-4 right-4 z-20">
-              <Button 
-                onClick={() => window.location.href = '/projects/kaleidoscope-gallery'}
-                className="w-16 h-16 bg-black/70 hover:bg-black/90 rounded-lg border-2 border-white/30 flex items-center justify-center"
-              >
-                <Grid3X3 className="w-8 h-8 text-white" />
-              </Button>
-            </div>
-            
-            {/* Capture button */}
-            <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-20">
-              <Button
-                onClick={startCapture}
-                size="lg"
-                className="w-20 h-20 rounded-full bg-white text-black hover:bg-gray-200 border-4 border-gray-300"
-              >
-                <Camera className="w-8 h-8" />
-              </Button>
-            </div>
-            
-            {/* Camera selection */}
-            <div className="absolute top-4 right-4 z-20">
-              <select
-                value={selectedCamera?.deviceId || ''}
-                onChange={(e) => {
-                  const camera = cameras.find(c => c.deviceId === e.target.value);
-                  if (camera) setSelectedCamera(camera);
-                }}
-                className="bg-black/50 text-white border border-white/30 rounded px-3 py-2"
-              >
-                {cameras.map((camera) => (
-                  <option key={camera.deviceId} value={camera.deviceId}>
-                    {camera.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-            
-            {/* Photo counter */}
-            <div className="absolute top-4 left-4 z-20">
-              <div className="bg-black/50 text-white px-4 py-2 rounded">
-                <div className="flex items-center gap-2">
-                  <Square className="w-5 h-5" />
-                  <span>{GRID_COLS}×{GRID_ROWS} Optimal Grid</span>
-                </div>
-                <div className="text-sm opacity-75">{TOTAL_PHOTOS} photos total</div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Capturing progress with real-time grid fill */}
-        {isCapturing && (
-          <div className="fixed inset-0 z-30">
-            {/* Video continues in background */}
-            <video
-              ref={videoRef}
-              autoPlay
-              playsInline
-              muted
-              className="w-full h-full object-cover opacity-50"
-            />
-            
-            {/* Real-time grid visualization */}
-            <div className="absolute inset-0 pointer-events-none">
-              <svg className="w-full h-full" viewBox="0 0 4 3" preserveAspectRatio="none">
-                {/* Grid lines */}
-                {Array.from({ length: GRID_COLS - 1 }, (_, i) => (
-                  <line
-                    key={`v${i}`}
-                    x1={i + 1}
-                    y1="0"
-                    x2={i + 1}
-                    y2="3"
-                    stroke="rgba(255,255,255,0.5)"
-                    strokeWidth="0.05"
-                    vectorEffect="non-scaling-stroke"
-                  />
-                ))}
-                {Array.from({ length: GRID_ROWS - 1 }, (_, i) => (
-                  <line
-                    key={`h${i}`}
-                    x1="0"
-                    y1={i + 1}
-                    x2="4"
-                    y2={i + 1}
-                    stroke="rgba(255,255,255,0.5)"
-                    strokeWidth="0.05"
-                    vectorEffect="non-scaling-stroke"
-                  />
-                ))}
-                
-                {/* Filled rectangles */}
-                {capturedPhotos.map((photo, index) => {
-                  const col = index % GRID_COLS;
-                  const row = Math.floor(index / GRID_COLS);
-                  return (
-                    <rect
-                      key={photo.id}
-                      x={col}
-                      y={row}
-                      width="1"
-                      height="1"
-                      fill="rgba(0,255,0,0.4)"
-                      stroke="rgba(0,255,0,0.8)"
-                      strokeWidth="0.02"
-                      vectorEffect="non-scaling-stroke"
-                    />
-                  );
-                })}
-                
-                {/* Current capture rectangle (blinking) */}
-                {capturedPhotos.length < TOTAL_PHOTOS && (() => {
-                  const currentIndex = capturedPhotos.length;
-                  const col = currentIndex % GRID_COLS;
-                  const row = Math.floor(currentIndex / GRID_COLS);
-                  return (
-                    <rect
-                      x={col}
-                      y={row}
-                      width="1"
-                      height="1"
-                      fill="rgba(255,255,0,0.6)"
-                      stroke="rgba(255,255,0,1)"
-                      strokeWidth="0.04"
-                      vectorEffect="non-scaling-stroke"
-                      className="animate-pulse"
-                    />
-                  );
-                })()}
-              </svg>
-            </div>
-            
-            {/* Progress overlay */}
-            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center bg-black/70 p-8 rounded-lg">
-              <div className="text-6xl font-bold mb-4 text-green-400">{capturedPhotos.length}</div>
-              <div className="text-2xl mb-8 text-white">/ {TOTAL_PHOTOS} RECTANGLES</div>
-              <div className="w-64 h-2 bg-gray-800 rounded-full overflow-hidden">
-                <div 
-                  className="h-full bg-green-500 transition-all duration-100"
-                  style={{ width: `${(capturedPhotos.length / TOTAL_PHOTOS) * 100}%` }}
-                />
-              </div>
-              <div className="text-lg mt-4 text-white">Capturing at 4fps...</div>
-              <div className="text-sm mt-2 opacity-75 text-gray-300">Filling {GRID_COLS}×{GRID_ROWS} grid in real-time</div>
-            </div>
-          </div>
-        )}
-
-        {/* Save status notification */}
-        {saveStatus === 'saving' && (
-          <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 bg-yellow-600 text-white px-4 py-2 rounded-lg">
-            💾 Saving to gallery...
-          </div>
-        )}
-        {saveStatus === 'saved' && (
-          <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 bg-green-600 text-white px-4 py-2 rounded-lg">
-            ✅ Saved to gallery
-          </div>
-        )}
-
-        {/* Camera selection and controls */}
-        {!isCapturing && !finalCollage && (
-          <div className="flex flex-col items-center justify-center min-h-screen p-8">
-            <h1 className="text-4xl font-bold mb-8 text-center">Optimal Camera Utilization</h1>
-            <p className="text-xl mb-8 text-center max-w-2xl">
-              Captures {TOTAL_PHOTOS} photos in {GRID_COLS}×{GRID_ROWS} rectangles at 4fps for testing. Each rectangle perfectly fills its section with zero wasted space, maximizing camera sensor utilization and creating seamless 4:3 composites.
-            </p>
-            
-            {hasPermission === false && (
-              <div className="text-center mb-8">
-                <p className="text-red-400 mb-4">Camera permission is required</p>
-                <Button 
-                  onClick={initializeCameras}
-                  size="lg"
-                  className="bg-blue-600 hover:bg-blue-700"
-                >
-                  <Camera className="w-6 h-6 mr-2" />
-                  Grant Camera Permission
-                </Button>
-              </div>
-            )}
-            
-            {/* Camera selection - only show if no stream is active */}
-            {cameras.length > 0 && hasPermission !== false && !stream && (
-              <Card className="bg-gray-900 border-gray-700 p-6 mb-6">
-                <div className="flex flex-col items-center gap-4">
-                  <h3 className="text-lg font-semibold">Select Camera</h3>
-                  <div className="grid gap-2 w-full">
-                    {cameras.map((camera) => (
-                      <Button
-                        key={camera.deviceId}
-                        onClick={() => setSelectedCamera(camera)}
-                        variant={selectedCamera?.deviceId === camera.deviceId ? "default" : "outline"}
-                        className="w-full justify-start"
-                      >
-                        <Camera className="w-4 h-4 mr-2" />
-                        {camera.label}
-                        {camera.facing !== 'unknown' && (
-                          <span className="ml-auto text-sm opacity-70">
-                            ({camera.facing})
-                          </span>
-                        )}
-                      </Button>
-                    ))}
-                  </div>
-                </div>
-              </Card>
-            )}
-
-            {!stream && selectedCamera && hasPermission !== false && (
-              <Button 
-                onClick={() => startCamera(selectedCamera)}
-                size="lg"
-                className="bg-blue-600 hover:bg-blue-700"
-              >
-                <Camera className="w-6 h-6 mr-2" />
-                Start Camera
-              </Button>
-            )}
-          </div>
-        )}
-
-        <canvas ref={canvasRef} className="hidden" />
+  if (hasPermission === null) {
+    return (
+      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="text-xl mb-4">Requesting camera access...</div>
+        </div>
       </div>
+    );
+  }
+
+  if (hasPermission === false) {
+    return (
+      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+        <div className="text-center max-w-md mx-4">
+          <h2 className="text-2xl font-bold mb-4">Camera Access Required</h2>
+          <p className="mb-6">This app needs camera access to create optimal collages. Please enable camera permissions and refresh the page.</p>
+          <Link href="/projects/cameras">
+            <button className="px-6 py-3 bg-blue-600 hover:bg-blue-700 rounded-lg text-white font-semibold transition-colors">
+              Back to Cameras
+            </button>
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div 
+      className="min-h-screen bg-black text-white overflow-hidden relative"
+      style={{
+        fontFamily: 'Georgia, "Times New Roman", Times, serif',
+        touchAction: 'manipulation',
+        userSelect: 'none'
+      }}
+    >
+      {/* Navigation */}
+      {!isCapturing && !finalCollage && (
+        <div className="absolute top-4 left-4 z-50">
+          <Link href="/projects/cameras">
+            <button className="px-4 py-2 bg-white/20 backdrop-blur-sm rounded-lg text-white hover:bg-white/30 transition-colors">
+              ← Cameras
+            </button>
+          </Link>
+        </div>
+      )}
+
+      {/* Video element */}
+      <video
+        ref={videoRef}
+        autoPlay
+        playsInline
+        muted
+        className={showViewfinder ? "absolute inset-0 w-full h-full object-cover" : "hidden"}
+      />
+
+      {/* Hidden canvas for processing */}
+      <canvas ref={canvasRef} className="hidden" />
+
+      {/* Camera selection and controls */}
+      {!isCapturing && !finalCollage && (
+        <div className="flex flex-col items-center justify-center min-h-screen p-8">
+          <h1 className="text-4xl font-bold mb-8 text-center">12-Photo Optimal Collage</h1>
+          <p className="text-xl mb-8 text-center max-w-2xl">
+            Click the shutter button to automatically capture 12 photos in sequence (4 per second). Each photo contributes one rectangle to create a seamless 4×3 grid composite with maximum camera sensor utilization.
+          </p>
+          
+          {/* Camera selection */}
+          {cameras.length > 1 && (
+            <div className="mb-8">
+              <h3 className="text-lg mb-4">Select Camera:</h3>
+              <div className="space-y-2">
+                {cameras.map(camera => (
+                  <button
+                    key={camera.deviceId}
+                    onClick={() => setSelectedCamera(camera)}
+                    className={`block w-full px-4 py-2 rounded-lg transition-colors ${
+                      selectedCamera?.deviceId === camera.deviceId
+                        ? 'bg-blue-600 text-white'
+                        : 'bg-white/20 hover:bg-white/30'
+                    }`}
+                  >
+                    {camera.label} ({camera.facing})
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+          
+          <button
+            onClick={startViewfinder}
+            disabled={!selectedCamera}
+            className="px-8 py-4 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed rounded-lg text-white font-semibold transition-colors"
+          >
+            Start Camera
+          </button>
+        </div>
+      )}
+
+      {/* Viewfinder mode */}
+      {showViewfinder && (
+        <div className="absolute inset-0 z-10">
+          {/* Grid overlay for preview */}
+          <div className="absolute inset-0 pointer-events-none">
+            <svg className="w-full h-full" viewBox="0 0 4 3" preserveAspectRatio="none">
+              {/* 4x3 grid lines */}
+              {Array.from({ length: GRID_COLS - 1 }, (_, i) => (
+                <line
+                  key={`v${i}`}
+                  x1={i + 1}
+                  y1="0"
+                  x2={i + 1}
+                  y2="3"
+                  stroke="rgba(255,255,255,0.4)"
+                  strokeWidth="0.05"
+                  vectorEffect="non-scaling-stroke"
+                />
+              ))}
+              {Array.from({ length: GRID_ROWS - 1 }, (_, i) => (
+                <line
+                  key={`h${i}`}
+                  x1="0"
+                  y1={i + 1}
+                  x2="4"
+                  y2={i + 1}
+                  stroke="rgba(255,255,255,0.4)"
+                  strokeWidth="0.05"
+                  vectorEffect="non-scaling-stroke"
+                />
+              ))}
+            </svg>
+          </div>
+
+          {/* Bottom controls */}
+          <div className="absolute bottom-8 left-0 right-0 flex justify-center pointer-events-auto">
+            <div className="text-center">
+              {isCapturingSequence && (
+                <div className="text-white text-lg mb-4 font-semibold">
+                  Taking photo {capturedPhotos.length + 1} of {TOTAL_PHOTOS}...
+                </div>
+              )}
+              <button
+                onClick={captureAllPhotos}
+                disabled={isCapturingSequence}
+                className={`w-20 h-20 border-4 border-gray-300 rounded-full transition-all duration-200 shadow-lg ${
+                  isCapturingSequence 
+                    ? 'bg-gray-400 cursor-not-allowed' 
+                    : 'bg-white hover:bg-gray-100'
+                }`}
+                style={{ boxShadow: '0 0 0 4px rgba(255,255,255,0.3)' }}
+              >
+                <div className={`w-full h-full rounded-full border-2 ${
+                  isCapturingSequence 
+                    ? 'bg-gray-400 border-gray-500' 
+                    : 'bg-white border-gray-400'
+                }`}></div>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Final collage display */}
+      {finalCollage && (
+        <div className="min-h-screen bg-black text-white flex flex-col items-center justify-center p-8">
+          <h1 className="text-4xl font-bold mb-8 text-center">Optimal Collage Complete!</h1>
+          
+          <div className="mb-8 max-w-4xl">
+            <img 
+              src={finalCollage} 
+              alt="Optimal collage"
+              className="w-full h-auto rounded-lg shadow-2xl"
+            />
+          </div>
+          
+          <div className="flex flex-col sm:flex-row gap-4 items-center">
+            <div className="flex gap-4">
+              <a
+                href={finalCollage}
+                download="optimal-collage.jpg"
+                className="px-6 py-3 bg-green-600 hover:bg-green-700 rounded-lg text-white font-semibold transition-colors"
+              >
+                Download Collage
+              </a>
+              
+              <Link href="/projects/kaleidoscope-gallery">
+                <button className="px-6 py-3 bg-purple-600 hover:bg-purple-700 rounded-lg text-white font-semibold transition-colors">
+                  View Gallery
+                </button>
+              </Link>
+            </div>
+            
+            <div>
+              <Link href="/projects/cameras">
+                <button className="px-6 py-3 bg-blue-600 hover:bg-blue-700 rounded-lg text-white font-semibold transition-colors">
+                  Back to Cameras
+                </button>
+              </Link>
+            </div>
+          </div>
+          
+          {saveStatus === 'saving' && (
+            <div className="mt-4 text-yellow-400">Saving to gallery...</div>
+          )}
+          {saveStatus === 'saved' && (
+            <div className="mt-4 text-green-400">Saved to gallery!</div>
+          )}
+          {saveStatus === 'error' && (
+            <div className="mt-4 text-red-400">Error saving to gallery</div>
+          )}
+        </div>
+      )}
+    </div>
   );
 }
