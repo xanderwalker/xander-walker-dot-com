@@ -39,7 +39,8 @@ export default function CameraSquares() {
   const initializeCameras = async () => {
     try {
       // Request camera permission first
-      await navigator.mediaDevices.getUserMedia({ video: true });
+      const tempStream = await navigator.mediaDevices.getUserMedia({ video: true });
+      tempStream.getTracks().forEach(track => track.stop()); // Stop temp stream
       
       const devices = await navigator.mediaDevices.enumerateDevices();
       const videoDevices = devices.filter(device => device.kind === 'videoinput');
@@ -63,7 +64,9 @@ export default function CameraSquares() {
       });
       
       setCameras(cameraDevices);
-      if (cameraDevices.length > 0 && !selectedCamera) {
+      setHasPermission(true);
+      
+      if (cameraDevices.length > 0) {
         const rearCamera = cameraDevices.find(cam => cam.facing === 'environment');
         setSelectedCamera(rearCamera || cameraDevices[0]);
       }
@@ -104,11 +107,7 @@ export default function CameraSquares() {
     }
   };
 
-  useEffect(() => {
-    if (selectedCamera && hasPermission !== false) {
-      startCamera(selectedCamera);
-    }
-  }, [selectedCamera, hasPermission]);
+  // Auto-start removed to prevent conflicts
 
   // Cleanup on unmount
   useEffect(() => {
