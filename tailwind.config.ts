@@ -6,9 +6,10 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        'sans': ['-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', 'sans-serif'],
-        'serif': ['Times New Roman', 'Georgia', 'Times', 'serif'],
-        'xanman-wide': ['XanmanWide', 'Inter', 'Arial', 'sans-serif'],
+        'sans': ['var(--primary-font-family)'],
+        'primary': ['var(--primary-font-family)'], 
+        'brand': ['var(--brand-font-family)'],
+        'xanman-wide': ['XanmanWide', 'var(--primary-font-family)'],
       },
       borderRadius: {
         lg: "var(--radius)",

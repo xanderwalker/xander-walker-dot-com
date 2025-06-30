@@ -264,7 +264,7 @@ export default function Roulette() {
       ctx.save();
       ctx.rotate(segment.angle * (Math.PI / 180));
       ctx.fillStyle = 'white';
-      ctx.font = 'bold 16px Georgia, serif';
+      ctx.font = 'bold 16px sans-serif';
       ctx.textAlign = 'center';
       ctx.fillText(segment.number.toString(), wheelRadius - 30, 5);
       ctx.restore();
@@ -310,13 +310,13 @@ export default function Roulette() {
     <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-black text-white p-4">
       {/* Header */}
       <div className="max-w-4xl mx-auto mb-8">
-        <Link href="/projects" className="text-blue-400 hover:text-blue-300  text-lg transition-colors" style={{fontFamily: 'Georgia, serif'}}>
+        <Link href="/projects" className="text-blue-400 hover:text-blue-300  text-lg transition-colors" >
           ← BACK TO PROJECTS
         </Link>
-        <h1 className="text-4xl  text-center mt-6 mb-2" style={{fontFamily: 'Georgia, serif'}}>
+        <h1 className="text-4xl  text-center mt-6 mb-2" >
           XANDER WALKER
         </h1>
-        <h2 className="text-2xl  text-center text-gray-300" style={{fontFamily: 'Georgia, serif'}}>
+        <h2 className="text-2xl  text-center text-gray-300" >
           ROULETTE WHEEL
         </h2>
       </div>
@@ -329,12 +329,12 @@ export default function Roulette() {
           {winningNumber !== null && (
             <div className="text-center mb-6">
               <div className="inline-block glassmorphism rounded-2xl px-8 py-4">
-                <h3 className=" text-xl mb-2" style={{fontFamily: 'Georgia, serif'}}>WINNING NUMBER</h3>
+                <h3 className=" text-xl mb-2" >WINNING NUMBER</h3>
                 <div className={`text-6xl  font-bold ${
                   rouletteNumbers.find(n => n.number === winningNumber)?.color === 'red' ? 'text-red-400' :
                   rouletteNumbers.find(n => n.number === winningNumber)?.color === 'black' ? 'text-gray-300' :
                   'text-green-400'
-                }`} style={{fontFamily: 'Georgia, serif'}}>
+                }`} >
                   {winningNumber}
                 </div>
               </div>
@@ -366,7 +366,7 @@ export default function Roulette() {
                   ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
                   : 'bg-red-600 text-white hover:bg-red-700'
               }`}
-              style={{fontFamily: 'Georgia, serif'}}
+              
             >
               DROP BALL
             </button>
@@ -378,14 +378,14 @@ export default function Roulette() {
                 setIsSpinning(false);
               }}
               className=" bg-gray-600 text-white px-6 py-3 rounded-lg text-lg font-bold hover:bg-gray-700 transition-colors"
-              style={{fontFamily: 'Georgia, serif'}}
+              
             >
               RESET
             </button>
           </div>
 
           {/* Instructions */}
-          <div className="mt-6 text-center text-sm text-gray-400 " style={{fontFamily: 'Georgia, serif'}}>
+          <div className="mt-6 text-center text-sm text-gray-400 " >
             <p>Drag the wheel to spin it, then drop the ball to play!</p>
             <p>The ball will bounce around and settle on a winning number.</p>
           </div>
