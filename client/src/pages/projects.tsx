@@ -4,11 +4,11 @@ import Layout from '../components/layout';
 export default function Projects() {
   const projects = [
     {
-      title: "20-PHOTO COLLAGE",
-      description: "High-speed photo collage creator. Captures 20 photos in 5 seconds (4 per second), using specific sections from each photo to build a seamless composite image. Each photo contributes one grid section to the final artwork.",
-      tags: "Camera • Collage • Composite • Fast Capture",
+      title: "CAMERA SYSTEMS",
+      description: "Advanced high-speed photo capture systems. Includes 20-shot sectional collage (4fps) with square grid sections, and 100-shot hexagonal collage (10fps) with hexagonal composite sections. Professional viewfinder interfaces and automatic gallery saves.",
+      tags: "Camera • Collage • Composite • Multi-Systems",
       timestamp: "June 30, 2025",
-      link: "/projects/camera-collage"
+      link: "/projects/cameras"
     },
     {
       title: "KALEIDOSCOPE GALLERY",
