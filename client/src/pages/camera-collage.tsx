@@ -163,16 +163,16 @@ export default function CameraCollage() {
     return canvas.toDataURL('image/jpeg', 0.9);
   }, []);
 
-  // Create collage from 4 photos
+  // Create collage from 20 photos (5 rows x 4 columns)
   const createCollage = useCallback((photos: CapturedPhoto[]) => {
-    if (photos.length !== 4 || !canvasRef.current) return;
+    if (photos.length !== 20 || !canvasRef.current) return;
     
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d')!;
     
-    // Set collage size
+    // Set collage size (4:5 aspect ratio for 4 columns x 5 rows)
     const collageWidth = 800;
-    const collageHeight = 800;
+    const collageHeight = 1000;
     canvas.width = collageWidth;
     canvas.height = collageHeight;
     
@@ -180,28 +180,34 @@ export default function CameraCollage() {
     ctx.fillStyle = '#000';
     ctx.fillRect(0, 0, collageWidth, collageHeight);
     
+    // Calculate grid dimensions
+    const cols = 4;
+    const rows = 5;
+    const cellWidth = collageWidth / cols;
+    const cellHeight = collageHeight / rows;
+    
     let loadedCount = 0;
     
     photos.forEach((photo, index) => {
       const img = new Image();
       img.onload = () => {
-        // Calculate the quarter section to use from each photo
-        const sourceHeight = img.height / 4;
-        const sourceY = sourceHeight * index;
+        // Calculate grid position
+        const col = index % cols;
+        const row = Math.floor(index / cols);
         
-        // Calculate destination position (each quarter takes up 1/4 of the collage height)
-        const destY = (collageHeight / 4) * index;
-        const destHeight = collageHeight / 4;
+        // Calculate destination position
+        const destX = col * cellWidth;
+        const destY = row * cellHeight;
         
-        // Draw the quarter section
+        // Draw the photo scaled to fit the cell
         ctx.drawImage(
           img,
-          0, sourceY, img.width, sourceHeight, // Source: full width, 1/4 height at appropriate position
-          0, destY, collageWidth, destHeight    // Destination: full width, 1/4 height
+          0, 0, img.width, img.height,           // Source: full image
+          destX, destY, cellWidth, cellHeight    // Destination: grid cell
         );
         
         loadedCount++;
-        if (loadedCount === 4) {
+        if (loadedCount === 20) {
           // All photos processed, create final collage
           const collageData = canvas.toDataURL('image/jpeg', 0.9);
           setFinalCollage(collageData);
@@ -210,7 +216,7 @@ export default function CameraCollage() {
           setSaveStatus('saving');
           saveSubmissionMutation.mutate({
             imageData: collageData,
-            flowerCount: 4 // Use 4 for photo count
+            flowerCount: 20 // Use 20 for photo count
           });
           
           // Stop camera
@@ -230,7 +236,7 @@ export default function CameraCollage() {
     setCapturedPhotos([]);
   };
 
-  // Take all 4 photos in sequence
+  // Take all 20 photos in sequence
   const captureAllPhotos = () => {
     setCapturedPhotos([]);
     setIsCapturingSequence(true);
@@ -248,8 +254,8 @@ export default function CameraCollage() {
         setCapturedPhotos(prev => {
           const updated = [...prev, newPhoto];
           
-          // If we have all 4 photos, create collage
-          if (updated.length === 4) {
+          // If we have all 20 photos, create collage
+          if (updated.length === 20) {
             setIsCapturingSequence(false);
             setTimeout(() => {
               setShowViewfinder(false);
@@ -263,7 +269,7 @@ export default function CameraCollage() {
         photoCount++;
         
         // Continue capturing if we need more photos
-        if (photoCount < 4) {
+        if (photoCount < 20) {
           setTimeout(captureSequence, 1000); // 1 second between photos
         }
       }
@@ -346,9 +352,9 @@ export default function CameraCollage() {
       {/* Camera selection and controls */}
       {!isCapturing && !finalCollage && (
         <div className="flex flex-col items-center justify-center min-h-screen p-8">
-          <h1 className="text-4xl font-bold mb-8 text-center">4-Photo Collage</h1>
+          <h1 className="text-4xl font-bold mb-8 text-center">20-Photo Collage</h1>
           <p className="text-xl mb-8 text-center max-w-2xl">
-            Click the shutter button to automatically capture 4 photos in sequence (one per second). Each photo contributes one quarter section to create a unique collage.
+            Click the shutter button to automatically capture 20 photos in sequence (one per second). Photos are arranged in 5 rows of 4 photos each to create a detailed collage.
           </p>
           
           {/* Camera selection */}
@@ -392,13 +398,14 @@ export default function CameraCollage() {
             <div className="absolute top-4 left-4 right-4 bg-black/50 backdrop-blur-sm rounded-lg p-4 pointer-events-auto">
               <div className="flex items-center justify-between mb-4">
                 <div className="text-white text-lg font-semibold">
-                  Photo {capturedPhotos.length + 1} of 4
+                  Photo {capturedPhotos.length + 1} of 20
                 </div>
                 <button
                   onClick={() => {
                     setShowViewfinder(false);
                     setIsCapturing(false);
                     setCapturedPhotos([]);
+                    setIsCapturingSequence(false);
                   }}
                   className="px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg text-white transition-colors"
                 >
@@ -410,21 +417,23 @@ export default function CameraCollage() {
               <div className="w-full bg-gray-700 rounded-full h-2">
                 <div 
                   className="bg-green-500 h-2 rounded-full transition-all duration-300"
-                  style={{ width: `${(capturedPhotos.length / 4) * 100}%` }}
+                  style={{ width: `${(capturedPhotos.length / 20) * 100}%` }}
                 />
               </div>
             </div>
 
-            {/* Captured photos preview */}
-            <div className="absolute top-24 left-4 flex gap-2 pointer-events-auto">
-              {capturedPhotos.map((photo, index) => (
-                <div key={photo.id} className="w-16 h-16 border-2 border-green-500 rounded-lg overflow-hidden">
-                  <img src={photo.imageData} alt={`Photo ${index + 1}`} className="w-full h-full object-cover" />
-                </div>
-              ))}
-              {Array.from({ length: 4 - capturedPhotos.length }).map((_, index) => (
-                <div key={`empty-${index}`} className="w-16 h-16 border-2 border-gray-500 border-dashed rounded-lg bg-black/30" />
-              ))}
+            {/* Captured photos preview - 5 rows x 4 columns */}
+            <div className="absolute top-24 left-4 pointer-events-auto">
+              <div className="grid grid-cols-4 gap-1 w-64">
+                {capturedPhotos.map((photo, index) => (
+                  <div key={photo.id} className="w-15 h-12 border border-green-500 rounded overflow-hidden">
+                    <img src={photo.imageData} alt={`Photo ${index + 1}`} className="w-full h-full object-cover" />
+                  </div>
+                ))}
+                {Array.from({ length: 20 - capturedPhotos.length }).map((_, index) => (
+                  <div key={`empty-${index}`} className="w-15 h-12 border border-gray-500 border-dashed rounded bg-black/30" />
+                ))}
+              </div>
             </div>
 
             {/* Center viewfinder frame */}
@@ -440,7 +449,7 @@ export default function CameraCollage() {
               <div className="text-center">
                 {isCapturingSequence && (
                   <div className="text-white text-lg mb-4 font-semibold">
-                    Taking photo {capturedPhotos.length + 1} of 4...
+                    Taking photo {capturedPhotos.length + 1} of 20...
                   </div>
                 )}
                 <button

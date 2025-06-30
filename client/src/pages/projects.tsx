@@ -4,10 +4,10 @@ import Layout from '../components/layout';
 export default function Projects() {
   const projects = [
     {
-      title: "4-PHOTO COLLAGE",
-      description: "Create unique collages from 4 consecutive photos. Each photo contributes one quarter section (top, upper-middle, lower-middle, bottom) to form a single artistic composition. Automatic capture with countdown timer.",
-      tags: "Camera • Collage • Photography • Art",
-      timestamp: "June 29, 2025",
+      title: "20-PHOTO COLLAGE",
+      description: "Create detailed collages from 20 consecutive photos arranged in a 5x4 grid. Single shutter press automatically captures all photos in sequence. Perfect for creating comprehensive photo compositions.",
+      tags: "Camera • Collage • Photography • Grid",
+      timestamp: "June 30, 2025",
       link: "/projects/camera-collage"
     },
     {
