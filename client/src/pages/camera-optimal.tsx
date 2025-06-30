@@ -194,19 +194,29 @@ export default function CameraOptimal() {
     // Get the first image to determine source aspect ratio
     const firstImg = new Image();
     firstImg.onload = () => {
-      // Calculate proper aspect ratio based on source image
-      const sourceAspectRatio = firstImg.width / firstImg.height;
+      // Get the actual viewport aspect ratio from the video element
+      const video = videoRef.current;
+      const viewportAspectRatio = video ? video.videoWidth / video.videoHeight : firstImg.width / firstImg.height;
       
-      // Create canvas with 4×3 grid layout, maintaining source aspect ratio for each rectangle
+      // Create canvas with 4×3 grid layout, maintaining viewport aspect ratio for each rectangle
       const cols = 4;
       const rows = 3;
       
-      // Calculate rectangle dimensions based on source aspect ratio
+      // Calculate rectangle dimensions based on actual viewport aspect ratio
       const baseSize = 300;
-      const rectWidth = baseSize * Math.max(1, sourceAspectRatio);
-      const rectHeight = baseSize * Math.max(1, 1/sourceAspectRatio);
+      let rectWidth, rectHeight;
       
-      // Total canvas dimensions
+      if (viewportAspectRatio > 1) {
+        // Landscape: width > height
+        rectWidth = baseSize * viewportAspectRatio;
+        rectHeight = baseSize;
+      } else {
+        // Portrait: height > width  
+        rectWidth = baseSize;
+        rectHeight = baseSize / viewportAspectRatio;
+      }
+      
+      // Total canvas dimensions - match the actual camera viewport layout
       const collageWidth = rectWidth * cols;
       const collageHeight = rectHeight * rows;
       
