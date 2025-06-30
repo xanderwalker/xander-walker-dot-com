@@ -70,7 +70,7 @@ export default function AnalogClock() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 relative overflow-hidden">
+    <div className="min-h-screen bg-white relative overflow-hidden">
       
       {/* Title */}
       <div className="fixed top-8 left-1/2 transform -translate-x-1/2 z-20">

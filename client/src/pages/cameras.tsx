@@ -52,10 +52,10 @@ export default function Cameras() {
       title="CAMERA SYSTEMS" 
       subtitle="Advanced photo collage and composite creators"
     >
-      <div className="min-h-screen bg-black text-white p-8">
+      <div className="min-h-screen bg-white text-gray-900 p-8">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
-            <p className="text-xl text-gray-300">
+            <p className="text-xl text-gray-600">
               High-speed photo capture systems that create composite artworks from rapid sequential photography
             </p>
           </div>
@@ -64,42 +64,32 @@ export default function Cameras() {
             {cameras.map((camera, index) => (
               <div
                 key={index}
-                className="bg-white/10 backdrop-blur-lg rounded-2xl p-8 border border-white/20 hover:bg-white/15 transition-all duration-300 hover:scale-105"
+                className="glassmorphism rounded-2xl p-8 hover:scale-105 transition-all duration-300"
               >
                 <div className="mb-6">
-                  <h2 className="text-2xl font-bold mb-3 text-white">
+                  <h2 className="text-2xl font-bold mb-3 text-black">
                     {camera.title}
                   </h2>
-                  <p 
-                    className="text-gray-300 text-lg leading-relaxed mb-4"
-                    
-                  >
+                  <p className="text-gray-700 text-lg leading-relaxed mb-4">
                     {camera.description}
                   </p>
                   <div className="flex flex-wrap gap-2 mb-4">
                     {camera.tags.split(' • ').map((tag, tagIndex) => (
                       <span
                         key={tagIndex}
-                        className="px-3 py-1 bg-white/20 rounded-full text-sm text-white"
-                        
+                        className="px-3 py-1 bg-gray-100 rounded-full text-sm text-gray-700 border border-gray-200"
                       >
                         {tag}
                       </span>
                     ))}
                   </div>
-                  <div 
-                    className="text-sm text-gray-400 mb-6"
-                    
-                  >
+                  <div className="text-sm text-gray-500 mb-6">
                     {camera.timestamp}
                   </div>
                 </div>
 
                 <Link href={camera.link}>
-                  <button 
-                    className="w-full px-6 py-3 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 rounded-lg text-white font-semibold transition-all duration-300 transform hover:scale-105"
-                    
-                  >
+                  <button className="w-full px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 rounded-lg text-white font-semibold transition-all duration-300 transform hover:scale-105">
                     Open Camera System
                   </button>
                 </Link>
@@ -109,10 +99,7 @@ export default function Cameras() {
 
           <div className="text-center mt-12">
             <Link href="/projects">
-              <button 
-                className="px-8 py-3 bg-white/20 backdrop-blur-sm rounded-lg text-white hover:bg-white/30 transition-colors"
-                
-              >
+              <button className="px-8 py-3 bg-gray-100 hover:bg-gray-200 rounded-lg text-gray-900 transition-colors border border-gray-300">
                 ← Back to Projects
               </button>
             </Link>

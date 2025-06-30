@@ -672,7 +672,6 @@ export default function TennisBallGun() {
     <div 
       className="min-h-screen bg-gradient-to-b from-green-800 via-green-700 to-green-900 text-white overflow-hidden"
       style={{
-        fontFamily: 'Georgia, "Times New Roman", Times, serif',
         touchAction: 'manipulation',
         userSelect: 'none'
       }}

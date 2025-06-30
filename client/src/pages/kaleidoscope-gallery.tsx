@@ -28,10 +28,10 @@ export default function CameraGallery() {
 
   if (isLoading) {
     return (
-      <Layout title="KALEIDOSCOPE GALLERY" subtitle="Loading submissions...">
-        <div className="min-h-screen bg-gradient-to-b from-purple-900 via-purple-800 to-black text-white flex items-center justify-center">
+      <Layout title="CAMERA GALLERY" subtitle="Loading submissions...">
+        <div className="min-h-screen bg-white text-gray-900 flex items-center justify-center">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-400 mx-auto mb-4"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-400 mx-auto mb-4"></div>
             <p className="text-lg">Loading gallery...</p>
           </div>
         </div>
@@ -42,9 +42,9 @@ export default function CameraGallery() {
   if (error) {
     return (
       <Layout title="CAMERA GALLERY" subtitle="Error loading photos">
-        <div className="min-h-screen bg-gradient-to-b from-purple-900 via-purple-800 to-black text-white flex items-center justify-center">
+        <div className="min-h-screen bg-white text-gray-900 flex items-center justify-center">
           <div className="text-center">
-            <p className="text-red-400 text-lg mb-4">Failed to load gallery</p>
+            <p className="text-red-500 text-lg mb-4">Failed to load gallery</p>
             <Link href="/projects">
               <button className="px-6 py-3 bg-blue-600 hover:bg-blue-700 rounded-lg text-white transition-colors">
                 Back to Projects
@@ -57,16 +57,11 @@ export default function CameraGallery() {
   }
 
   return (
-    <div 
-      className="min-h-screen bg-gradient-to-b from-purple-900 via-purple-800 to-black text-white"
-      style={{
-        fontFamily: 'Georgia, "Times New Roman", Times, serif'
-      }}
-    >
+    <div className="min-h-screen bg-white text-gray-900">
       {/* Navigation */}
       <div className="absolute top-4 left-4 z-50">
         <Link href="/projects">
-          <button className="px-4 py-2 bg-white/20 backdrop-blur-sm rounded-lg text-white hover:bg-white/30 transition-colors">
+          <button className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-gray-900 transition-colors border border-gray-300">
             ← Projects
           </button>
         </Link>
@@ -74,7 +69,7 @@ export default function CameraGallery() {
 
       <div className="absolute top-4 right-4 z-50">
         <Link href="/projects/cameras">
-          <button className="px-4 py-2 bg-pink-600/80 backdrop-blur-sm rounded-lg text-white hover:bg-pink-700/80 transition-colors">
+          <button className="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg text-white transition-colors">
             Back to Cameras
           </button>
         </Link>
@@ -82,10 +77,10 @@ export default function CameraGallery() {
 
       {/* Header */}
       <div className="pt-20 pb-8 text-center">
-        <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-pink-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent">
+        <h1 className="text-4xl md:text-5xl font-bold mb-4 text-gray-900">
           CAMERA GALLERY
         </h1>
-        <p className="text-xl text-gray-300 max-w-2xl mx-auto px-4">
+        <p className="text-xl text-gray-600 max-w-2xl mx-auto px-4">
           A collection of composite photos created with our camera systems
         </p>
         <div className="mt-4 text-sm text-gray-400">
