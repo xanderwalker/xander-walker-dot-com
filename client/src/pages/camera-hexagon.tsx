@@ -159,7 +159,7 @@ export default function CameraHexagon() {
     return canvas.toDataURL('image/jpeg', 0.9);
   }, []);
 
-  // Create hexagonal collage from 100 photos (10x10 grid)
+  // Create interlocking hexagonal collage from 100 photos (10x10 grid)
   const createHexagonalCollage = useCallback((photos: CapturedPhoto[]) => {
     if (photos.length !== 100 || !canvasRef.current) return;
     
@@ -174,11 +174,16 @@ export default function CameraHexagon() {
     ctx.fillStyle = '#000';
     ctx.fillRect(0, 0, collageWidth, collageHeight);
     
-    // Calculate hexagon dimensions for 10x10 grid
+    // Calculate interlocking hexagon dimensions
     const cols = 10;
     const rows = 10;
-    const cellWidth = collageWidth / cols;
-    const cellHeight = collageHeight / rows;
+    const hexRadius = 50; // Radius of each hexagon
+    const hexWidth = hexRadius * 2;
+    const hexHeight = Math.sqrt(3) * hexRadius; // Height of hexagon
+    
+    // Horizontal and vertical spacing for interlocking pattern
+    const horizontalSpacing = hexWidth * 0.75; // 3/4 width for interlocking
+    const verticalSpacing = hexHeight; // Full height
     
     let loadedCount = 0;
     
@@ -194,23 +199,21 @@ export default function CameraHexagon() {
         const sourceX = col * sourceWidth;
         const sourceY = row * sourceHeight;
         
-        // Calculate destination position
-        const destX = col * cellWidth;
-        const destY = row * cellHeight;
+        // Calculate hexagon center position for interlocking pattern
+        // Offset every other row for honeycomb pattern
+        const offsetX = (row % 2) * (horizontalSpacing / 2);
+        const centerX = offsetX + col * horizontalSpacing + hexRadius;
+        const centerY = row * verticalSpacing + hexRadius;
         
         // Create hexagonal clipping path
         ctx.save();
         ctx.beginPath();
         
-        const centerX = destX + cellWidth / 2;
-        const centerY = destY + cellHeight / 2;
-        const radius = Math.min(cellWidth, cellHeight) * 0.45;
-        
-        // Draw hexagon path
+        // Draw hexagon path (flat-top orientation)
         for (let i = 0; i < 6; i++) {
-          const angle = (i * Math.PI) / 3;
-          const x = centerX + radius * Math.cos(angle);
-          const y = centerY + radius * Math.sin(angle);
+          const angle = (i * Math.PI) / 3 - Math.PI / 6; // Rotate 30 degrees for flat-top
+          const x = centerX + hexRadius * Math.cos(angle);
+          const y = centerY + hexRadius * Math.sin(angle);
           
           if (i === 0) {
             ctx.moveTo(x, y);
@@ -222,10 +225,12 @@ export default function CameraHexagon() {
         ctx.clip();
         
         // Draw the photo section within the hexagon
+        // Scale and position the image to fit the hexagon area
+        const imageSize = hexRadius * 2.2; // Slightly larger to ensure full coverage
         ctx.drawImage(
           img,
           sourceX, sourceY, sourceWidth, sourceHeight,
-          destX, destY, cellWidth, cellHeight
+          centerX - imageSize/2, centerY - imageSize/2, imageSize, imageSize
         );
         
         ctx.restore();
@@ -289,7 +294,7 @@ export default function CameraHexagon() {
         photoCount++;
         
         if (photoCount < 100) {
-          setTimeout(captureSequence, 100); // 0.1 seconds between photos (10 fps)
+          setTimeout(captureSequence, 10); // 0.01 seconds between photos (100 fps)
         }
       }
     };
@@ -372,7 +377,7 @@ export default function CameraHexagon() {
         <div className="flex flex-col items-center justify-center min-h-screen p-8">
           <h1 className="text-4xl font-bold mb-8 text-center">100-Shot Hexagonal Collage</h1>
           <p className="text-xl mb-8 text-center max-w-2xl">
-            Click the shutter button to automatically capture 100 photos in sequence (10 per second). Each photo contributes one hexagonal section to create an intricate composite artwork.
+            Click the shutter button to automatically capture 100 photos in sequence (100 per second). Each photo contributes one interlocking hexagonal section to create a seamless honeycomb composite artwork.
           </p>
           
           {/* Camera selection */}

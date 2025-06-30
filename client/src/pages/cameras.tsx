@@ -12,8 +12,8 @@ export default function Cameras() {
     },
     {
       title: "100-SHOT HEXAGONAL COLLAGE", 
-      description: "Ultra-fast capture system taking 100 photos in 10 seconds. Creates intricate hexagonal composite images where each photo contributes one hexagonal section to the final artwork.",
-      tags: "100 Photos • 10fps • Hexagonal Grid • 10x10 Layout",
+      description: "Ultra-fast capture system taking 100 photos in 1 second. Creates interlocking honeycomb composite images where each photo contributes one hexagonal section with no gaps between sections.",
+      tags: "100 Photos • 100fps • Interlocking Hexagons • Honeycomb Pattern",
       timestamp: "June 30, 2025",
       link: "/projects/camera-hexagon"
     }
