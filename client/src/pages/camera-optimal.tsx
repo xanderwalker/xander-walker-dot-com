@@ -191,62 +191,75 @@ export default function CameraOptimal() {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d')!;
     
-    // Create 4:3 aspect ratio canvas
-    const collageWidth = 1200;
-    const collageHeight = 900; // 4:3 ratio
-    canvas.width = collageWidth;
-    canvas.height = collageHeight;
-    
-    ctx.fillStyle = '#000';
-    ctx.fillRect(0, 0, collageWidth, collageHeight);
-    
-    // 4×3 grid layout
-    const cols = 4;
-    const rows = 3;
-    const rectWidth = collageWidth / cols;  // 300px each
-    const rectHeight = collageHeight / rows; // 300px each
-    
-    let loadedCount = 0;
-    
-    photos.forEach((photo, index) => {
-      const img = new Image();
-      img.onload = () => {
-        const col = index % cols;
-        const row = Math.floor(index / cols);
-        
-        // Calculate destination rectangle position
-        const destX = col * rectWidth;
-        const destY = row * rectHeight;
-        
-        // Calculate source section coordinates (this is the key fix!)
-        // Divide the original image into 4×3 grid and take the corresponding section
-        const sourceWidth = img.width / cols;
-        const sourceHeight = img.height / rows;
-        const sourceX = col * sourceWidth;
-        const sourceY = row * sourceHeight;
-        
-        // Draw only the corresponding section of the photo
-        ctx.drawImage(
-          img,
-          sourceX, sourceY, sourceWidth, sourceHeight,  // Source section
-          destX, destY, rectWidth, rectHeight           // Destination rectangle
-        );
-        
-        loadedCount++;
-        if (loadedCount === 12) {
-          const collageData = canvas.toDataURL('image/jpeg', 0.9);
-          setFinalCollage(collageData);
+    // Get the first image to determine source aspect ratio
+    const firstImg = new Image();
+    firstImg.onload = () => {
+      // Calculate proper aspect ratio based on source image
+      const sourceAspectRatio = firstImg.width / firstImg.height;
+      
+      // Create canvas with 4×3 grid layout, maintaining source aspect ratio for each rectangle
+      const cols = 4;
+      const rows = 3;
+      
+      // Calculate rectangle dimensions based on source aspect ratio
+      const baseSize = 300;
+      const rectWidth = baseSize * Math.max(1, sourceAspectRatio);
+      const rectHeight = baseSize * Math.max(1, 1/sourceAspectRatio);
+      
+      // Total canvas dimensions
+      const collageWidth = rectWidth * cols;
+      const collageHeight = rectHeight * rows;
+      
+      canvas.width = collageWidth;
+      canvas.height = collageHeight;
+      
+      ctx.fillStyle = '#000';
+      ctx.fillRect(0, 0, collageWidth, collageHeight);
+      
+      let loadedCount = 0;
+      
+      photos.forEach((photo, index) => {
+        const img = new Image();
+        img.onload = () => {
+          const col = index % cols;
+          const row = Math.floor(index / cols);
           
-          // Save to gallery
-          setSaveStatus('saving');
-          saveSubmissionMutation.mutate({
-            imageData: collageData,
-            flowerCount: 12
-          });
-        }
-      };
-      img.src = photo.imageData;
-    });
+          // Calculate destination rectangle position
+          const destX = col * rectWidth;
+          const destY = row * rectHeight;
+          
+          // Calculate source section coordinates
+          // Divide the original image into 4×3 grid and take the corresponding section
+          const sourceWidth = img.width / cols;
+          const sourceHeight = img.height / rows;
+          const sourceX = col * sourceWidth;
+          const sourceY = row * sourceHeight;
+          
+          // Draw only the corresponding section of the photo, maintaining aspect ratio
+          ctx.drawImage(
+            img,
+            sourceX, sourceY, sourceWidth, sourceHeight,  // Source section
+            destX, destY, rectWidth, rectHeight           // Destination rectangle
+          );
+          
+          loadedCount++;
+          if (loadedCount === 12) {
+            const collageData = canvas.toDataURL('image/jpeg', 0.9);
+            setFinalCollage(collageData);
+            
+            // Save to gallery
+            setSaveStatus('saving');
+            saveSubmissionMutation.mutate({
+              imageData: collageData,
+              flowerCount: 12
+            });
+          }
+        };
+        img.src = photo.imageData;
+      });
+    };
+    
+    firstImg.src = photos[0].imageData;
   }, [saveSubmissionMutation]);
 
   // Initialize cameras on mount
