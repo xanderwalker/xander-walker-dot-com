@@ -4,9 +4,16 @@ import Layout from '../components/layout';
 export default function Cameras() {
   const cameras = [
     {
-      title: "OPTIMAL CAMERA UTILIZATION", 
-      description: "Maximum efficiency system capturing 144 photos in 16×9 rectangles at 143fps. Each rectangular section perfectly fills its area with zero wasted sensor space, creating seamless cinema-quality composites.",
-      tags: "144 Photos • 143fps • 16:9 Aspect • Maximum Utilization",
+      title: "80-PHOTO MAXIMUM DETAIL", 
+      description: "Ultra-high resolution tessellation capturing 80 photos in a 10×8 grid at 8fps. Each micro-rectangle contributes precise detail for the most comprehensive composite image possible.",
+      tags: "80 Photos • 8fps • 10×8 Grid • Maximum Detail",
+      timestamp: "June 30, 2025",
+      link: "/projects/camera-optimal-80"
+    },
+    {
+      title: "12-PHOTO OPTIMAL UTILIZATION", 
+      description: "Perfect aspect ratio system capturing 12 photos in 4×3 rectangles. Each section maintains camera's natural proportions with no distortion, creating clean composite images.",
+      tags: "12 Photos • 4fps • 4×3 Grid • Perfect Aspect Ratio",
       timestamp: "June 30, 2025",
       link: "/projects/camera-optimal"
     },
