@@ -432,35 +432,30 @@ export default function CameraOptimal80() {
       {/* Viewfinder mode */}
       {showViewfinder && (
         <div className="absolute inset-0 z-10">
-          {/* Grid overlay showing 10×8 layout */}
+          {/* Live Micro-Rectangle Grid Overlay */}
           <div className="absolute inset-0 pointer-events-none">
             <svg className="w-full h-full" viewBox="0 0 10 8" preserveAspectRatio="none">
-              {/* Vertical grid lines */}
-              {Array.from({ length: 9 }, (_, i) => (
-                <line
-                  key={`v${i}`}
-                  x1={i + 1}
-                  y1="0"
-                  x2={i + 1}
-                  y2="8"
-                  stroke="rgba(255,255,255,0.3)"
-                  strokeWidth="0.02"
-                  vectorEffect="non-scaling-stroke"
-                />
-              ))}
-              {/* Horizontal grid lines */}
-              {Array.from({ length: 7 }, (_, i) => (
-                <line
-                  key={`h${i}`}
-                  x1="0"
-                  y1={i + 1}
-                  x2="10"
-                  y2={i + 1}
-                  stroke="rgba(255,255,255,0.3)"
-                  strokeWidth="0.02"
-                  vectorEffect="non-scaling-stroke"
-                />
-              ))}
+              {Array.from({ length: 80 }, (_, i) => {
+                const col = i % 10;
+                const row = Math.floor(i / 10);
+                
+                const captured = i < capturedPhotos.length;
+                const current = i === capturedPhotos.length && isCapturingSequence;
+
+                return (
+                  <rect
+                    key={i}
+                    x={col}
+                    y={row}
+                    width={0.98}
+                    height={0.98}
+                    fill={captured ? 'rgba(168, 85, 247, 0.3)' : current ? 'rgba(255, 255, 0, 0.5)' : 'none'}
+                    stroke={captured ? 'rgba(168, 85, 247, 0.8)' : current ? 'rgba(255, 255, 0, 1)' : 'rgba(255, 255, 255, 0.3)'}
+                    strokeWidth="0.02"
+                    vectorEffect="non-scaling-stroke"
+                  />
+                );
+              })}
             </svg>
           </div>
 

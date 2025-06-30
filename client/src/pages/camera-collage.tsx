@@ -477,6 +477,33 @@ export default function CameraCollage() {
               </div>
             </div>
 
+            {/* Live Sectional Grid Overlay */}
+            <div className="absolute inset-0 pointer-events-none">
+              <svg className="w-full h-full" viewBox="0 0 5 4" preserveAspectRatio="none">
+                {Array.from({ length: 20 }, (_, i) => {
+                  const col = i % 5;
+                  const row = Math.floor(i / 5);
+                  
+                  const captured = i < capturedPhotos.length;
+                  const current = i === capturedPhotos.length && isCapturingSequence;
+
+                  return (
+                    <rect
+                      key={i}
+                      x={col}
+                      y={row}
+                      width={0.95}
+                      height={0.95}
+                      fill={captured ? 'rgba(236, 72, 153, 0.3)' : current ? 'rgba(255, 255, 0, 0.5)' : 'none'}
+                      stroke={captured ? 'rgba(236, 72, 153, 0.8)' : current ? 'rgba(255, 255, 0, 1)' : 'rgba(255, 255, 255, 0.4)'}
+                      strokeWidth="0.04"
+                      vectorEffect="non-scaling-stroke"
+                    />
+                  );
+                })}
+              </svg>
+            </div>
+
             {/* Center viewfinder frame */}
             <div className="absolute inset-4 border-2 border-white/50 rounded-lg pointer-events-none">
               <div className="absolute top-2 left-2 w-8 h-8 border-t-4 border-l-4 border-white rounded-tl-lg"></div>

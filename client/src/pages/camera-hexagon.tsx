@@ -498,6 +498,41 @@ export default function CameraHexagon() {
               </div>
             </div>
 
+            {/* Live Hexagon Overlay */}
+            <div className="absolute inset-0 pointer-events-none">
+              <svg className="w-full h-full" viewBox="0 0 10 10">
+                {Array.from({ length: 100 }, (_, i) => {
+                  const col = i % 10;
+                  const row = Math.floor(i / 10);
+                  
+                  // Hexagon positioning for honeycomb pattern
+                  const centerX = col + 0.5 + (row % 2) * 0.5;
+                  const centerY = row * 0.85 + 0.5;
+                  const radius = 0.4;
+                  
+                  const points = Array.from({ length: 6 }, (_, j) => {
+                    const angle = (j * Math.PI) / 3;
+                    const x = centerX + radius * Math.cos(angle);
+                    const y = centerY + radius * Math.sin(angle);
+                    return `${x},${y}`;
+                  }).join(' ');
+
+                  const captured = i < capturedPhotos.length;
+                  const current = i === capturedPhotos.length && isCapturingSequence;
+
+                  return (
+                    <polygon
+                      key={i}
+                      points={points}
+                      fill={captured ? 'rgba(34, 197, 94, 0.3)' : current ? 'rgba(255, 255, 0, 0.5)' : 'none'}
+                      stroke={captured ? 'rgba(34, 197, 94, 0.8)' : current ? 'rgba(255, 255, 0, 1)' : 'rgba(255, 255, 255, 0.3)'}
+                      strokeWidth="0.02"
+                    />
+                  );
+                })}
+              </svg>
+            </div>
+
             {/* Center viewfinder frame */}
             <div className="absolute inset-4 border-2 border-white/50 rounded-lg pointer-events-none">
               <div className="absolute top-2 left-2 w-8 h-8 border-t-4 border-l-4 border-white rounded-tl-lg"></div>

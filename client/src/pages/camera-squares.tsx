@@ -304,34 +304,29 @@ export default function CameraSquares() {
               className="w-full h-full object-cover"
             />
             
-            {/* Grid overlay for preview */}
+            {/* Live Square Grid Overlay */}
             <div className="absolute inset-0 pointer-events-none">
-              <svg className="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
-                {/* 10x10 grid lines */}
-                {Array.from({ length: 9 }, (_, i) => (
-                  <g key={i}>
-                    {/* Vertical lines */}
-                    <line
-                      x1={(i + 1) * 10}
-                      y1="0"
-                      x2={(i + 1) * 10}
-                      y2="100"
-                      stroke="rgba(255,255,255,0.3)"
-                      strokeWidth="0.1"
-                      vectorEffect="non-scaling-stroke"
+              <svg className="w-full h-full" viewBox="0 0 10 10">
+                {Array.from({ length: 100 }, (_, i) => {
+                  const col = i % 10;
+                  const row = Math.floor(i / 10);
+                  
+                  const captured = i < capturedPhotos.length;
+                  const current = i === capturedPhotos.length && isCapturing;
+
+                  return (
+                    <rect
+                      key={i}
+                      x={col}
+                      y={row}
+                      width={0.95}
+                      height={0.95}
+                      fill={captured ? 'rgba(59, 130, 246, 0.3)' : current ? 'rgba(255, 255, 0, 0.5)' : 'none'}
+                      stroke={captured ? 'rgba(59, 130, 246, 0.8)' : current ? 'rgba(255, 255, 0, 1)' : 'rgba(255, 255, 255, 0.3)'}
+                      strokeWidth="0.02"
                     />
-                    {/* Horizontal lines */}
-                    <line
-                      x1="0"
-                      y1={(i + 1) * 10}
-                      x2="100"
-                      y2={(i + 1) * 10}
-                      stroke="rgba(255,255,255,0.3)"
-                      strokeWidth="0.1"
-                      vectorEffect="non-scaling-stroke"
-                    />
-                  </g>
-                ))}
+                  );
+                })}
               </svg>
             </div>
             
