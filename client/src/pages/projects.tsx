@@ -5,8 +5,8 @@ export default function Projects() {
   const projects = [
     {
       title: "20-PHOTO COLLAGE",
-      description: "Create detailed collages from 20 consecutive photos arranged in a 5x4 grid. Single shutter press automatically captures all photos in sequence. Perfect for creating comprehensive photo compositions.",
-      tags: "Camera • Collage • Photography • Grid",
+      description: "High-speed photo collage creator. Captures 20 photos in 5 seconds (4 per second), using specific sections from each photo to build a seamless composite image. Each photo contributes one grid section to the final artwork.",
+      tags: "Camera • Collage • Composite • Fast Capture",
       timestamp: "June 30, 2025",
       link: "/projects/camera-collage"
     },

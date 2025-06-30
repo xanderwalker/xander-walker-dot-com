@@ -163,7 +163,7 @@ export default function CameraCollage() {
     return canvas.toDataURL('image/jpeg', 0.9);
   }, []);
 
-  // Create collage from 20 photos (5 rows x 4 columns)
+  // Create collage from specific sections of 20 photos (5 rows x 4 columns)
   const createCollage = useCallback((photos: CapturedPhoto[]) => {
     if (photos.length !== 20 || !canvasRef.current) return;
     
@@ -191,19 +191,25 @@ export default function CameraCollage() {
     photos.forEach((photo, index) => {
       const img = new Image();
       img.onload = () => {
-        // Calculate grid position
+        // Calculate which grid position this photo should fill
         const col = index % cols;
         const row = Math.floor(index / cols);
         
-        // Calculate destination position
+        // Calculate source section from the photo (the specific part we want)
+        const sourceWidth = img.width / cols;
+        const sourceHeight = img.height / rows;
+        const sourceX = col * sourceWidth;
+        const sourceY = row * sourceHeight;
+        
+        // Calculate destination position in final collage
         const destX = col * cellWidth;
         const destY = row * cellHeight;
         
-        // Draw the photo scaled to fit the cell
+        // Draw only the specific section of this photo to its grid position
         ctx.drawImage(
           img,
-          0, 0, img.width, img.height,           // Source: full image
-          destX, destY, cellWidth, cellHeight    // Destination: grid cell
+          sourceX, sourceY, sourceWidth, sourceHeight,  // Source: specific section of photo
+          destX, destY, cellWidth, cellHeight            // Destination: corresponding grid cell
         );
         
         loadedCount++;
@@ -270,7 +276,7 @@ export default function CameraCollage() {
         
         // Continue capturing if we need more photos
         if (photoCount < 20) {
-          setTimeout(captureSequence, 1000); // 1 second between photos
+          setTimeout(captureSequence, 250); // 0.25 seconds between photos
         }
       }
     };
@@ -354,7 +360,7 @@ export default function CameraCollage() {
         <div className="flex flex-col items-center justify-center min-h-screen p-8">
           <h1 className="text-4xl font-bold mb-8 text-center">20-Photo Collage</h1>
           <p className="text-xl mb-8 text-center max-w-2xl">
-            Click the shutter button to automatically capture 20 photos in sequence (one per second). Photos are arranged in 5 rows of 4 photos each to create a detailed collage.
+            Click the shutter button to automatically capture 20 photos in sequence (4 per second). Each photo contributes one specific section to create a seamless collage composition.
           </p>
           
           {/* Camera selection */}
