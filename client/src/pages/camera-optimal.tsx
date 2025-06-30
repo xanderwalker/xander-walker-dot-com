@@ -218,11 +218,18 @@ export default function CameraOptimal() {
         const destX = col * rectWidth;
         const destY = row * rectHeight;
         
-        // Draw the photo to fill the entire rectangle
+        // Calculate source section coordinates (this is the key fix!)
+        // Divide the original image into 4×3 grid and take the corresponding section
+        const sourceWidth = img.width / cols;
+        const sourceHeight = img.height / rows;
+        const sourceX = col * sourceWidth;
+        const sourceY = row * sourceHeight;
+        
+        // Draw only the corresponding section of the photo
         ctx.drawImage(
           img,
-          0, 0, img.width, img.height,
-          destX, destY, rectWidth, rectHeight
+          sourceX, sourceY, sourceWidth, sourceHeight,  // Source section
+          destX, destY, rectWidth, rectHeight           // Destination rectangle
         );
         
         loadedCount++;
