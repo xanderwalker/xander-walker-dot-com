@@ -4,18 +4,11 @@ import Layout from '../components/layout';
 export default function Cameras() {
   const cameras = [
     {
-      title: "20-PHOTO SECTIONAL COLLAGE",
-      description: "High-speed capture system that takes 20 photos in 5 seconds. Each photo contributes one specific grid section to create a seamless composite image with square sections.",
-      tags: "20 Photos • 4fps • Square Grid • 5x4 Layout",
+      title: "OPTIMAL CAMERA UTILIZATION", 
+      description: "Maximum efficiency system capturing 144 photos in 16×9 rectangles at 143fps. Each rectangular section perfectly fills its area with zero wasted sensor space, creating seamless cinema-quality composites.",
+      tags: "144 Photos • 143fps • 16:9 Aspect • Maximum Utilization",
       timestamp: "June 30, 2025",
-      link: "/projects/camera-collage"
-    },
-    {
-      title: "100-SHOT HEXAGONAL COLLAGE", 
-      description: "Ultra-fast capture system taking 100 photos in 1 second. Creates interlocking honeycomb composite images where each photo contributes one hexagonal section with no gaps between sections.",
-      tags: "100 Photos • 100fps • Interlocking Hexagons • Honeycomb Pattern",
-      timestamp: "June 30, 2025",
-      link: "/projects/camera-hexagon"
+      link: "/projects/camera-optimal"
     },
     {
       title: "100-SHOT SQUARE GRID", 
@@ -25,11 +18,18 @@ export default function Cameras() {
       link: "/projects/camera-squares"
     },
     {
-      title: "OPTIMAL CAMERA UTILIZATION", 
-      description: "Maximum efficiency system capturing 144 photos in 16×9 rectangles at 143fps. Each rectangular section perfectly fills its area with zero wasted sensor space, creating seamless cinema-quality composites.",
-      tags: "144 Photos • 143fps • 16:9 Aspect • Maximum Utilization",
+      title: "100-SHOT HEXAGONAL COLLAGE", 
+      description: "Ultra-fast capture system taking 100 photos in 1 second. Creates interlocking honeycomb composite images where each photo contributes one hexagonal section with no gaps between sections.",
+      tags: "100 Photos • 100fps • Interlocking Hexagons • Honeycomb Pattern",
       timestamp: "June 30, 2025",
-      link: "/projects/camera-optimal"
+      link: "/projects/camera-hexagon"
+    },
+    {
+      title: "20-PHOTO SECTIONAL COLLAGE",
+      description: "High-speed capture system that takes 20 photos in 5 seconds. Each photo contributes one specific grid section to create a seamless composite image with square sections.",
+      tags: "20 Photos • 4fps • Square Grid • 5x4 Layout",
+      timestamp: "June 30, 2025",
+      link: "/projects/camera-collage"
     }
   ];
 
