@@ -16,6 +16,13 @@ export default function Cameras() {
       tags: "100 Photos • 100fps • Interlocking Hexagons • Honeycomb Pattern",
       timestamp: "June 30, 2025",
       link: "/projects/camera-hexagon"
+    },
+    {
+      title: "100-SHOT SQUARE GRID", 
+      description: "Ultra-fast capture system taking 100 photos in 1 second. Creates perfect 10x10 grid composite images where each photo contributes one square section with no gaps between sections.",
+      tags: "100 Photos • 100fps • Perfect Grid • Square Sections",
+      timestamp: "June 30, 2025",
+      link: "/projects/camera-squares"
     }
   ];
 
