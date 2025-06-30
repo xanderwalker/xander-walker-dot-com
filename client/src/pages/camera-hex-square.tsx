@@ -166,7 +166,7 @@ export default function CameraHexSquare() {
     firstImg.onload = () => {
       const originalAspectRatio = firstImg.width / firstImg.height;
       
-      // Create true tessellation with interlocking hexagons and squares
+      // Create proper octagon-square tessellation like the reference image
       const canvasSize = 800;
       canvas.width = canvasSize;
       canvas.height = canvasSize;
@@ -174,145 +174,96 @@ export default function CameraHexSquare() {
       ctx.fillStyle = '#000';
       ctx.fillRect(0, 0, canvasSize, canvasSize);
       
-      // Define tessellation pattern - hexagons with squares filling gaps
-      const hexRadius = canvasSize / 12; // Size of hexagons
-      const hexWidth = hexRadius * 2;
-      const hexHeight = hexRadius * Math.sqrt(3);
+      // Define tessellation pattern - octagons with small squares in gaps
+      const octCols = 8; // 8x8 grid of octagons
+      const octRows = 8;
+      const cellSize = canvasSize / octCols;
+      const octRadius = cellSize * 0.3; // Octagon radius
+      const smallSquareSize = cellSize * 0.15; // Small gap squares
       
-      // Calculate how many shapes fit
-      const hexCols = Math.floor(canvasSize / (hexWidth * 0.75));
-      const hexRows = Math.floor(canvasSize / hexHeight);
-      
-      let shapeIndex = 0;
       let loadedCount = 0;
+      const totalShapes = octCols * octRows + (octCols - 1) * (octRows - 1); // Octagons + gap squares
       
-      // Create array to track all shapes and their positions
-      const shapes = [];
-      
-      // Place hexagons in tessellation pattern
-      for (let row = 0; row < hexRows && shapeIndex < TOTAL_PHOTOS; row++) {
-        for (let col = 0; col < hexCols && shapeIndex < TOTAL_PHOTOS; col++) {
-          const offsetX = (row % 2) * hexWidth * 0.375; // Offset every other row
-          const centerX = col * hexWidth * 0.75 + hexRadius + offsetX;
-          const centerY = row * hexHeight + hexRadius;
+      // Draw octagons first
+      for (let row = 0; row < octRows; row++) {
+        for (let col = 0; col < octCols; col++) {
+          const photoIndex = row * octCols + col;
+          if (photoIndex >= TOTAL_PHOTOS) continue;
           
-          if (centerX + hexRadius < canvasSize && centerY + hexRadius < canvasSize) {
-            shapes.push({
-              type: 'hex',
-              centerX,
-              centerY,
-              radius: hexRadius,
-              photoIndex: shapeIndex
-            });
-            shapeIndex++;
-          }
-        }
-      }
-      
-      // Fill remaining spots with squares
-      const squareSize = hexRadius * 0.8;
-      const squareCols = Math.floor(canvasSize / squareSize);
-      const squareRows = Math.floor(canvasSize / squareSize);
-      
-      for (let row = 0; row < squareRows && shapeIndex < TOTAL_PHOTOS; row++) {
-        for (let col = 0; col < squareCols && shapeIndex < TOTAL_PHOTOS; col++) {
-          const x = col * squareSize;
-          const y = row * squareSize;
-          const centerX = x + squareSize / 2;
-          const centerY = y + squareSize / 2;
+          const photo = photos[photoIndex];
+          if (!photo) continue;
           
-          // Check if this square position overlaps with any hexagon
-          let overlaps = false;
-          for (const shape of shapes) {
-            if (shape.type === 'hex') {
-              const dist = Math.sqrt((centerX - shape.centerX) ** 2 + (centerY - shape.centerY) ** 2);
-              if (dist < shape.radius + squareSize / 2) {
-                overlaps = true;
-                break;
-              }
-            }
-          }
-          
-          if (!overlaps) {
-            shapes.push({
-              type: 'square',
-              x,
-              y,
-              size: squareSize,
-              photoIndex: shapeIndex
-            });
-            shapeIndex++;
-          }
-        }
-      }
-      
-      // Limit to available photos
-      const finalShapes = shapes.slice(0, TOTAL_PHOTOS);
-      
-      // Draw each shape with its corresponding photo section
-      finalShapes.forEach((shape, index) => {
-        const photo = photos[index];
-        if (!photo) return;
-        
-        const img = new Image();
-        img.onload = () => {
-          ctx.save();
-          
-          if (shape.type === 'hex') {
-            // Create hexagonal clip path
+          const img = new Image();
+          img.onload = () => {
+            const centerX = col * cellSize + cellSize / 2;
+            const centerY = row * cellSize + cellSize / 2;
+            
+            ctx.save();
+            
+            // Create octagon clip path
             ctx.beginPath();
-            for (let i = 0; i < 6; i++) {
-              const angle = (i * Math.PI) / 3;
-              const x = shape.centerX + shape.radius * Math.cos(angle);
-              const y = shape.centerY + shape.radius * Math.sin(angle);
+            for (let i = 0; i < 8; i++) {
+              const angle = (i * Math.PI) / 4;
+              const x = centerX + octRadius * Math.cos(angle);
+              const y = centerY + octRadius * Math.sin(angle);
               if (i === 0) ctx.moveTo(x, y);
               else ctx.lineTo(x, y);
             }
             ctx.closePath();
             ctx.clip();
             
-            // Draw photo to fill hexagon
-            const imgSize = shape.radius * 2.2;
+            // Extract corresponding section from photo
+            const sourceWidth = img.width / octCols;
+            const sourceHeight = img.height / octRows;
+            const sourceX = col * sourceWidth;
+            const sourceY = row * sourceHeight;
+            
+            // Draw the specific section of the photo
             ctx.drawImage(
               img,
-              shape.centerX - imgSize/2,
-              shape.centerY - imgSize/2,
-              imgSize,
-              imgSize
+              sourceX, sourceY, sourceWidth, sourceHeight,
+              centerX - octRadius, centerY - octRadius, octRadius * 2, octRadius * 2
             );
-          } else {
-            // Create square clip path
-            ctx.beginPath();
-            ctx.rect(shape.x, shape.y, shape.size, shape.size);
-            ctx.clip();
             
-            // Draw photo to fill square
-            ctx.drawImage(
-              img,
-              shape.x,
-              shape.y,
-              shape.size,
-              shape.size
+            ctx.restore();
+            
+            loadedCount++;
+            if (loadedCount === TOTAL_PHOTOS) {
+              // Add small squares in gaps
+              addGapSquares();
+            }
+          };
+          img.src = photo.imageData;
+        }
+      }
+      
+      function addGapSquares() {
+        // Add small squares between octagons
+        for (let row = 0; row < octRows - 1; row++) {
+          for (let col = 0; col < octCols - 1; col++) {
+            const centerX = (col + 1) * cellSize;
+            const centerY = (row + 1) * cellSize;
+            
+            ctx.fillStyle = '#333';
+            ctx.fillRect(
+              centerX - smallSquareSize / 2,
+              centerY - smallSquareSize / 2,
+              smallSquareSize,
+              smallSquareSize
             );
           }
-          
-          ctx.restore();
-          
-          loadedCount++;
-          if (loadedCount === finalShapes.length) {
-            const collageData = canvas.toDataURL('image/jpeg', 0.9);
-            setFinalCollage(collageData);
-            
-            // Save to gallery
-            setSaveStatus('saving');
-            saveSubmissionMutation.mutate({
-              imageData: collageData,
-              flowerCount: finalShapes.length
-            });
-          }
-        };
-        img.src = photo.imageData;
-      });
+        }
+        
+        const collageData = canvas.toDataURL('image/jpeg', 0.9);
+        setFinalCollage(collageData);
+        
+        // Save to gallery
+        setSaveStatus('saving');
+        saveSubmissionMutation.mutate({
+          imageData: collageData,
+          flowerCount: TOTAL_PHOTOS
+        });
+      }
     };
     
     firstImg.src = photos[0].imageData;
@@ -489,111 +440,69 @@ export default function CameraHexSquare() {
         {/* Viewfinder mode */}
         {showViewfinder && (
           <div className="absolute inset-0 z-10">
-            {/* Live Tessellation Overlay */}
+            {/* Live Octagon-Square Tessellation Overlay */}
             <div className="absolute inset-0 pointer-events-none">
               <svg className="w-full h-full" viewBox="0 0 800 800" preserveAspectRatio="none">
                 {(() => {
+                  const octCols = 8;
+                  const octRows = 8;
+                  const cellSize = 800 / octCols;
+                  const octRadius = cellSize * 0.3;
                   const shapes = [];
-                  const hexRadius = 800 / 12;
-                  const hexWidth = hexRadius * 2;
-                  const hexHeight = hexRadius * Math.sqrt(3);
-                  const hexCols = Math.floor(800 / (hexWidth * 0.75));
-                  const hexRows = Math.floor(800 / hexHeight);
                   
-                  let shapeIndex = 0;
-                  
-                  // Place hexagons
-                  for (let row = 0; row < hexRows && shapeIndex < TOTAL_PHOTOS; row++) {
-                    for (let col = 0; col < hexCols && shapeIndex < TOTAL_PHOTOS; col++) {
-                      const offsetX = (row % 2) * hexWidth * 0.375;
-                      const centerX = col * hexWidth * 0.75 + hexRadius + offsetX;
-                      const centerY = row * hexHeight + hexRadius;
+                  // Create octagons
+                  for (let row = 0; row < octRows; row++) {
+                    for (let col = 0; col < octCols; col++) {
+                      const index = row * octCols + col;
+                      const centerX = col * cellSize + cellSize / 2;
+                      const centerY = row * cellSize + cellSize / 2;
                       
-                      if (centerX + hexRadius < 800 && centerY + hexRadius < 800) {
-                        shapes.push({
-                          type: 'hex',
-                          centerX,
-                          centerY,
-                          radius: hexRadius,
-                          index: shapeIndex
-                        });
-                        shapeIndex++;
-                      }
-                    }
-                  }
-                  
-                  // Fill with squares
-                  const squareSize = hexRadius * 0.8;
-                  const squareCols = Math.floor(800 / squareSize);
-                  const squareRows = Math.floor(800 / squareSize);
-                  
-                  for (let row = 0; row < squareRows && shapeIndex < TOTAL_PHOTOS; row++) {
-                    for (let col = 0; col < squareCols && shapeIndex < TOTAL_PHOTOS; col++) {
-                      const x = col * squareSize;
-                      const y = row * squareSize;
-                      const centerX = x + squareSize / 2;
-                      const centerY = y + squareSize / 2;
+                      const captured = index < capturedPhotos.length;
+                      const current = index === capturedPhotos.length && isCapturingSequence;
                       
-                      let overlaps = false;
-                      for (const shape of shapes) {
-                        if (shape.type === 'hex') {
-                          const dist = Math.sqrt((centerX - shape.centerX) ** 2 + (centerY - shape.centerY) ** 2);
-                          if (dist < shape.radius + squareSize / 2) {
-                            overlaps = true;
-                            break;
-                          }
-                        }
-                      }
-                      
-                      if (!overlaps) {
-                        shapes.push({
-                          type: 'square',
-                          x,
-                          y,
-                          size: squareSize,
-                          index: shapeIndex
-                        });
-                        shapeIndex++;
-                      }
-                    }
-                  }
-                  
-                  return shapes.slice(0, TOTAL_PHOTOS).map((shape) => {
-                    const captured = shape.index < capturedPhotos.length;
-                    const current = shape.index === capturedPhotos.length && isCapturingSequence;
-                    
-                    if (shape.type === 'hex') {
-                      const points = Array.from({ length: 6 }, (_, j) => {
-                        const angle = (j * Math.PI) / 3;
-                        const x = shape.centerX + shape.radius * Math.cos(angle);
-                        const y = shape.centerY + shape.radius * Math.sin(angle);
+                      // Create octagon points
+                      const points = Array.from({ length: 8 }, (_, i) => {
+                        const angle = (i * Math.PI) / 4;
+                        const x = centerX + octRadius * Math.cos(angle);
+                        const y = centerY + octRadius * Math.sin(angle);
                         return `${x},${y}`;
                       }).join(' ');
 
-                      return (
+                      shapes.push(
                         <polygon
-                          key={shape.index}
+                          key={index}
                           points={points}
                           fill={captured ? "rgba(34, 197, 94, 0.3)" : current ? "rgba(251, 191, 36, 0.5)" : "transparent"}
                           stroke={captured ? "rgba(34, 197, 94, 0.8)" : current ? "rgba(251, 191, 36, 1)" : "rgba(255, 255, 255, 0.3)"}
                           strokeWidth="2"
                         />
                       );
-                    } else {
-                      return (
+                    }
+                  }
+                  
+                  // Add small squares in gaps
+                  const smallSquareSize = cellSize * 0.15;
+                  for (let row = 0; row < octRows - 1; row++) {
+                    for (let col = 0; col < octCols - 1; col++) {
+                      const centerX = (col + 1) * cellSize;
+                      const centerY = (row + 1) * cellSize;
+                      
+                      shapes.push(
                         <rect
-                          key={shape.index}
-                          x={shape.x}
-                          y={shape.y}
-                          width={shape.size}
-                          height={shape.size}
-                          fill={captured ? "rgba(34, 197, 94, 0.3)" : current ? "rgba(251, 191, 36, 0.5)" : "transparent"}
-                          stroke={captured ? "rgba(34, 197, 94, 0.8)" : current ? "rgba(251, 191, 36, 1)" : "rgba(255, 255, 255, 0.3)"}
-                          strokeWidth="2"
+                          key={`gap-${row}-${col}`}
+                          x={centerX - smallSquareSize / 2}
+                          y={centerY - smallSquareSize / 2}
+                          width={smallSquareSize}
+                          height={smallSquareSize}
+                          fill="rgba(255, 255, 255, 0.1)"
+                          stroke="rgba(255, 255, 255, 0.3)"
+                          strokeWidth="1"
                         />
                       );
                     }
-                  });
+                  }
+                  
+                  return shapes;
                 })()}
               </svg>
             </div>
