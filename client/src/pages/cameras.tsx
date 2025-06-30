@@ -52,7 +52,7 @@ export default function Cameras() {
       title="cameras" 
       subtitle="Advanced photo collage and composite creators"
     >
-      <div className="min-h-screen bg-white text-gray-900 p-8">
+      <div className="min-h-screen text-gray-900 p-8">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
             <p className="text-xl text-gray-600">
