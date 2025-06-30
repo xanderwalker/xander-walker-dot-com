@@ -4,6 +4,7 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Camera, Download, Grid3X3, Square } from 'lucide-react';
+import type { KaleidoscopeSubmission } from '@shared/schema';
 // Layout removed to focus on camera execution
 
 interface CameraDevice {
@@ -190,8 +191,6 @@ export default function CameraOptimal() {
         loadedCount++;
         if (loadedCount === TOTAL_PHOTOS) {
           const collageData = canvas.toDataURL('image/jpeg', 0.9);
-          setFinalCollage(collageData);
-          setIsCapturing(false); // Stop capturing state
           
           setSaveStatus('saving');
           saveSubmissionMutation.mutate({
@@ -199,16 +198,20 @@ export default function CameraOptimal() {
             flowerCount: TOTAL_PHOTOS
           });
           
-          if (stream) {
-            stream.getTracks().forEach(track => track.stop());
-          }
+          // Auto-return to viewfinder after short delay
+          setTimeout(() => {
+            setCapturedPhotos([]);
+            setIsCapturing(false);
+            setSaveStatus('idle');
+            // Keep camera stream running for next photo
+          }, 2000);
         }
       };
       img.src = photo.imageData;
     });
   }, [stream, TOTAL_PHOTOS, GRID_COLS, GRID_ROWS]);
 
-  const { data: submissions } = useQuery({
+  const { data: submissions = [] } = useQuery<KaleidoscopeSubmission[]>({
     queryKey: ['/api/kaleidoscope-submissions'],
   });
 
@@ -303,7 +306,7 @@ export default function CameraOptimal() {
       <div className="relative min-h-screen bg-black text-white overflow-hidden">
         
         {/* Live viewfinder */}
-        {stream && !isCapturing && !finalCollage && (
+        {stream && !isCapturing && (
           <div className="fixed inset-0 z-10">
             <video
               ref={videoRef}
@@ -342,6 +345,16 @@ export default function CameraOptimal() {
                   />
                 ))}
               </svg>
+            </div>
+            
+            {/* Gallery link in bottom right */}
+            <div className="absolute bottom-4 right-4 z-20">
+              <Button 
+                onClick={() => window.location.href = '/projects/kaleidoscope-gallery'}
+                className="w-16 h-16 bg-black/70 hover:bg-black/90 rounded-lg border-2 border-white/30 flex items-center justify-center"
+              >
+                <Grid3X3 className="w-8 h-8 text-white" />
+              </Button>
             </div>
             
             {/* Capture button */}
@@ -484,50 +497,15 @@ export default function CameraOptimal() {
           </div>
         )}
 
-        {/* Final result */}
-        {finalCollage && (
-          <div className="fixed inset-0 z-30 bg-black flex flex-col items-center justify-center p-4">
-            <h2 className="text-3xl font-bold mb-4">Your optimal {GRID_COLS}×{GRID_ROWS} composite has been created.</h2>
-            
-            {saveStatus === 'saving' && (
-              <div className="text-yellow-400 mb-4">💾 Saving to gallery...</div>
-            )}
-            {saveStatus === 'saved' && (
-              <div className="text-green-400 mb-4">✅ Saved to gallery</div>
-            )}
-            {saveStatus === 'error' && (
-              <div className="text-red-400 mb-4">❌ Failed to save to gallery</div>
-            )}
-            
-            <div className="max-w-4xl max-h-96 mb-6">
-              <img 
-                src={finalCollage} 
-                alt="Optimal Collage"
-                className="w-full h-full object-contain rounded-lg shadow-2xl"
-              />
-            </div>
-            
-            <div className="flex gap-4">
-              <Button onClick={downloadImage} className="bg-green-600 hover:bg-green-700">
-                <Download className="w-4 h-4 mr-2" />
-                Download Collage
-              </Button>
-              
-              <Button onClick={() => window.location.href = '/projects/kaleidoscope-gallery'} className="bg-purple-600 hover:bg-purple-700">
-                <Grid3X3 className="w-4 h-4 mr-2" />
-                View Gallery
-              </Button>
-              
-              <Button onClick={() => window.location.href = '/projects/cameras'} className="bg-blue-600 hover:bg-blue-700">
-                <Camera className="w-4 h-4 mr-2" />
-                Back to Cameras
-              </Button>
-              
-              <Button onClick={resetCamera} className="bg-gray-600 hover:bg-gray-700">
-                <Camera className="w-4 h-4 mr-2" />
-                Take New Photo
-              </Button>
-            </div>
+        {/* Save status notification */}
+        {saveStatus === 'saving' && (
+          <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 bg-yellow-600 text-white px-4 py-2 rounded-lg">
+            💾 Saving to gallery...
+          </div>
+        )}
+        {saveStatus === 'saved' && (
+          <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 bg-green-600 text-white px-4 py-2 rounded-lg">
+            ✅ Saved to gallery
           </div>
         )}
 
