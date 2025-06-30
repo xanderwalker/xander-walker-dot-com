@@ -4,6 +4,13 @@ import Layout from '../components/layout';
 export default function Cameras() {
   const cameras = [
     {
+      title: "64-PHOTO HEX-SQUARE HYBRID", 
+      description: "Innovative tessellation combining hexagonal and square patterns in an 8×8 alternating grid. Creates stunning geometric composites with natural honeycomb-square hybrid tessellation.",
+      tags: "64 Photos • 8fps • Hex-Square Pattern • Geometric Hybrid",
+      timestamp: "June 30, 2025",
+      link: "/projects/camera-hex-square"
+    },
+    {
       title: "80-PHOTO MAXIMUM DETAIL", 
       description: "Ultra-high resolution tessellation capturing 80 photos in a 10×8 grid at 8fps. Each micro-rectangle contributes precise detail for the most comprehensive composite image possible.",
       tags: "80 Photos • 8fps • 10×8 Grid • Maximum Detail",
