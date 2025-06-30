@@ -181,9 +181,9 @@ export default function CameraHexagon() {
     const hexWidth = hexRadius * 2;
     const hexHeight = Math.sqrt(3) * hexRadius; // Height of hexagon
     
-    // Horizontal and vertical spacing for interlocking pattern
+    // Horizontal and vertical spacing for tight interlocking pattern
     const horizontalSpacing = hexWidth * 0.75; // 3/4 width for interlocking
-    const verticalSpacing = hexHeight; // Full height
+    const verticalSpacing = hexHeight * 0.75; // Reduced vertical spacing for touching edges
     
     let loadedCount = 0;
     
