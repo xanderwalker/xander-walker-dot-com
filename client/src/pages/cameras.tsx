@@ -23,6 +23,13 @@ export default function Cameras() {
       tags: "100 Photos • 100fps • Perfect Grid • Square Sections",
       timestamp: "June 30, 2025",
       link: "/projects/camera-squares"
+    },
+    {
+      title: "OPTIMAL CAMERA UTILIZATION", 
+      description: "Maximum efficiency system capturing 144 photos in 16×9 rectangles at 143fps. Each rectangular section perfectly fills its area with zero wasted sensor space, creating seamless cinema-quality composites.",
+      tags: "144 Photos • 143fps • 16:9 Aspect • Maximum Utilization",
+      timestamp: "June 30, 2025",
+      link: "/projects/camera-optimal"
     }
   ];
 

@@ -29,6 +29,7 @@ import CameraKaleidoscope from "@/pages/camera-kaleidoscope";
 import CameraCollage from "@/pages/camera-collage";
 import CameraHexagon from "@/pages/camera-hexagon";
 import CameraSquares from "@/pages/camera-squares";
+import CameraOptimal from "@/pages/camera-optimal";
 import Cameras from "@/pages/cameras";
 import KaleidoscopeGallery from "@/pages/kaleidoscope-gallery";
 import Contact from "@/pages/contact";
@@ -73,6 +74,7 @@ function Router() {
         <Route path="/projects/camera-collage" component={CameraCollage} />
         <Route path="/projects/camera-hexagon" component={CameraHexagon} />
         <Route path="/projects/camera-squares" component={CameraSquares} />
+        <Route path="/projects/camera-optimal" component={CameraOptimal} />
         <Route path="/projects/cameras" component={Cameras} />
         <Route path="/projects/kaleidoscope-gallery" component={KaleidoscopeGallery} />
         <Route path="/projects/slot-machine" component={SlotMachine} />
