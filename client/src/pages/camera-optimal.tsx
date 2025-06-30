@@ -111,6 +111,13 @@ export default function CameraOptimal() {
     }
   };
 
+  // Connect stream to video element when stream changes
+  useEffect(() => {
+    if (stream && videoRef.current) {
+      videoRef.current.srcObject = stream;
+    }
+  }, [stream]);
+
   // Cleanup on unmount
   useEffect(() => {
     return () => {
@@ -515,6 +522,11 @@ export default function CameraOptimal() {
                 <Camera className="w-4 h-4 mr-2" />
                 Back to Cameras
               </Button>
+              
+              <Button onClick={resetCamera} className="bg-gray-600 hover:bg-gray-700">
+                <Camera className="w-4 h-4 mr-2" />
+                Take New Photo
+              </Button>
             </div>
           </div>
         )}
@@ -524,7 +536,7 @@ export default function CameraOptimal() {
           <div className="flex flex-col items-center justify-center min-h-screen p-8">
             <h1 className="text-4xl font-bold mb-8 text-center">Optimal Camera Utilization</h1>
             <p className="text-xl mb-8 text-center max-w-2xl">
-              Captures {TOTAL_PHOTOS} photos in {GRID_COLS}×{GRID_ROWS} rectangles at ~143fps. Each rectangle perfectly fills its section with zero wasted space, maximizing camera sensor utilization and creating seamless 16:9 composites.
+              Captures {TOTAL_PHOTOS} photos in {GRID_COLS}×{GRID_ROWS} rectangles at 4fps for testing. Each rectangle perfectly fills its section with zero wasted space, maximizing camera sensor utilization and creating seamless 4:3 composites.
             </p>
             
             {hasPermission === false && (
@@ -541,8 +553,8 @@ export default function CameraOptimal() {
               </div>
             )}
             
-            {/* Camera selection */}
-            {cameras.length > 0 && hasPermission !== false && (
+            {/* Camera selection - only show if no stream is active */}
+            {cameras.length > 0 && hasPermission !== false && !stream && (
               <Card className="bg-gray-900 border-gray-700 p-6 mb-6">
                 <div className="flex flex-col items-center gap-4">
                   <h3 className="text-lg font-semibold">Select Camera</h3>
